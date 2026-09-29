@@ -24,6 +24,20 @@ test('users can authenticate using the login screen', function () {
     $this->assertAuthenticated();
 });
 
+test('unverified users can authenticate and access the dashboard', function () {
+    $user = User::factory()->unverified()->create();
+
+    $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('dashboard', absolute: false));
+
+    $this->assertAuthenticated();
+    $this->get(route('dashboard'))->assertOk();
+});
+
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 

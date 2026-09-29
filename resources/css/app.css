@@ -11,6 +11,12 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
+    
+    --color-primary: #F4D000;
+    --color-primary-dark: #C9AD00;
+    --color-dark: #1F1F1F;
+    --color-dark-light: #2A2A2A;
+    --color-surface: #FAFAF7;
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
     --color-zinc-200: #e5e5e5;
@@ -64,3 +70,6 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+body {
+    @apply bg-surface text-dark antialiased;
+}

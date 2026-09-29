@@ -9,6 +9,6 @@ class Fakultas extends Model
     protected $table = 'fakultas';
     protected $guarded = ['id'];
     public function programStudi() {
-    return $this->hasMany(ProgramStudi::class);
-}
+        return $this->hasMany(ProgramStudi::class);
+    }
 }
