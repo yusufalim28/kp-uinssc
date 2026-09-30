@@ -1,10 +1,16 @@
 <?php
 
-use App\Livewire\Public\Home;
+use App\Livewire\Admin\MasterData\DosenIndex;
+use App\Livewire\Admin\MasterData\FakultasIndex;
+use App\Livewire\Admin\MasterData\KelasIndex;
+use App\Livewire\Admin\MasterData\MataKuliahIndex;
+use App\Livewire\Admin\MasterData\ProgramStudiIndex;
+use App\Livewire\Admin\MasterData\RuangPraktikumIndex;
+use App\Livewire\Admin\MasterData\TahunAkademikIndex;
 use App\Livewire\Public\DaftarJadwal;
 use App\Livewire\Public\DetailJadwal;
+use App\Livewire\Public\Home;
 use App\Livewire\Public\KalenderJadwal;
-use App\Livewire\Admin\MasterData\FakultasIndex;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,8 +23,6 @@ Route::get('/jadwal', DaftarJadwal::class)->name('jadwal.index');
 Route::get('/jadwal/{jadwal}', DetailJadwal::class)->name('jadwal.detail');
 Route::get('/kalender', KalenderJadwal::class)->name('jadwal.kalender');
 
-
-
 // Route Terproteksi
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -27,6 +31,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Master Data — hanya super-admin & operator
     Route::middleware('role:super-admin|operator')->group(function () {
         Route::get('/master/fakultas', FakultasIndex::class)->name('fakultas.index');
+        Route::get('/master/prodi', ProgramStudiIndex::class)->name('prodi.index');
+        Route::get('/master/kelas', KelasIndex::class)->name('kelas.index');
+        Route::get('/master/mata-kuliah', MataKuliahIndex::class)->name('matakuliah.index');
+        Route::get('/master/dosen', DosenIndex::class)->name('dosen.index');
+        Route::get('/master/ruang', RuangPraktikumIndex::class)->name('ruang.index');
+        Route::get('/master/tahun-akademik', TahunAkademikIndex::class)->name('tahunakademik.index');
 
         // Pola yang sama persis dipakai untuk 6 master data lain,
         // tinggal buat komponennya mengikuti pola FakultasIndex:
@@ -51,7 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // route CRUD master data
     });
 });
-/*  
+/*
 |--------------------------------------------------------------------------
 | Route Terproteksi (Phase 3 lanjutan — Authorization & CRUD)
 |--------------------------------------------------------------------------

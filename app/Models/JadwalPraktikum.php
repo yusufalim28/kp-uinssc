@@ -7,25 +7,36 @@ use Illuminate\Database\Eloquent\Model;
 class JadwalPraktikum extends Model
 {
     protected $table = 'jadwal_praktikum';
+
     protected $guarded = ['id'];
 
-    public function mataKuliah() {
+    public function mataKuliah()
+    {
         return $this->belongsTo(MataKuliah::class);
     }
 
-    public function kelas() {
+    public function kelas()
+    {
         return $this->belongsTo(Kelas::class);
     }
 
-    public function dosen() {
+    public function dosen()
+    {
         return $this->belongsTo(Dosen::class);
     }
 
-    public function ruangPraktikum() {
+    public function ruangPraktikum()
+    {
         return $this->belongsTo(RuangPraktikum::class);
     }
 
-    public function tahunAkademik() {
+    public function tahunAkademik()
+    {
         return $this->belongsTo(TahunAkademik::class);
+    }
+
+    public function PengajuanPerubahan()
+    {
+        return $this->hasMany(PengajuanPerubahan::class);
     }
 }

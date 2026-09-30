@@ -1,0 +1,27 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Fakultas;
+use App\Models\ProgramStudi;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<ProgramStudi>
+ */
+class ProgramStudiFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'fakultas_id' => Fakultas::factory(),
+            'kode_program_studi' => fake()->unique()->regexify('[A-Z]{2}[0-9]{3}'),
+            'nama_program_studi' => fake()->unique()->words(2, true),
+        ];
+    }
+}

@@ -88,3 +88,12 @@ feat(auth+master-data): tambah role middleware dan CRUD 7 tabel master data
   proteksi hapus data yang masih punya relasi anak)
 - Tambah 7 route terproteksi role:super-admin|operator
 ```
+
+## Melakukan Test 
+1. ruang bentrok ketika jam saling overlap
+2. ruang tidak bentrok ketika jam persis bersambung
+3. dosen bentrok walau ruang berbeda
+4. jadwal yang sedang diedit tidak dianggap bentrok dengan dirinya sendiri
+
+php artisan test --filter=JadwalConflictServiceTest
+![alt text](test-jadwalConflict-04.png)
