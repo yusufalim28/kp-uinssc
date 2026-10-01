@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\Dosen\PengajuanSaya;
+use App\Livewire\Admin\PengajuanIndex;
+use App\Livewire\Admin\JadwalManage;
 use App\Livewire\Admin\MasterData\DosenIndex;
 use App\Livewire\Admin\MasterData\FakultasIndex;
 use App\Livewire\Admin\MasterData\KelasIndex;
@@ -47,13 +50,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Route::get('/master/ruang', RuangIndex::class)->name('ruang.index');
         // Route::get('/master/tahun-akademik', TahunAkademikIndex::class)->name('tahunakademik.index');
 
-        // Route::get('/jadwal-manage', JadwalManage::class)->name('jadwal.manage');
-        // Route::get('/pengajuan', PengajuanIndex::class)->name('pengajuan.index');
+        Route::get('/jadwal-manage', JadwalManage::class)->name('jadwal.manage');
+        Route::get('/pengajuan', PengajuanIndex::class)->name('pengajuan.index');
     });
 
     // Menu khusus dosen
     Route::middleware('role:dosen')->group(function () {
-        // Route::get('/pengajuan-saya', PengajuanSaya::class)->name('pengajuan.saya');
+        Route::get('/pengajuan-saya', PengajuanSaya::class)->name('pengajuan.saya');
     });
 
     // Khusus super admin

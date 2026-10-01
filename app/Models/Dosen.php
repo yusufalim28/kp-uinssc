@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\JadwalPraktikum;
+use App\Models\User;
 
 class Dosen extends Model
 {
@@ -21,5 +23,10 @@ class Dosen extends Model
     public function pengajuanPerubahan()
     {
         return $this->hasMany(PengajuanPerubahan::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
