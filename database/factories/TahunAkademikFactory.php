@@ -21,10 +21,14 @@ class TahunAkademikFactory extends Factory
         $tahunSelesai = $tahunMulai + 1;
 
         return [
-            'nama' => "{$tahunMulai}/{$tahunSelesai}",
-            'semester' => fake()->randomElement(['Ganjil', 'Genap']),
-            'tahun_mulai' => $tahunMulai,
-            'tahun_selesai' => $tahunSelesai,
+            'nama'         => "{$tahun}/" . ($tahun + 1) . ' Ganjil',
+            'tahun_mulai'  => $tahun,
+            'status_aktif' => false,
+            
+            // 'nama' => "{$tahunMulai}/{$tahunSelesai}",
+            // 'semester' => fake()->randomElement(['Ganjil', 'Genap']),
+            // 'tahun_mulai' => $tahunMulai,
+            // 'tahun_selesai' => $tahunSelesai,
         ];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Admin\SampahIndex;
+use App\Livewire\Admin\ActivityLogIndex;
 use App\Livewire\Dosen\PengajuanSaya;
 use App\Livewire\Admin\PengajuanIndex;
 use App\Livewire\Admin\JadwalManage;
@@ -41,27 +43,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/master/ruang', RuangPraktikumIndex::class)->name('ruang.index');
         Route::get('/master/tahun-akademik', TahunAkademikIndex::class)->name('tahunakademik.index');
 
-        // Pola yang sama persis dipakai untuk 6 master data lain,
-        // tinggal buat komponennya mengikuti pola FakultasIndex:
-        // Route::get('/master/prodi', ProdiIndex::class)->name('prodi.index');
-        // Route::get('/master/kelas', KelasIndex::class)->name('kelas.index');
-        // Route::get('/master/mata-kuliah', MataKuliahIndex::class)->name('matakuliah.index');
-        // Route::get('/master/dosen', DosenIndex::class)->name('dosen.index');
-        // Route::get('/master/ruang', RuangIndex::class)->name('ruang.index');
-        // Route::get('/master/tahun-akademik', TahunAkademikIndex::class)->name('tahunakademik.index');
-
         Route::get('/jadwal-manage', JadwalManage::class)->name('jadwal.manage');
         Route::get('/pengajuan', PengajuanIndex::class)->name('pengajuan.index');
+    });
+
+    // Sampah & Activity Log — KHUSUS super-admin (lebih ketat dari operator)
+    Route::middleware('role:super-admin')->group(function () {
+        Route::get('/sampah', SampahIndex::class)->name('sampah.index');
+        Route::get('/log-aktivitas', ActivityLogIndex::class)->name('activitylog.index');
     });
 
     // Menu khusus dosen
     Route::middleware('role:dosen')->group(function () {
         Route::get('/pengajuan-saya', PengajuanSaya::class)->name('pengajuan.saya');
-    });
-
-    // Khusus super admin
-    Route::middleware('auth', 'role:super-admin|operator')->group(function () {
-        // route CRUD master data
     });
 });
 /*

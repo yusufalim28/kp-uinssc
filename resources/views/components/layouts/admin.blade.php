@@ -89,6 +89,22 @@
                 @endif
             @endrole
 
+            @role('super-admin')
+                <p class="px-3 pt-4 pb-1 text-white/40 uppercase text-xs tracking-wide">Super Admin</p>
+                @if (Route::has('sampah.index'))
+                    <a href="{{ route('sampah.index') }}"
+                       class="block px-3 py-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('sampah.*') ? 'bg-primary text-dark font-medium' : '' }}">
+                        Sampah
+                    </a>
+                @endif
+                @if (Route::has('activitylog.index'))
+                    <a href="{{ route('activitylog.index') }}"
+                       class="block px-3 py-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('activitylog.*') ? 'bg-primary text-dark font-medium' : '' }}">
+                        Riwayat Aktivitas
+                    </a>
+                @endif
+            @endrole
+
             @role('dosen')
                 @if (Route::has('pengajuan.saya'))
                     <p class="px-3 pt-4 pb-1 text-white/40 uppercase text-xs tracking-wide">Menu Dosen</p>

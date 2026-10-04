@@ -19,9 +19,14 @@ class KelasFactory extends Factory
     public function definition(): array
     {
         return [
-            'nama_kelas' => fake()->unique()->regexify('[1-8][A-Z]'),
-            'semester' => fake()->numberBetween(1, 8),
             'program_studi_id' => ProgramStudi::factory(),
+            'nama_kelas'       => fake()->unique()->bothify('??-#?'),
+            'semester'         => fake()->numberBetween(1, 8),
+            'status'           => 'aktif',
+
+            // 'nama_kelas' => fake()->unique()->regexify('[1-8][A-Z]'),
+            // 'semester' => fake()->numberBetween(1, 8),
+            // 'program_studi_id' => ProgramStudi::factory(),
         ];
     }
 }

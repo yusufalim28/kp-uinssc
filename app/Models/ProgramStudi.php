@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class ProgramStudi extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $table = 'program_studi';
 
@@ -26,5 +29,13 @@ class ProgramStudi extends Model
     public function kelas()
     {
         return $this->hasMany(Kelas::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nama_program_studi', 'kode_program_studi', 'fakultas_id', 'status']) // field yang dicatat
+            ->logOnlyDirty()                                        // hanya catat yang berubah
+            ->dontLogEmptyChanges();
     }
 }

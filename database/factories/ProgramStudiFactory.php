@@ -19,9 +19,14 @@ class ProgramStudiFactory extends Factory
     public function definition(): array
     {
         return [
-            'fakultas_id' => Fakultas::factory(),
-            'kode_program_studi' => fake()->unique()->regexify('[A-Z]{2}[0-9]{3}'),
-            'nama_program_studi' => fake()->unique()->words(2, true),
+            'fakultas_id'         => Fakultas::factory(),
+            'nama_program_studi'  => 'Program Studi ' . fake()->unique()->word(),
+            'kode_program_studi'  => strtoupper(fake()->unique()->lexify('????')),
+            'status'              => 'aktif',
+
+            // 'fakultas_id' => Fakultas::factory(),
+            // 'kode_program_studi' => fake()->unique()->regexify('[A-Z]{2}[0-9]{3}'),
+            // 'nama_program_studi' => fake()->unique()->words(2, true),
         ];
     }
 }

@@ -18,9 +18,15 @@ class DosenFactory extends Factory
     public function definition(): array
     {
         return [
-            'nama' => fake()->name(),
-            'nidn' => fake()->unique()->regexify('[0-9]{10}'),
-            'email' => fake()->unique()->safeEmail(),
+            'kode_dosen' => strtoupper(fake()->unique()->bothify('DSN###')),
+            'nama'       => fake()->name(),
+            'email'      => fake()->unique()->safeEmail(),
+            'status'     => 'aktif',
+            'user_id'    => null
+
+            // 'nama' => fake()->name(),
+            // 'nidn' => fake()->unique()->regexify('[0-9]{10}'),
+            // 'email' => fake()->unique()->safeEmail(),
         ];
     }
 }

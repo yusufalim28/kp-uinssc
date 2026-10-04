@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,4 +48,14 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function loginAsRole(string $role): User
+{
+    $user = User::factory()->create();
+    $user->assignRole($role);
+
+    test()->actingAs($user);
+
+    return $user;
 }
