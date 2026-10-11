@@ -1,8 +1,8 @@
 <div class="space-y-6">
 
     <div>
-        <h1 class="text-xl font-bold text-dark">Sampah — Data Terhapus</h1>
-        <p class="text-dark/60 text-sm">
+        <h1 class="text-xl font-bold text-gray-900">Sampah — Data Terhapus</h1>
+        <p class="text-gray-500 text-sm">
             Data yang dihapus dari Master Data atau Jadwal tidak langsung hilang permanen.
             Pulihkan di sini kalau terhapus tidak sengaja.
         </p>
@@ -15,20 +15,20 @@
     {{-- Filter jenis --}}
     <div class="flex flex-wrap gap-2">
         <button wire:click="$set('filterJenis', '')"
-                @class(['px-3 py-1.5 rounded-lg text-sm border', 'bg-dark text-white border-dark' => $filterJenis === '', 'border-dark/20 text-dark/70 hover:bg-dark/5' => $filterJenis !== ''])>
+                @class(['px-3 py-1.5 rounded-lg text-sm border', 'bg-gray-900 text-white border-gray-300' => $filterJenis === '', 'border-gray-300/20 text-gray-600 hover:bg-gray-900/5' => $filterJenis !== ''])>
             Semua
         </button>
         @foreach ($jenisMap as $key => $config)
             <button wire:click="$set('filterJenis', '{{ $key }}')"
-                    @class(['px-3 py-1.5 rounded-lg text-sm border', 'bg-dark text-white border-dark' => $filterJenis === $key, 'border-dark/20 text-dark/70 hover:bg-dark/5' => $filterJenis !== $key])>
+                    @class(['px-3 py-1.5 rounded-lg text-sm border', 'bg-gray-900 text-white border-gray-300' => $filterJenis === $key, 'border-gray-300/20 text-gray-600 hover:bg-gray-900/5' => $filterJenis !== $key])>
                 {{ $config['label'] }}
             </button>
         @endforeach
     </div>
 
-    <div class="bg-white border border-dark/10 rounded-xl overflow-x-auto">
+    <div class="bg-white border border-gray-300/10 rounded-xl overflow-x-auto">
         <table class="w-full text-sm">
-            <thead class="bg-dark text-white text-left">
+            <thead class="bg-primary text-white text-left">
                 <tr>
                     <th class="px-4 py-3">Jenis</th>
                     <th class="px-4 py-3">Nama / Keterangan</th>
@@ -40,10 +40,10 @@
                 @forelse ($items as $item)
                     <tr class="hover:bg-primary/5">
                         <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded-full text-xs bg-dark/10 text-dark/60">{{ $item['label_jenis'] }}</span>
+                            <span class="px-2 py-1 rounded-full text-xs bg-gray-900/10 text-gray-500">{{ $item['label_jenis'] }}</span>
                         </td>
-                        <td class="px-4 py-3 font-medium text-dark">{{ $item['nama'] }}</td>
-                        <td class="px-4 py-3 text-dark/60">{{ $item['deleted_at']?->format('d M Y, H:i') }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $item['nama'] }}</td>
+                        <td class="px-4 py-3 text-gray-500">{{ $item['deleted_at']?->format('d M Y, H:i') }}</td>
                         <td class="px-4 py-3 text-right space-x-2">
                             <button wire:click="restore('{{ $item['jenis'] }}', {{ $item['id'] }})"
                                     class="text-green-700 font-medium hover:underline">
@@ -57,7 +57,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-4 py-8 text-center text-dark/50">Tidak ada data di sampah.</td></tr>
+                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-900/50">Tidak ada data di sampah.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\PengajuanPerubahan;
+use App\Notifications\PengajuanStatusDiperbarui;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -49,12 +50,18 @@ class PengajuanIndex extends Component
                 'catatan_penolakan'  => $this->catatan_penolakan,
             ]);
 
+            $pengajuan->dosen->user?->notify(new PengajuanStatusDiperbarui($pengajuan));
+
             session()->flash('success', 'Pengajuan berhasil ditolak.');
         } else {
             $pengajuan->update([
                 'status'             => 'disetujui',
                 'catatan_penolakan'  => null,
             ]);
+
+            $pengajuan->dosen->user?->notify(new PengajuanStatusDiperbarui($pengajuan));
+
+            session()->flash('success', 'Pengajuan disetujui. Jangan lupa terapkan perubahannya di menu Kelola Jadwal.');
 
             // Catatan: menyetujui pengajuan TIDAK otomatis mengubah data
             // di tabel jadwal_praktikum — perubahan teks bebas ("perubahan")

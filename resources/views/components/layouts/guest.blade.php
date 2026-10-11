@@ -11,20 +11,20 @@
 <body class="min-h-screen flex flex-col">
 
     {{-- Navbar publik --}}
-    <header class="bg-dark text-white sticky top-0 z-40">
+    <header class="bg-primary text-white sticky top-0 z-40">
         <nav class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
             <a href="{{ route('home') }}" class="flex items-center gap-2 font-semibold text-lg">
-                <span class="w-8 h-8 rounded bg-primary text-dark flex items-center justify-center font-bold">SP</span>
+                <span class="w-8 h-8 rounded bg-white text-primary flex items-center justify-center font-bold">SP</span>
                 <span>SI Jadwal Praktikum</span>
             </a>
 
             {{-- Menu desktop --}}
             <div class="hidden md:flex items-center gap-6 text-sm">
-                <a href="{{ route('home') }}" class="hover:text-primary transition">Beranda</a>
-                <a href="{{ route('jadwal.index') }}" class="hover:text-primary transition">Daftar Jadwal</a>
-                <a href="{{ route('jadwal.kalender') }}" class="hover:text-primary transition">Kalender</a>
+                <a href="{{ route('home') }}" class="hover:text-white/80 transition">Beranda</a>
+                <a href="{{ route('jadwal.index') }}" class="hover:text-white/80 transition">Daftar Jadwal</a>
+                <a href="{{ route('jadwal.kalender') }}" class="hover:text-white/80 transition">Kalender</a>
                 <a href="{{ route('login') }}"
-                   class="bg-primary text-dark font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">
+                   class="bg-white text-primary font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                     Login
                 </a>
             </div>
@@ -39,11 +39,11 @@
 
         {{-- Menu mobile --}}
         <div x-data="{ open: false }" @toggle-mobile-menu.window="open = !open" x-show="open" x-cloak
-             class="md:hidden border-t border-dark-light px-4 py-3 flex flex-col gap-3 text-sm">
-            <a href="{{ route('home') }}" class="hover:text-primary">Beranda</a>
-            <a href="{{ route('jadwal.index') }}" class="hover:text-primary">Daftar Jadwal</a>
-            <a href="{{ route('jadwal.kalender') }}" class="hover:text-primary">Kalender</a>
-            <a href="{{ route('login') }}" class="text-primary font-medium">Login</a>
+             class="md:hidden border-t border-white/20 px-4 py-3 flex flex-col gap-3 text-sm">
+            <a href="{{ route('home') }}" class="hover:text-white/80">Beranda</a>
+            <a href="{{ route('jadwal.index') }}" class="hover:text-white/80">Daftar Jadwal</a>
+            <a href="{{ route('jadwal.kalender') }}" class="hover:text-white/80">Kalender</a>
+            <a href="{{ route('login') }}" class="text-white font-medium">Login</a>
         </div>
     </header>
 
@@ -51,7 +51,7 @@
         {{ $slot }}
     </main>
 
-    <footer class="bg-dark text-white/60 text-sm text-center py-6">
+    <footer class="bg-primary-dark text-white/80 text-sm text-center py-6">
         &copy; {{ date('Y') }} Sistem Informasi Manajemen Jadwal Praktikum
     </footer>
 

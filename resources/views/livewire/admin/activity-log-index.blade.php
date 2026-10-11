@@ -1,16 +1,16 @@
 <div class="space-y-6">
 
     <div>
-        <h1 class="text-xl font-bold text-dark">Riwayat Aktivitas</h1>
-        <p class="text-dark/60 text-sm">Catatan siapa mengubah apa, kapan — untuk keperluan audit.</p>
+        <h1 class="text-xl font-bold text-gray-900">Riwayat Aktivitas</h1>
+        <p class="text-gray-500 text-sm">Catatan siapa mengubah apa, kapan — untuk keperluan audit.</p>
     </div>
 
     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari berdasarkan aksi atau jenis data..."
-           class="w-full md:w-96 rounded-lg border-dark/20 text-sm">
+           class="w-full md:w-96 rounded-lg border-gray-300/20 text-sm">
 
-    <div class="bg-white border border-dark/10 rounded-xl overflow-x-auto">
+    <div class="bg-white border border-gray-300/10 rounded-xl overflow-x-auto">
         <table class="w-full text-sm">
-            <thead class="bg-dark text-white text-left">
+            <thead class="bg-primary text-white text-left">
                 <tr>
                     <th class="px-4 py-3">Waktu</th>
                     <th class="px-4 py-3">Pengguna</th>
@@ -22,10 +22,10 @@
             <tbody class="divide-y divide-dark/10">
                 @forelse ($logs as $log)
                     <tr class="hover:bg-primary/5 align-top">
-                        <td class="px-4 py-3 text-dark/60 whitespace-nowrap">
+                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">
                             {{ $log->created_at->format('d M Y, H:i') }}
                         </td>
-                        <td class="px-4 py-3 text-dark/70">
+                        <td class="px-4 py-3 text-gray-600">
                             {{ $log->causer?->name ?? 'Sistem' }}
                         </td>
                         <td class="px-4 py-3">
@@ -39,10 +39,10 @@
                                 {{ ucfirst($log->description) }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-dark/70">
+                        <td class="px-4 py-3 text-gray-600">
                             {{ class_basename($log->subject_type) }} #{{ $log->subject_id }}
                         </td>
-                        <td class="px-4 py-3 text-xs text-dark/60">
+                        <td class="px-4 py-3 text-xs text-gray-500">
                             @php
                                 $old = $log->properties['old'] ?? [];
                                 $new = $log->properties['attributes'] ?? [];
@@ -55,7 +55,7 @@
                                             <li>
                                                 <span class="font-medium">{{ $field }}</span>:
                                                 @if (isset($old[$field]))
-                                                    <span class="line-through text-dark/40">{{ $old[$field] }}</span> →
+                                                    <span class="line-through text-gray-900/40">{{ $old[$field] }}</span> →
                                                 @endif
                                                 <span>{{ $value }}</span>
                                             </li>
@@ -63,12 +63,12 @@
                                     @endforeach
                                 </ul>
                             @else
-                                <span class="text-dark/30">—</span>
+                                <span class="text-gray-900/30">—</span>
                             @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-8 text-center text-dark/50">Belum ada riwayat aktivitas.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-900/50">Belum ada riwayat aktivitas.</td></tr>
                 @endforelse
             </tbody>
         </table>

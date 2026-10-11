@@ -3,6 +3,7 @@
 use App\Livewire\Admin\SampahIndex;
 use App\Livewire\Admin\ActivityLogIndex;
 use App\Livewire\Dosen\PengajuanSaya;
+use App\Livewire\Dosen\NotifikasiSaya;
 use App\Livewire\Admin\PengajuanIndex;
 use App\Livewire\Admin\JadwalManage;
 use App\Livewire\Admin\MasterData\DosenIndex;
@@ -16,6 +17,7 @@ use App\Livewire\Public\DaftarJadwal;
 use App\Livewire\Public\DetailJadwal;
 use App\Livewire\Public\Home;
 use App\Livewire\Public\KalenderJadwal;
+use App\Http\Controllers\JadwalExportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +29,8 @@ Route::get('/', Home::class)->name('home');
 Route::get('/jadwal', DaftarJadwal::class)->name('jadwal.index');
 Route::get('/jadwal/{jadwal}', DetailJadwal::class)->name('jadwal.detail');
 Route::get('/kalender', KalenderJadwal::class)->name('jadwal.kalender');
+Route::get('/jadwal/export/pdf', [JadwalExportController::class, 'pdf'])->name('jadwal.export.pdf');
+Route::get('/jadwal/export/excel', [JadwalExportController::class, 'excel'])->name('jadwal.export.excel');
 
 // Route Terproteksi
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -56,6 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Menu khusus dosen
     Route::middleware('role:dosen')->group(function () {
         Route::get('/pengajuan-saya', PengajuanSaya::class)->name('pengajuan.saya');
+        Route::get('/notifikasi-saya', NotifikasiSaya::class)->name('notifikasi.saya');
     });
 });
 /*

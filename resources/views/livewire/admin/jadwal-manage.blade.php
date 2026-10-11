@@ -2,10 +2,10 @@
 
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="text-xl font-bold text-dark">Kelola Jadwal Praktikum</h1>
-            <p class="text-dark/60 text-sm">Setiap jadwal otomatis dicek bentrok ruang & dosen sebelum disimpan.</p>
+            <h1 class="text-xl font-bold text-gray-900">Kelola Jadwal Praktikum</h1>
+            <p class="text-gray-500 text-sm">Setiap jadwal otomatis dicek bentrok ruang & dosen sebelum disimpan.</p>
         </div>
-        <button wire:click="openCreate" class="bg-primary text-dark font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">
+        <button wire:click="openCreate" class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">
             + Tambah Jadwal
         </button>
     </div>
@@ -17,9 +17,9 @@
         <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">{{ session('error') }}</div>
     @endif
 
-    <div class="bg-white border border-dark/10 rounded-xl overflow-x-auto">
+    <div class="bg-white border border-gray-300/10 rounded-xl overflow-x-auto">
         <table class="w-full text-sm">
-            <thead class="bg-dark text-white text-left">
+            <thead class="bg-primary text-white text-left">
                 <tr>
                     <th class="px-4 py-3">Mata Kuliah</th>
                     <th class="px-4 py-3">Kelas</th>
@@ -33,18 +33,18 @@
             <tbody class="divide-y divide-dark/10">
                 @forelse ($jadwal as $j)
                     <tr class="hover:bg-primary/5">
-                        <td class="px-4 py-3 font-medium text-dark">{{ $j->mataKuliah->nama_mk }}</td>
-                        <td class="px-4 py-3 text-dark/70">{{ $j->kelas->nama_kelas }}</td>
-                        <td class="px-4 py-3 text-dark/70">{{ $j->dosen->nama }}</td>
-                        <td class="px-4 py-3 text-dark/70">
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $j->mataKuliah->nama_mk }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $j->kelas->nama_kelas }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $j->dosen->nama }}</td>
+                        <td class="px-4 py-3 text-gray-600">
                             {{ $j->hari }}, {{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}
                         </td>
-                        <td class="px-4 py-3 text-dark/70">{{ $j->ruangPraktikum->nama_ruang }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $j->ruangPraktikum->nama_ruang }}</td>
                         <td class="px-4 py-3">
                             <span @class([
                                 'px-2 py-1 rounded-full text-xs',
                                 'bg-green-100 text-green-700' => $j->status === 'aktif',
-                                'bg-dark/10 text-dark/50' => $j->status === 'nonaktif',
+                                'bg-gray-900/10 text-gray-900/50' => $j->status === 'nonaktif',
                                 'bg-red-100 text-red-700' => $j->status === 'dibatalkan',
                             ])>
                                 {{ ucfirst($j->status) }}
@@ -56,7 +56,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-4 py-8 text-center text-dark/50">Belum ada jadwal.</td></tr>
+                    <tr><td colspan="7" class="px-4 py-8 text-center text-gray-900/50">Belum ada jadwal.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -68,7 +68,7 @@
     @if ($showModal)
         <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 py-8 overflow-y-auto">
             <div class="bg-white rounded-xl w-full max-w-lg p-6 space-y-4">
-                <h2 class="text-lg font-semibold text-dark">{{ $editId ? 'Edit Jadwal' : 'Tambah Jadwal' }}</h2>
+                <h2 class="text-lg font-semibold text-gray-900">{{ $editId ? 'Edit Jadwal' : 'Tambah Jadwal' }}</h2>
 
                 {{-- Pesan bentrok — beda dari error validasi biasa --}}
                 @if ($conflictMessage)
@@ -79,8 +79,8 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div class="col-span-2">
-                        <label class="text-sm text-dark/70">Mata Kuliah</label>
-                        <select wire:model="mata_kuliah_id" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Mata Kuliah</label>
+                        <select wire:model="mata_kuliah_id" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="">-- Pilih Mata Kuliah --</option>
                             @foreach ($mataKuliah as $mk)
                                 <option value="{{ $mk->id }}">{{ $mk->nama_mk }} ({{ $mk->sks }} SKS)</option>
@@ -90,8 +90,8 @@
                     </div>
 
                     <div>
-                        <label class="text-sm text-dark/70">Kelas</label>
-                        <select wire:model="kelas_id" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Kelas</label>
+                        <select wire:model="kelas_id" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="">-- Pilih Kelas --</option>
                             @foreach ($kelasList as $k)
                                 <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
@@ -101,8 +101,8 @@
                     </div>
 
                     <div>
-                        <label class="text-sm text-dark/70">Dosen</label>
-                        <select wire:model="dosen_id" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Dosen</label>
+                        <select wire:model="dosen_id" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="">-- Pilih Dosen --</option>
                             @foreach ($dosenList as $d)
                                 <option value="{{ $d->id }}">{{ $d->nama }}</option>
@@ -112,8 +112,8 @@
                     </div>
 
                     <div>
-                        <label class="text-sm text-dark/70">Ruang</label>
-                        <select wire:model="ruang_praktikum_id" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Ruang</label>
+                        <select wire:model="ruang_praktikum_id" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="">-- Pilih Ruang --</option>
                             @foreach ($ruangList as $r)
                                 <option value="{{ $r->id }}">{{ $r->nama_ruang }}</option>
@@ -123,8 +123,8 @@
                     </div>
 
                     <div>
-                        <label class="text-sm text-dark/70">Tahun Akademik</label>
-                        <select wire:model="tahun_akademik_id" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Tahun Akademik</label>
+                        <select wire:model="tahun_akademik_id" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="">-- Pilih Tahun Akademik --</option>
                             @foreach ($tahunList as $t)
                                 <option value="{{ $t->id }}">{{ $t->nama }}</option>
@@ -134,8 +134,8 @@
                     </div>
 
                     <div class="col-span-2">
-                        <label class="text-sm text-dark/70">Hari</label>
-                        <select wire:model="hari" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Hari</label>
+                        <select wire:model="hari" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="">-- Pilih Hari --</option>
                             @foreach ($hariList as $h)
                                 <option value="{{ $h }}">{{ $h }}</option>
@@ -145,20 +145,20 @@
                     </div>
 
                     <div>
-                        <label class="text-sm text-dark/70">Jam Mulai</label>
-                        <input type="time" wire:model="jam_mulai" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Jam Mulai</label>
+                        <input type="time" wire:model="jam_mulai" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                         @error('jam_mulai') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
-                        <label class="text-sm text-dark/70">Jam Selesai</label>
-                        <input type="time" wire:model="jam_selesai" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Jam Selesai</label>
+                        <input type="time" wire:model="jam_selesai" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                         @error('jam_selesai') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="col-span-2">
-                        <label class="text-sm text-dark/70">Status</label>
-                        <select wire:model="status" class="w-full rounded-lg border-dark/20 text-sm mt-1">
+                        <label class="text-sm text-gray-600">Status</label>
+                        <select wire:model="status" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                             <option value="aktif">Aktif</option>
                             <option value="nonaktif">Nonaktif</option>
                             <option value="dibatalkan">Dibatalkan</option>
@@ -166,17 +166,17 @@
                     </div>
 
                     <div class="col-span-2">
-                        <label class="text-sm text-dark/70">Keterangan (opsional)</label>
-                        <textarea wire:model="keterangan" rows="2" class="w-full rounded-lg border-dark/20 text-sm mt-1"></textarea>
+                        <label class="text-sm text-gray-600">Keterangan (opsional)</label>
+                        <textarea wire:model="keterangan" rows="2" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition"></textarea>
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
-                    <button wire:click="$set('showModal', false)" class="px-4 py-2 text-sm text-dark/60 hover:bg-dark/5 rounded-lg">
+                    <button wire:click="$set('showModal', false)" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-900/5 rounded-lg">
                         Batal
                     </button>
                     <button wire:click="save" wire:loading.attr="disabled"
-                            class="px-4 py-2 text-sm bg-primary text-dark font-medium rounded-lg hover:bg-primary-dark disabled:opacity-50">
+                            class="px-4 py-2 text-sm bg-primary text-white font-medium rounded-lg hover:bg-primary-dark disabled:opacity-50">
                         <span wire:loading.remove wire:target="save">Simpan</span>
                         <span wire:loading wire:target="save">Mengecek bentrok...</span>
                     </button>
@@ -189,10 +189,10 @@
     @if ($confirmDeleteId)
         <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
             <div class="bg-white rounded-xl w-full max-w-sm p-6 space-y-4">
-                <h2 class="text-lg font-semibold text-dark">Hapus Jadwal?</h2>
-                <p class="text-sm text-dark/60">Data yang sudah dihapus tidak bisa dikembalikan.</p>
+                <h2 class="text-lg font-semibold text-gray-900">Hapus Jadwal?</h2>
+                <p class="text-sm text-gray-500">Data yang sudah dihapus tidak bisa dikembalikan.</p>
                 <div class="flex justify-end gap-2">
-                    <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-sm text-dark/60 hover:bg-dark/5 rounded-lg">Batal</button>
+                    <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-900/5 rounded-lg">Batal</button>
                     <button wire:click="delete" class="px-4 py-2 text-sm bg-red-600 text-white font-medium rounded-lg hover:bg-red-700">Ya, Hapus</button>
                 </div>
             </div>
