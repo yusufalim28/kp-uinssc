@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Dosen;
-use App\Models\JadwalPraktikum;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class PengajuanPerubahan extends Model
 {
     use LogsActivity;
+
     protected $table = 'pengajuan_perubahan';
+
+    protected $guarded = ['id'];
 
     public function jadwalPraktikum()
     {
@@ -26,8 +27,8 @@ class PengajuanPerubahan extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['status', 'catatan_penolakan']) // field yang dicatat
-            ->logOnlyDirty()                                        // hanya catat yang berubah
+            ->logOnly(['status', 'catatan_penolakan', 'jenis_perubahan', 'perubahan', 'alasan'])
+            ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
 }

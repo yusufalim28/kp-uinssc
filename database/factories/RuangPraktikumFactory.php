@@ -19,11 +19,10 @@ class RuangPraktikumFactory extends Factory
     {
         return [
             'kode_ruang' => strtoupper(fake()->unique()->bothify('RG###')),
-            'nama_ruang' => 'Lab ' . fake()->unique()->word(),
-            'lokasi'     => 'Gedung ' . fake()->randomLetter() . ' Lantai ' . fake()->numberBetween(1, 4),
-            'kapasitas'  => fake()->numberBetween(20, 60),
-            'status'     => 'aktif',
-
+            'nama_ruang' => 'Lab '.fake()->unique()->word(),
+            'lokasi' => 'Gedung '.fake()->randomLetter().' Lantai '.fake()->numberBetween(1, 4),
+            'kapasitas' => fake()->numberBetween(20, 60),
+            'status' => 'aktif',
 
             // 'kode_ruang' => fake()->unique()->regexify('[A-Z]{2}[0-9]{3}'),
             // 'nama_ruang' => fake()->unique()->word(),

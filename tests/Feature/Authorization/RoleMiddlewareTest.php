@@ -1,9 +1,10 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(RolePermissionSeeder::class);
 });
 
 test('tamu (belum login) diarahkan ke halaman login saat akses master data', function () {

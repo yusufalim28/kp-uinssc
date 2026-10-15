@@ -4,10 +4,11 @@ use App\Livewire\Admin\MasterData\ProgramStudiIndex;
 use App\Models\Fakultas;
 use App\Models\Kelas;
 use App\Models\ProgramStudi;
+use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(RolePermissionSeeder::class);
     loginAsRole('super-admin');
 });
 

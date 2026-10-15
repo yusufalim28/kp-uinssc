@@ -18,9 +18,9 @@ class FakultasFactory extends Factory
     public function definition(): array
     {
         return [
-            'nama_fakultas' => 'Fakultas ' . fake()->unique()->word(),
+            'nama_fakultas' => 'Fakultas '.fake()->unique()->word(),
             'kode_fakultas' => strtoupper(fake()->unique()->lexify('???')),
-            'status'        => 'aktif',
+            'status' => 'aktif',
             // 'kode_fakultas' => fake()->unique()->regexify('FAK[0-9]{3}'),
             // 'nama_fakultas' => fake()->unique()->words(2, true),
         ];

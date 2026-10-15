@@ -20,7 +20,8 @@
     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama atau kode ruang..."
            class="w-full md:w-96 rounded-xl border-gray-300 bg-white shadow-sm focus:border-primary focus:ring focus:ring-primary/20 text-sm px-4 py-2.5 transition">
 
-    <div class="bg-white border border-gray-300/10 rounded-xl overflow-x-auto">
+    {{-- Desktop Table --}}
+    <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
         <table class="w-full text-sm">
             <thead class="bg-primary text-white text-left">
                 <tr>
@@ -40,8 +41,13 @@
                         <td class="px-4 py-3 text-gray-600">{{ $r->lokasi }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ $r->kapasitas }} orang</td>
                         <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded-full text-xs {{ $r->status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-900/10 text-gray-900/50' }}">
-                                {{ ucfirst($r->status) }}
+                            <span @class([
+                                'px-2 py-1 rounded-full text-xs font-medium',
+                                'bg-green-100 text-green-700' => in_array($r->status, ['aktif', 'tersedia']),
+                                'bg-yellow-100 text-yellow-700' => $r->status === 'perbaikan',
+                                'bg-gray-900/10 text-gray-900/50' => !in_array($r->status, ['aktif', 'tersedia', 'perbaikan']),
+                            ])>
+                                {{ $r->status === 'perbaikan' ? 'Perbaikan' : ucfirst($r->status) }}
                             </span>
                         </td>
                         <td class="px-4 py-3 text-right space-x-2">
@@ -54,6 +60,43 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- Mobile Card View --}}
+    <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+        @forelse ($ruang as $r)
+            <div class="bg-white border border-gray-100 rounded-xl p-3.5 shadow-xs hover:border-gray-200 transition flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="inline-block px-2 py-0.5 rounded bg-primary/10 font-mono text-xs text-primary font-semibold">{{ $r->kode_ruang }}</span>
+                        <span @class([
+                            'px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0',
+                            'bg-green-100 text-green-700' => in_array($r->status, ['aktif', 'tersedia']),
+                            'bg-yellow-100 text-yellow-700' => $r->status === 'perbaikan',
+                            'bg-gray-100 text-gray-600' => !in_array($r->status, ['aktif', 'tersedia', 'perbaikan']),
+                        ])>
+                            {{ $r->status === 'perbaikan' ? 'Perbaikan' : ucfirst($r->status) }}
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-sm text-gray-900 leading-snug">{{ $r->nama_ruang }}</h3>
+                    <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                        <span>Kapasitas: <strong class="text-gray-700">{{ $r->kapasitas }} org</strong></span>
+                        @if($r->lokasi)
+                            <span>• {{ $r->lokasi }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2.5 mt-3 border-t border-gray-100">
+                    <button wire:click="openEdit({{ $r->id }})" class="px-2.5 py-1 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/15 rounded-lg transition">Edit</button>
+                    <button wire:click="confirmDelete({{ $r->id }})" class="px-2.5 py-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="sm:col-span-2 bg-white rounded-xl p-8 text-center border border-gray-100 text-gray-500 text-sm">
+                Belum ada data ruang praktikum.
+            </div>
+        @endforelse
     </div>
 
     {{ $ruang->links() }}
@@ -92,6 +135,7 @@
                     <select wire:model="status" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition">
                         <option value="aktif">Aktif</option>
                         <option value="nonaktif">Nonaktif</option>
+                        <option value="perbaikan">Dalam Perbaikan</option>
                     </select>
                 </div>
 

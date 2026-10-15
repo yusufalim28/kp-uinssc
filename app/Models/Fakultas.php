@@ -10,7 +10,7 @@ use Spatie\Activitylog\Support\LogOptions;
 
 class Fakultas extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $table = 'fakultas';
 
@@ -20,6 +20,7 @@ class Fakultas extends Model
     {
         return $this->hasMany(ProgramStudi::class);
     }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

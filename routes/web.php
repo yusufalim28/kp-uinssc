@@ -1,10 +1,7 @@
 <?php
 
-use App\Livewire\Admin\SampahIndex;
+use App\Http\Controllers\JadwalExportController;
 use App\Livewire\Admin\ActivityLogIndex;
-use App\Livewire\Dosen\PengajuanSaya;
-use App\Livewire\Dosen\NotifikasiSaya;
-use App\Livewire\Admin\PengajuanIndex;
 use App\Livewire\Admin\JadwalManage;
 use App\Livewire\Admin\MasterData\DosenIndex;
 use App\Livewire\Admin\MasterData\FakultasIndex;
@@ -13,11 +10,14 @@ use App\Livewire\Admin\MasterData\MataKuliahIndex;
 use App\Livewire\Admin\MasterData\ProgramStudiIndex;
 use App\Livewire\Admin\MasterData\RuangPraktikumIndex;
 use App\Livewire\Admin\MasterData\TahunAkademikIndex;
+use App\Livewire\Admin\PengajuanIndex;
+use App\Livewire\Admin\SampahIndex;
+use App\Livewire\Dosen\NotifikasiSaya;
+use App\Livewire\Dosen\PengajuanSaya;
 use App\Livewire\Public\DaftarJadwal;
 use App\Livewire\Public\DetailJadwal;
 use App\Livewire\Public\Home;
 use App\Livewire\Public\KalenderJadwal;
-use App\Http\Controllers\JadwalExportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -85,3 +85,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 */
 
 // require __DIR__.'/auth.php';
+require __DIR__.'/settings.php';

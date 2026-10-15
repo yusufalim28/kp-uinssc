@@ -35,7 +35,7 @@ class RuangPraktikumIndex extends Component
             'nama_ruang' => 'required|string|max:100',
             'lokasi' => 'required|string|max:150',
             'kapasitas' => 'required|integer|min:1|max:200',
-            'status' => 'required|in:aktif,nonaktif',
+            'status' => 'required|in:aktif,nonaktif,perbaikan,tersedia',
         ];
     }
 

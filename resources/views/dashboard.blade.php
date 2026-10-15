@@ -1,25 +1,75 @@
 <x-layouts.admin :title="'Dashboard'">
     <div class="space-y-6">
         <!-- Welcome Card -->
-        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-6 justify-between">
+        <div class="bg-white rounded-2xl p-6 md:p-8 shadow-xs border border-gray-100 flex flex-col md:flex-row items-center gap-6 justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Selamat datang, {{ auth()->user()->name }}</h1>
-                <p class="text-gray-500 mt-2">
-                    Anda login sebagai <span class="font-semibold text-primary px-2 py-1 bg-primary/10 rounded-md">{{ auth()->user()->getRoleNames()->implode(', ') ?: 'User Biasa' }}</span>
+                <p class="text-gray-500 mt-2 text-sm">
+                    Anda masuk ke sistem sebagai <span class="font-semibold text-primary px-2.5 py-1 bg-primary/10 rounded-lg">{{ auth()->user()->getRoleNames()->implode(', ') ?: 'Pengelola Lab' }}</span>
                 </p>
             </div>
-            <div class="hidden md:block">
-                <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <div class="hidden md:flex items-center gap-3">
+                <div class="text-right">
+                    <span class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Tahun Akademik</span>
+                    <span class="text-sm font-bold text-gray-800">
+                        {{ \App\Models\TahunAkademik::where('is_aktif', true)->first()?->nama ?? 'Semester Aktif' }}
+                    </span>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 </div>
             </div>
         </div>
 
         @role('super-admin|operator')
+        <!-- Metric Statistics Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                    <span class="block text-xl font-extrabold text-gray-900">{{ \App\Models\JadwalPraktikum::where('status', 'aktif')->count() }}</span>
+                    <span class="text-xs text-gray-500 font-medium">Jadwal Aktif</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <span class="block text-xl font-extrabold text-gray-900">{{ \App\Models\Dosen::where('status', 'aktif')->count() }}</span>
+                    <span class="text-xs text-gray-500 font-medium">Dosen Pengampu</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+                <div>
+                    <span class="block text-xl font-extrabold text-gray-900">{{ \App\Models\RuangPraktikum::where('status', 'aktif')->count() }}</span>
+                    <span class="text-xs text-gray-500 font-medium">Ruang Lab</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-xs flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    @php $pendingCount = \App\Models\PengajuanPerubahan::where('status', 'menunggu')->count(); @endphp
+                    <span class="block text-xl font-extrabold {{ $pendingCount > 0 ? 'text-orange-600' : 'text-gray-900' }}">{{ $pendingCount }}</span>
+                    <span class="text-xs text-gray-500 font-medium">Pengajuan Antre</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin/Operator Shortcuts -->
         <div>
-            <h2 class="text-lg font-bold text-gray-900 mb-4">Akses Cepat Master Data</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <h2 class="text-base font-bold text-gray-900 mb-3">Akses Cepat Master Data</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <a href="{{ route('jadwal.manage') }}" class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:border-primary hover:shadow-md transition text-center group">
                     <div class="w-12 h-12 mx-auto rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:bg-blue-600 group-hover:text-white transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>

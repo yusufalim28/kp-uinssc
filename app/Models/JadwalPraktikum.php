@@ -2,22 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\Dosen;
-use App\Models\Kelas;
-use App\Models\MataKuliah;
-use App\Models\PengajuanPerubahan;
-use App\Models\RuangPraktikum;
-use App\Models\TahunAkademik;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
-
 class JadwalPraktikum extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
+
     protected $table = 'jadwal_praktikum';
 
     protected $guarded = ['id'];

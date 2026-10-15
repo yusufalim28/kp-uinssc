@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Laravel\Fortify\Features;
 
 test('login screen can be rendered', function () {
@@ -77,5 +78,73 @@ test('users can logout', function () {
 
     $response->assertRedirect(route('home'));
 
+    $this->assertGuest();
+});
+
+test('student NIM cannot authenticate into portal', function () {
+    $response = $this->post(route('login.store'), [
+        'email' => '210101001',
+        'password' => 'password123',
+    ]);
+
+    $response->assertSessionHasErrors('email');
+    $this->assertGuest();
+});
+
+test('dosen can authenticate via bridge api v2', function () {
+    config(['services.pustikom_bridge.enabled' => true]);
+    config(['services.pustikom_bridge.base_url' => 'https://bridge.ecampuz.com']);
+
+    Http::fake([
+        'https://bridge.ecampuz.com/api/v2/portal/login' => Http::response([
+            'status' => 'success',
+            'data' => [
+                'token' => 'mock-jwt-token-12345',
+            ],
+        ], 200),
+        'https://bridge.ecampuz.com/api/v2/profil' => Http::response([
+            'status' => 'success',
+            'data' => [
+                'nama' => 'Dr. Ahmad Fauzi, M.Kom',
+                'nip' => '198501012010121001',
+                'email' => 'ahmad.fauzi@uinssc.ac.id',
+                'role' => 'dosen',
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->post(route('login.store'), [
+        'email' => '198501012010121001',
+        'password' => 'password-rahasia',
+    ]);
+
+    $response->assertSessionHasNoErrors();
+    $this->assertAuthenticated();
+});
+
+test('mahasiswa is blocked even if bridge api returns success', function () {
+    config(['services.pustikom_bridge.enabled' => true]);
+    config(['services.pustikom_bridge.base_url' => 'https://bridge.ecampuz.com']);
+
+    Http::fake([
+        'https://bridge.ecampuz.com/api/v2/portal/login' => Http::response([
+            'data' => ['token' => 'mock-student-token'],
+        ], 200),
+        'https://bridge.ecampuz.com/api/v2/profil' => Http::response([
+            'data' => [
+                'nama' => 'Budi Santoso',
+                'nim' => '210101001',
+                'nip' => null,
+                'role' => 'mahasiswa',
+            ],
+        ], 200),
+    ]);
+
+    $response = $this->post(route('login.store'), [
+        'email' => '210101001',
+        'password' => 'password-mahasiswa',
+    ]);
+
+    $response->assertSessionHasErrors('email');
     $this->assertGuest();
 });

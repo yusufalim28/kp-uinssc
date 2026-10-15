@@ -58,10 +58,10 @@ class PengajuanStatusDiperbarui extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'pengajuan_id'      => $this->pengajuan->id,
-            'status'            => $this->pengajuan->status,
-            'nama_mk'           => $this->pengajuan->jadwalPraktikum->mataKuliah->nama_mk,
-            'perubahan'         => $this->pengajuan->perubahan,
+            'pengajuan_id' => $this->pengajuan->id,
+            'status' => $this->pengajuan->status,
+            'nama_mk' => $this->pengajuan->jadwalPraktikum->mataKuliah->nama_mk,
+            'perubahan' => $this->pengajuan->perubahan,
             'catatan_penolakan' => $this->pengajuan->catatan_penolakan,
         ];
     }

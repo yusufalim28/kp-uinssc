@@ -5,12 +5,13 @@ use App\Models\Dosen;
 use App\Models\JadwalPraktikum;
 use App\Models\PengajuanPerubahan;
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(RolePermissionSeeder::class);
 
-    $this->user  = User::factory()->create();
+    $this->user = User::factory()->create();
     $this->user->assignRole('dosen');
     $this->dosen = Dosen::factory()->create(['user_id' => $this->user->id]);
     $this->actingAs($this->user);
@@ -55,10 +56,10 @@ test('dosen hanya melihat riwayat pengajuannya sendiri, bukan milik dosen lain',
 
     PengajuanPerubahan::create([
         'jadwal_praktikum_id' => $jadwalLain->id,
-        'dosen_id'            => $dosenLain->id,
-        'perubahan'           => 'Punya dosen lain',
-        'alasan'              => 'Tidak relevan',
-        'status'              => 'menunggu',
+        'dosen_id' => $dosenLain->id,
+        'perubahan' => 'Punya dosen lain',
+        'alasan' => 'Tidak relevan',
+        'status' => 'menunggu',
     ]);
 
     Livewire::test(PengajuanSaya::class)

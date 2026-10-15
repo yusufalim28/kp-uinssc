@@ -20,7 +20,8 @@
     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama atau kode prodi..."
            class="w-full md:w-96 rounded-xl border-gray-300 bg-white shadow-sm focus:border-primary focus:ring focus:ring-primary/20 text-sm px-4 py-2.5 transition">
 
-    <div class="bg-white border border-gray-300/10 rounded-xl overflow-x-auto">
+    {{-- Desktop Table --}}
+    <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
         <table class="w-full text-sm">
             <thead class="bg-primary text-white text-left">
                 <tr>
@@ -52,6 +53,35 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- Mobile Cards Grid --}}
+    <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+        @forelse ($prodi as $p)
+            <div class="bg-white border border-gray-100 rounded-xl p-3.5 shadow-xs hover:border-gray-200 transition flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="font-mono text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{{ $p->kode_program_studi }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium {{ $p->status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ ucfirst($p->status) }}
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-sm text-gray-900 leading-snug">{{ $p->nama_program_studi }}</h3>
+                    <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <span>{{ $p->fakultas->nama_fakultas }}</span>
+                    </p>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2.5 mt-3 border-t border-gray-100">
+                    <button wire:click="openEdit({{ $p->id }})" class="px-2.5 py-1 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/15 rounded-lg transition">Edit</button>
+                    <button wire:click="confirmDelete({{ $p->id }})" class="px-2.5 py-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="sm:col-span-2 bg-white rounded-xl p-8 text-center border border-gray-100">
+                <p class="text-gray-500 text-sm">Belum ada data program studi.</p>
+            </div>
+        @endforelse
     </div>
 
     {{ $prodi->links() }}

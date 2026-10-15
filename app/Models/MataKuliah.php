@@ -10,7 +10,7 @@ use Spatie\Activitylog\Support\LogOptions;
 
 class MataKuliah extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $table = 'mata_kuliah';
 

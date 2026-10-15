@@ -17,18 +17,16 @@ class TahunAkademikFactory extends Factory
      */
     public function definition(): array
     {
-        $tahunMulai = fake()->numberBetween(2020, 2035);
+        $tahunMulai = fake()->numberBetween(2020, 2045);
         $tahunSelesai = $tahunMulai + 1;
+        $semester = fake()->randomElement(['Ganjil', 'Genap']);
 
         return [
-            'nama'         => "{$tahun}/" . ($tahun + 1) . ' Ganjil',
-            'tahun_mulai'  => $tahun,
-            'status_aktif' => false,
-            
-            // 'nama' => "{$tahunMulai}/{$tahunSelesai}",
-            // 'semester' => fake()->randomElement(['Ganjil', 'Genap']),
-            // 'tahun_mulai' => $tahunMulai,
-            // 'tahun_selesai' => $tahunSelesai,
+            'nama' => "{$tahunMulai}/{$tahunSelesai} {$semester} ".fake()->unique()->numerify('###'),
+            'semester' => $semester,
+            'tahun_mulai' => $tahunMulai,
+            'tahun_selesai' => $tahunSelesai,
+            'is_aktif' => false,
         ];
     }
 }

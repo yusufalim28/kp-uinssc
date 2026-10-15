@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Public;
 
-use App\Models\JadwalPraktikum;
-use App\Models\ProgramStudi;
-use App\Models\MataKuliah;
 use App\Models\Dosen;
+use App\Models\JadwalPraktikum;
+use App\Models\MataKuliah;
+use App\Models\ProgramStudi;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,16 +14,19 @@ class DaftarJadwal extends Component
     use WithPagination;
 
     public string $programStudiId = '';
+
     public string $mataKuliahId = '';
+
     public string $dosenId = '';
+
     public string $hari = '';
 
     // Simpan filter di URL supaya link bisa di-share/bookmark
     protected $queryString = [
         'programStudiId' => ['except' => ''],
-        'mataKuliahId'    => ['except' => ''],
-        'dosenId'         => ['except' => ''],
-        'hari'            => ['except' => ''],
+        'mataKuliahId' => ['except' => ''],
+        'dosenId' => ['except' => ''],
+        'hari' => ['except' => ''],
     ];
 
     public function updating($field, $value): void
@@ -49,16 +52,16 @@ class DaftarJadwal extends Component
             ->when($this->mataKuliahId, fn ($q) => $q->where('mata_kuliah_id', $this->mataKuliahId))
             ->when($this->dosenId, fn ($q) => $q->where('dosen_id', $this->dosenId))
             ->when($this->hari, fn ($q) => $q->where('hari', $this->hari))
-            ->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jum''at','Sabtu')")
+            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END")
             ->orderBy('jam_mulai')
             ->paginate(10);
 
         return view('livewire.public.daftar-jadwal', [
-            'jadwal'       => $jadwal,
+            'jadwal' => $jadwal,
             'programStudi' => ProgramStudi::orderBy('nama_program_studi')->get(),
-            'mataKuliah'   => MataKuliah::orderBy('nama_mk')->get(),
-            'dosen'        => Dosen::orderBy('nama')->get(),
-            'hariList'     => ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'],
+            'mataKuliah' => MataKuliah::orderBy('nama_mk')->get(),
+            'dosen' => Dosen::orderBy('nama')->get(),
+            'hariList' => ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'],
         ])->layout('components.layouts.guest', ['title' => 'Daftar Jadwal']);
     }
 }

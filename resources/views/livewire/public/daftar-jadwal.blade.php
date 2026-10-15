@@ -81,8 +81,10 @@
     </div>
 
     {{-- Tabel hasil --}}
-    <div class="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden" wire:loading.class="opacity-60 transition-opacity">
-        <div class="overflow-x-auto">
+    <div wire:loading.class="opacity-60 transition-opacity">
+
+        {{-- Desktop Table (hidden on mobile) --}}
+        <div class="hidden md:block bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
             <table class="w-full text-sm">
                 <thead class="bg-primary text-white text-left">
                     <tr>
@@ -119,7 +121,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="5" class="px-6 py-12 text-center">
                                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 text-gray-400 mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                 </div>
@@ -130,9 +132,43 @@
                 </tbody>
             </table>
         </div>
-        
+
+        {{-- Mobile Cards Grid (hidden on desktop) --}}
+        <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            @forelse ($jadwal as $j)
+                <a href="{{ route('jadwal.detail', $j) }}" class="block bg-white border border-gray-100 shadow-xs rounded-xl p-3.5 hover:border-primary hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-primary/10 text-primary">
+                                {{ $j->hari }}
+                            </span>
+                            <span class="text-xs font-semibold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
+                                {{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }} – {{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}
+                            </span>
+                        </div>
+                        <h3 class="font-bold text-gray-900 text-sm leading-snug">{{ $j->mataKuliah->nama_mk }}</h3>
+                        <div class="mt-2 flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 rounded bg-gray-50 border border-gray-100 text-gray-700 font-medium">Kelas {{ $j->kelas->nama_kelas }}</span>
+                            <span class="px-2 py-0.5 rounded bg-gray-50 border border-gray-100 text-gray-700 font-medium">{{ $j->ruangPraktikum->nama_ruang }}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 truncate flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <span class="truncate">{{ $j->dosen->nama }}</span>
+                        </p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-end text-xs font-semibold text-primary">
+                        <span>Lihat Detail &rarr;</span>
+                    </div>
+                </a>
+            @empty
+                <div class="sm:col-span-2 bg-white rounded-xl p-8 text-center border border-gray-100">
+                    <p class="text-gray-500 font-medium text-sm">Tidak ada jadwal yang sesuai dengan filter.</p>
+                </div>
+            @endforelse
+        </div>
+
         @if($jadwal->hasPages())
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <div class="mt-4">
             {{ $jadwal->links() }}
         </div>
         @endif

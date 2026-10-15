@@ -59,7 +59,7 @@ class JadwalManage extends Component
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jum\'at,Sabtu',
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
-            'status' => 'required|in:aktif,nonaktif,dibatalkan',
+            'status' => 'required|in:aktif,nonaktif,dibatalkan,reschedule',
             'keterangan' => 'nullable|string|max:255',
         ];
     }
@@ -99,30 +99,33 @@ class JadwalManage extends Component
         $validated = $this->validate();
         $this->conflictMessage = null;
 
-        // 1) Cek bentrok ruang
-        $bentrokRuang = $conflictService->cekBentrokRuang(
-            $this->ruang_praktikum_id, $this->hari, $this->jam_mulai, $this->jam_selesai,
-            $this->tahun_akademik_id, $this->editId
-        );
+        // Hanya cek bentrok jika status jadwal adalah aktif
+        if ($this->status === 'aktif') {
+            // 1) Cek bentrok ruang
+            $bentrokRuang = $conflictService->cekBentrokRuang(
+                $this->ruang_praktikum_id, $this->hari, $this->jam_mulai, $this->jam_selesai,
+                $this->tahun_akademik_id, $this->editId
+            );
 
-        if ($bentrokRuang) {
-            $this->conflictMessage = "Ruang sudah dipakai untuk {$bentrokRuang->mataKuliah->nama_mk} "
-                ."oleh {$bentrokRuang->dosen->nama} ({$bentrokRuang->jam_mulai}–{$bentrokRuang->jam_selesai}).";
+            if ($bentrokRuang) {
+                $this->conflictMessage = "Ruang sudah dipakai untuk {$bentrokRuang->mataKuliah->nama_mk} "
+                    ."oleh {$bentrokRuang->dosen->nama} ({$bentrokRuang->jam_mulai}–{$bentrokRuang->jam_selesai}).";
 
-            return;
-        }
+                return;
+            }
 
-        // 2) Cek bentrok dosen
-        $bentrokDosen = $conflictService->cekBentrokDosen(
-            $this->dosen_id, $this->hari, $this->jam_mulai, $this->jam_selesai,
-            $this->tahun_akademik_id, $this->editId
-        );
+            // 2) Cek bentrok dosen
+            $bentrokDosen = $conflictService->cekBentrokDosen(
+                $this->dosen_id, $this->hari, $this->jam_mulai, $this->jam_selesai,
+                $this->tahun_akademik_id, $this->editId
+            );
 
-        if ($bentrokDosen) {
-            $this->conflictMessage = "Dosen sudah mengajar {$bentrokDosen->mataKuliah->nama_mk} "
-                ."di ruang {$bentrokDosen->ruangPraktikum->nama_ruang} ({$bentrokDosen->jam_mulai}–{$bentrokDosen->jam_selesai}).";
+            if ($bentrokDosen) {
+                $this->conflictMessage = "Dosen sudah mengajar {$bentrokDosen->mataKuliah->nama_mk} "
+                    ."di ruang {$bentrokDosen->ruangPraktikum->nama_ruang} ({$bentrokDosen->jam_mulai}–{$bentrokDosen->jam_selesai}).";
 
-            return;
+                return;
+            }
         }
 
         // 3) Lolos validasi bentrok, baru simpan
@@ -132,7 +135,7 @@ class JadwalManage extends Component
         $this->reset([
             'editId', 'mata_kuliah_id', 'kelas_id', 'dosen_id',
             'ruang_praktikum_id', 'tahun_akademik_id', 'hari',
-            'jam_mulai', 'jam_selesai', 'keterangan',
+            'jam_mulai', 'jam_selesai', 'keterangan', 'conflictMessage',
         ]);
         session()->flash('success', $this->editId ? 'Jadwal berhasil diperbarui.' : 'Jadwal berhasil ditambahkan.');
     }
@@ -162,7 +165,7 @@ class JadwalManage extends Component
     {
         $jadwal = JadwalPraktikum::query()
             ->with(['mataKuliah', 'kelas', 'dosen', 'ruangPraktikum', 'tahunAkademik'])
-            ->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jum''at','Sabtu')")
+            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END")
             ->orderBy('jam_mulai')
             ->paginate(10);
 
@@ -171,7 +174,7 @@ class JadwalManage extends Component
             'mataKuliah' => MataKuliah::where('status', 'aktif')->orderBy('nama_mk')->get(),
             'kelasList' => Kelas::where('status', 'aktif')->orderBy('nama_kelas')->get(),
             'dosenList' => Dosen::where('status', 'aktif')->orderBy('nama')->get(),
-            'ruangList' => RuangPraktikum::where('status', 'aktif')->orderBy('nama_ruang')->get(),
+            'ruangList' => RuangPraktikum::whereIn('status', ['aktif', 'tersedia'])->orderBy('nama_ruang')->get(),
             'tahunList' => TahunAkademik::orderByDesc('tahun_mulai')->get(),
         ])->layout('components.layouts.admin', ['title' => 'Kelola Jadwal Praktikum']);
     }

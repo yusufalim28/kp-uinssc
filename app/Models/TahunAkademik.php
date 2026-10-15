@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\JadwalPraktikum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +10,7 @@ use Spatie\Activitylog\Support\LogOptions;
 
 class TahunAkademik extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $table = 'tahun_akademik';
 
@@ -20,6 +19,16 @@ class TahunAkademik extends Model
     public function jadwalPraktikum()
     {
         return $this->hasMany(JadwalPraktikum::class);
+    }
+
+    public function setStatusAktifAttribute($value): void
+    {
+        $this->attributes['is_aktif'] = (bool) $value;
+    }
+
+    public function getStatusAktifAttribute(): bool
+    {
+        return (bool) ($this->attributes['is_aktif'] ?? false);
     }
 
     public function getActivitylogOptions(): LogOptions

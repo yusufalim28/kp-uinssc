@@ -18,8 +18,8 @@ class KalenderJadwal extends Component
             ->groupBy('hari');
 
         return view('livewire.public.kalender-jadwal', [
-            'hariList'       => $hariList,
-            'jadwalPerHari'  => $jadwalPerHari,
+            'hariList' => $hariList,
+            'jadwalPerHari' => $jadwalPerHari,
         ])->layout('components.layouts.guest', ['title' => 'Kalender Jadwal']);
     }
 }

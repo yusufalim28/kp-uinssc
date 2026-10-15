@@ -161,7 +161,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Dinonaktifkan: Mahasiswa tidak boleh login/daftar. Akses hanya Dosen & Pengelola Lab.
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

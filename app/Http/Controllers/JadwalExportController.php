@@ -26,7 +26,7 @@ class JadwalExportController extends Controller
             ->when($request->query('mata_kuliah_id'), fn ($q, $id) => $q->where('mata_kuliah_id', $id))
             ->when($request->query('dosen_id'), fn ($q, $id) => $q->where('dosen_id', $id))
             ->when($request->query('hari'), fn ($q, $hari) => $q->where('hari', $hari))
-            ->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jum''at','Sabtu')")
+            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END")
             ->orderBy('jam_mulai')
             ->get();
     }
@@ -36,11 +36,11 @@ class JadwalExportController extends Controller
         $jadwal = $this->filteredJadwal($request);
 
         $pdf = Pdf::loadView('exports.jadwal-pdf', [
-            'jadwal'      => $jadwal,
+            'jadwal' => $jadwal,
             'tanggalExport' => now()->translatedFormat('d F Y, H:i'),
         ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('jadwal-praktikum-' . now()->format('Y-m-d') . '.pdf');
+        return $pdf->download('jadwal-praktikum-'.now()->format('Y-m-d').'.pdf');
     }
 
     public function excel(Request $request)
@@ -49,7 +49,7 @@ class JadwalExportController extends Controller
 
         return Excel::download(
             new JadwalExport($jadwal),
-            'jadwal-praktikum-' . now()->format('Y-m-d') . '.xlsx'
+            'jadwal-praktikum-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 }

@@ -5,33 +5,35 @@ use App\Models\Dosen;
 use App\Models\JadwalPraktikum;
 use App\Models\Kelas;
 use App\Models\MataKuliah;
+use App\Models\PengajuanPerubahan;
 use App\Models\RuangPraktikum;
 use App\Models\TahunAkademik;
+use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(RolePermissionSeeder::class);
     loginAsRole('operator');
 
-    $this->mk     = MataKuliah::factory()->create();
-    $this->kelas  = Kelas::factory()->create();
-    $this->dosen  = Dosen::factory()->create();
-    $this->ruang  = RuangPraktikum::factory()->create();
-    $this->tahun  = TahunAkademik::factory()->create();
+    $this->mk = MataKuliah::factory()->create();
+    $this->kelas = Kelas::factory()->create();
+    $this->dosen = Dosen::factory()->create();
+    $this->ruang = RuangPraktikum::factory()->create();
+    $this->tahun = TahunAkademik::factory()->create();
 });
 
 function isiFormJadwal($component, array $override = [])
 {
     $data = array_merge([
-        'mata_kuliah_id'     => test()->mk->id,
-        'kelas_id'           => test()->kelas->id,
-        'dosen_id'           => test()->dosen->id,
+        'mata_kuliah_id' => test()->mk->id,
+        'kelas_id' => test()->kelas->id,
+        'dosen_id' => test()->dosen->id,
         'ruang_praktikum_id' => test()->ruang->id,
-        'tahun_akademik_id'  => test()->tahun->id,
-        'hari'               => 'Senin',
-        'jam_mulai'          => '08:00',
-        'jam_selesai'        => '10:00',
-        'status'             => 'aktif',
+        'tahun_akademik_id' => test()->tahun->id,
+        'hari' => 'Senin',
+        'jam_mulai' => '08:00',
+        'jam_selesai' => '10:00',
+        'status' => 'aktif',
     ], $override);
 
     foreach ($data as $key => $value) {
@@ -53,10 +55,10 @@ test('bisa membuat jadwal baru tanpa bentrok', function () {
 test('jadwal bentrok ruang ditolak dan pesan error tampil', function () {
     JadwalPraktikum::factory()->create([
         'ruang_praktikum_id' => $this->ruang->id,
-        'tahun_akademik_id'  => $this->tahun->id,
-        'hari'               => 'Senin',
-        'jam_mulai'          => '08:00',
-        'jam_selesai'        => '10:00',
+        'tahun_akademik_id' => $this->tahun->id,
+        'hari' => 'Senin',
+        'jam_mulai' => '08:00',
+        'jam_selesai' => '10:00',
     ]);
 
     $component = Livewire::test(JadwalManage::class)->call('openCreate');
@@ -71,11 +73,11 @@ test('jadwal bentrok ruang ditolak dan pesan error tampil', function () {
 test('mengedit jadwal tanpa mengubah jam tidak dianggap bentrok dengan dirinya sendiri', function () {
     $jadwal = JadwalPraktikum::factory()->create([
         'ruang_praktikum_id' => $this->ruang->id,
-        'tahun_akademik_id'  => $this->tahun->id,
-        'hari'               => 'Senin',
-        'jam_mulai'          => '08:00',
-        'jam_selesai'        => '10:00',
-        'keterangan'         => null,
+        'tahun_akademik_id' => $this->tahun->id,
+        'hari' => 'Senin',
+        'jam_mulai' => '08:00',
+        'jam_selesai' => '10:00',
+        'keterangan' => null,
     ]);
 
     $component = Livewire::test(JadwalManage::class)->call('openEdit', $jadwal->id);
@@ -88,12 +90,12 @@ test('mengedit jadwal tanpa mengubah jam tidak dianggap bentrok dengan dirinya s
 
 test('tidak bisa menghapus jadwal yang masih punya riwayat pengajuan perubahan', function () {
     $jadwal = JadwalPraktikum::factory()->create();
-    \App\Models\PengajuanPerubahan::create([
+    PengajuanPerubahan::create([
         'jadwal_praktikum_id' => $jadwal->id,
-        'dosen_id'            => $this->dosen->id,
-        'perubahan'           => 'Pindah jam',
-        'alasan'              => 'Ada rapat',
-        'status'              => 'menunggu',
+        'dosen_id' => $this->dosen->id,
+        'perubahan' => 'Pindah jam',
+        'alasan' => 'Ada rapat',
+        'status' => 'menunggu',
     ]);
 
     Livewire::test(JadwalManage::class)

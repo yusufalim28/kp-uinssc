@@ -40,7 +40,7 @@ class SampleDataSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        if (!$superAdmin->hasRole('super-admin')) {
+        if (! $superAdmin->hasRole('super-admin')) {
             $superAdmin->assignRole('super-admin');
         }
 
@@ -53,7 +53,7 @@ class SampleDataSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        if (!$operator->hasRole('operator')) {
+        if (! $operator->hasRole('operator')) {
             $operator->assignRole('operator');
         }
 
@@ -79,7 +79,7 @@ class SampleDataSeeder extends Seeder
                     'email_verified_at' => now(),
                 ]
             );
-            if (!$user->hasRole('dosen')) {
+            if (! $user->hasRole('dosen')) {
                 $user->assignRole('dosen');
             }
             $dosenUsers[] = $user;
@@ -347,14 +347,14 @@ class SampleDataSeeder extends Seeder
         }
 
         echo "✅ Sample data seeded successfully!\n";
-        echo "   - " . User::count() . " users\n";
-        echo "   - " . Fakultas::count() . " fakultas\n";
-        echo "   - " . ProgramStudi::count() . " program studi\n";
-        echo "   - " . Kelas::count() . " kelas\n";
-        echo "   - " . MataKuliah::count() . " mata kuliah\n";
-        echo "   - " . Dosen::count() . " dosen\n";
-        echo "   - " . RuangPraktikum::count() . " ruang praktikum\n";
-        echo "   - " . TahunAkademik::count() . " tahun akademik\n";
-        echo "   - " . JadwalPraktikum::count() . " jadwal praktikum\n";
+        echo '   - '.User::count()." users\n";
+        echo '   - '.Fakultas::count()." fakultas\n";
+        echo '   - '.ProgramStudi::count()." program studi\n";
+        echo '   - '.Kelas::count()." kelas\n";
+        echo '   - '.MataKuliah::count()." mata kuliah\n";
+        echo '   - '.Dosen::count()." dosen\n";
+        echo '   - '.RuangPraktikum::count()." ruang praktikum\n";
+        echo '   - '.TahunAkademik::count()." tahun akademik\n";
+        echo '   - '.JadwalPraktikum::count()." jadwal praktikum\n";
     }
 }

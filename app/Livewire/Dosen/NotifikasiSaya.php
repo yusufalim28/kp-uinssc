@@ -28,7 +28,7 @@ class NotifikasiSaya extends Component
             ->paginate(10);
 
         return view('livewire.dosen.notifikasi-saya', [
-            'notifikasi'    => $notifikasi,
+            'notifikasi' => $notifikasi,
             'jumlahBelumDibaca' => auth()->user()->unreadNotifications()->count(),
         ])->layout('components.layouts.admin', ['title' => 'Notifikasi Saya']);
     }

@@ -14,7 +14,9 @@ class PengajuanIndex extends Component
     public string $filterStatus = 'menunggu';
 
     public ?int $processId = null;
+
     public string $processAction = ''; // 'approve' | 'reject'
+
     public string $catatan_penolakan = '';
 
     public function updatingFilterStatus(): void
@@ -46,8 +48,8 @@ class PengajuanIndex extends Component
             ]);
 
             $pengajuan->update([
-                'status'             => 'ditolak',
-                'catatan_penolakan'  => $this->catatan_penolakan,
+                'status' => 'ditolak',
+                'catatan_penolakan' => $this->catatan_penolakan,
             ]);
 
             $pengajuan->dosen->user?->notify(new PengajuanStatusDiperbarui($pengajuan));
@@ -55,8 +57,8 @@ class PengajuanIndex extends Component
             session()->flash('success', 'Pengajuan berhasil ditolak.');
         } else {
             $pengajuan->update([
-                'status'             => 'disetujui',
-                'catatan_penolakan'  => null,
+                'status' => 'disetujui',
+                'catatan_penolakan' => null,
             ]);
 
             $pengajuan->dosen->user?->notify(new PengajuanStatusDiperbarui($pengajuan));

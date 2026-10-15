@@ -20,12 +20,12 @@ class MataKuliahFactory extends Factory
     {
         return [
             'program_studi_id' => ProgramStudi::factory(),
-            'kode_mk'          => strtoupper(fake()->unique()->bothify('MK###')),
-            'nama_mk'          => 'Praktikum ' . fake()->unique()->word(),
-            'sks'              => fake()->numberBetween(1, 4),
-            'semester'         => fake()->numberBetween(1, 8),
-            'status'           => 'aktif',
-            
+            'kode_mk' => strtoupper(fake()->unique()->bothify('MK###')),
+            'nama_mk' => 'Praktikum '.fake()->unique()->word(),
+            'sks' => fake()->numberBetween(1, 4),
+            'semester' => fake()->numberBetween(1, 8),
+            'status' => 'aktif',
+
             // 'program_studi_id' => ProgramStudi::factory(),
             // 'kode_mk' => fake()->unique()->regexify('[A-Z]{2}[0-9]{3}'),
             // 'nama_mk' => fake()->unique()->words(3, true),

@@ -4,21 +4,22 @@ use App\Livewire\Admin\PengajuanIndex;
 use App\Models\Dosen;
 use App\Models\JadwalPraktikum;
 use App\Models\PengajuanPerubahan;
+use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(RolePermissionSeeder::class);
     loginAsRole('operator');
 
-    $dosen  = Dosen::factory()->create();
+    $dosen = Dosen::factory()->create();
     $jadwal = JadwalPraktikum::factory()->create(['dosen_id' => $dosen->id]);
 
     $this->pengajuan = PengajuanPerubahan::create([
         'jadwal_praktikum_id' => $jadwal->id,
-        'dosen_id'            => $dosen->id,
-        'perubahan'           => 'Pindah ke Rabu',
-        'alasan'              => 'Bentrok jadwal lain',
-        'status'              => 'menunggu',
+        'dosen_id' => $dosen->id,
+        'perubahan' => 'Pindah ke Rabu',
+        'alasan' => 'Bentrok jadwal lain',
+        'status' => 'menunggu',
     ]);
 });
 
@@ -54,10 +55,10 @@ test('menolak tanpa catatan ditolak oleh validasi', function () {
 test('filter status hanya menampilkan pengajuan sesuai status dipilih', function () {
     $disetujui = PengajuanPerubahan::create([
         'jadwal_praktikum_id' => $this->pengajuan->jadwal_praktikum_id,
-        'dosen_id'            => $this->pengajuan->dosen_id,
-        'perubahan'           => 'Sudah beres',
-        'alasan'              => 'Contoh',
-        'status'              => 'disetujui',
+        'dosen_id' => $this->pengajuan->dosen_id,
+        'perubahan' => 'Sudah beres',
+        'alasan' => 'Contoh',
+        'status' => 'disetujui',
     ]);
 
     Livewire::test(PengajuanIndex::class)

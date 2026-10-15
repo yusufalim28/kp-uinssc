@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Services\PustikomBridgeAuthService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -26,9 +27,23 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureAuthentication();
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+    }
+
+    /**
+     * Configure authentication using Pustikom Bridge API / Local Auth.
+     */
+    private function configureAuthentication(): void
+    {
+        Fortify::authenticateUsing(function (Request $request) {
+            $username = (string) ($request->input(Fortify::username()) ?? $request->input('email') ?? $request->input('username'));
+            $password = (string) $request->input('password');
+
+            return app(PustikomBridgeAuthService::class)->authenticate($username, $password);
+        });
     }
 
     /**

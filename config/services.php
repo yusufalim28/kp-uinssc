@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'pustikom_bridge' => [
+        'base_url' => env('PUSTIKOM_BRIDGE_URL', 'https://bridge.ecampuz.com'),
+        'enabled' => env('PUSTIKOM_BRIDGE_ENABLED', false),
+        'timeout' => env('PUSTIKOM_BRIDGE_TIMEOUT', 4),
+    ],
+
 ];

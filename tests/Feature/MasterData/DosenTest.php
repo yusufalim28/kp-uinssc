@@ -3,10 +3,11 @@
 use App\Livewire\Admin\MasterData\DosenIndex;
 use App\Models\Dosen;
 use App\Models\JadwalPraktikum;
+use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(RolePermissionSeeder::class);
     loginAsRole('super-admin');
 });
 

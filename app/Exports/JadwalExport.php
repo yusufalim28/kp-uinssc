@@ -10,11 +10,9 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class JadwalExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+class JadwalExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
-    public function __construct(protected Collection $jadwal)
-    {
-    }
+    public function __construct(protected Collection $jadwal) {}
 
     public function collection(): Collection
     {

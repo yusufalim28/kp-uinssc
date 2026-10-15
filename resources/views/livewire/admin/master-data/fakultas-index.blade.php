@@ -32,7 +32,8 @@
            class="w-full md:w-96 rounded-xl border-gray-300 bg-white shadow-sm focus:border-primary focus:ring focus:ring-primary/20 text-sm px-4 py-2.5 transition">
 
     {{-- Tabel --}}
-    <div class="bg-white border border-gray-300/10 rounded-xl overflow-x-auto">
+    {{-- Desktop Table --}}
+    <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
         <table class="w-full text-sm">
             <thead class="bg-primary text-white text-left">
                 <tr>
@@ -53,21 +54,40 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-right space-x-2">
-                            <button wire:click="openEdit({{ $f->id }})" class="text-primary-dark font-medium hover:underline">
-                                Edit
-                            </button>
-                            <button wire:click="confirmDelete({{ $f->id }})" class="text-red-600 font-medium hover:underline">
-                                Hapus
-                            </button>
+                            <button wire:click="openEdit({{ $f->id }})" class="text-primary-dark font-medium hover:underline">Edit</button>
+                            <button wire:click="confirmDelete({{ $f->id }})" class="text-red-600 font-medium hover:underline">Hapus</button>
                         </td>
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="4" class="px-4 py-8 text-center text-gray-900/50">Belum ada data fakultas.</td>
-                    </tr>
+                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-900/50">Belum ada data fakultas.</td></tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- Mobile Cards Grid --}}
+    <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+        @forelse ($fakultas as $f)
+            <div class="bg-white border border-gray-100 rounded-xl p-3.5 shadow-xs hover:border-gray-200 transition flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="font-mono text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{{ $f->kode_fakultas }}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium {{ $f->status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ ucfirst($f->status) }}
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-sm text-gray-900 leading-snug">{{ $f->nama_fakultas }}</h3>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2.5 mt-3 border-t border-gray-100">
+                    <button wire:click="openEdit({{ $f->id }})" class="px-2.5 py-1 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/15 rounded-lg transition">Edit</button>
+                    <button wire:click="confirmDelete({{ $f->id }})" class="px-2.5 py-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="sm:col-span-2 bg-white rounded-xl p-8 text-center border border-gray-100">
+                <p class="text-gray-500 text-sm">Belum ada data fakultas.</p>
+            </div>
+        @endforelse
     </div>
 
     {{ $fakultas->links() }}

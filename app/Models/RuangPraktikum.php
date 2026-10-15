@@ -10,7 +10,7 @@ use Spatie\Activitylog\Support\LogOptions;
 
 class RuangPraktikum extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $table = 'ruang_praktikum';
 
@@ -20,6 +20,7 @@ class RuangPraktikum extends Model
     {
         return $this->hasMany(JadwalPraktikum::class);
     }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

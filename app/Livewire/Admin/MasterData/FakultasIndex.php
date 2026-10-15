@@ -12,11 +12,15 @@ class FakultasIndex extends Component
 
     // State form
     public ?int $editId = null;
+
     public string $nama_fakultas = '';
+
     public string $kode_fakultas = '';
+
     public string $status = 'aktif';
 
     public bool $showModal = false;
+
     public string $search = '';
 
     // State konfirmasi hapus
@@ -26,8 +30,8 @@ class FakultasIndex extends Component
     {
         return [
             'nama_fakultas' => 'required|string|max:150',
-            'kode_fakultas' => 'required|string|max:20|unique:fakultas,kode_fakultas,' . $this->editId,
-            'status'        => 'required|in:aktif,nonaktif',
+            'kode_fakultas' => 'required|string|max:20|unique:fakultas,kode_fakultas,'.$this->editId,
+            'status' => 'required|in:aktif,nonaktif',
         ];
     }
 
@@ -47,11 +51,11 @@ class FakultasIndex extends Component
     {
         $fakultas = Fakultas::findOrFail($id);
 
-        $this->editId        = $fakultas->id;
+        $this->editId = $fakultas->id;
         $this->nama_fakultas = $fakultas->nama_fakultas;
         $this->kode_fakultas = $fakultas->kode_fakultas;
-        $this->status        = $fakultas->status;
-        $this->showModal     = true;
+        $this->status = $fakultas->status;
+        $this->showModal = true;
     }
 
     public function save(): void
