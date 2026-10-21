@@ -57,7 +57,12 @@ class MataKuliahIndex extends Component
 
     public function openEdit(int $id): void
     {
-        $mk = MataKuliah::findOrFail($id);
+        $user = auth()->user();
+        $mk = MataKuliah::with('programStudi')->findOrFail($id);
+
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            abort_if($mk->programStudi && $mk->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengedit Mata Kuliah di bawah fakultas sendiri.');
+        }
 
         $this->editId = $mk->id;
         $this->kode_mk = $mk->kode_mk;
@@ -71,7 +76,18 @@ class MataKuliahIndex extends Component
 
     public function save(): void
     {
+        $user = auth()->user();
         $validated = $this->validate();
+
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $prodi = ProgramStudi::findOrFail($this->program_studi_id);
+            abort_if($prodi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengelola Mata Kuliah di bawah fakultas sendiri.');
+
+            if ($this->editId) {
+                $mk = MataKuliah::with('programStudi')->findOrFail($this->editId);
+                abort_if($mk->programStudi && $mk->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengedit Mata Kuliah di bawah fakultas sendiri.');
+            }
+        }
 
         MataKuliah::updateOrCreate(['id' => $this->editId], $validated);
 
@@ -82,14 +98,25 @@ class MataKuliahIndex extends Component
 
     public function confirmDelete(int $id): void
     {
+        $user = auth()->user();
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $mk = MataKuliah::with('programStudi')->findOrFail($id);
+            abort_if($mk->programStudi && $mk->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Mata Kuliah di bawah fakultas sendiri.');
+        }
+
         $this->confirmDeleteId = $id;
     }
 
     public function delete(): void
     {
-        $mk = MataKuliah::find($this->confirmDeleteId);
+        $user = auth()->user();
+        $mk = MataKuliah::with('programStudi')->find($this->confirmDeleteId);
 
         if ($mk) {
+            if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+                abort_if($mk->programStudi && $mk->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Mata Kuliah di bawah fakultas sendiri.');
+            }
+
             if ($mk->jadwalPraktikum()->exists()) {
                 session()->flash('error', 'Mata Kuliah tidak bisa dihapus karena masih dipakai di Jadwal Praktikum.');
             } else {
@@ -103,16 +130,27 @@ class MataKuliahIndex extends Component
 
     public function render()
     {
-        $mataKuliah = MataKuliah::query()
-            ->with('programStudi')
+        $user = auth()->user();
+
+        $query = MataKuliah::query()->with('programStudi');
+
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $query->whereHas('programStudi', fn ($q) => $q->where('fakultas_id', $user->fakultas_id));
+        }
+
+        $mataKuliah = $query
             ->when($this->search, fn ($q) => $q->where('nama_mk', 'like', "%{$this->search}%")
                 ->orWhere('kode_mk', 'like', "%{$this->search}%"))
             ->orderBy('nama_mk')
             ->paginate(10);
 
+        $programStudi = ($user && $user->hasRole('operator') && $user->fakultas_id)
+            ? ProgramStudi::where('fakultas_id', $user->fakultas_id)->orderBy('nama_program_studi')->get()
+            : ProgramStudi::orderBy('nama_program_studi')->get();
+
         return view('livewire.admin.master-data.mata-kuliah-index', [
             'mataKuliah' => $mataKuliah,
-            'programStudi' => ProgramStudi::orderBy('nama_program_studi')->get(),
+            'programStudi' => $programStudi,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Mata Kuliah']);
     }
 }

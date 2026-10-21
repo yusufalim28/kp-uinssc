@@ -23,13 +23,13 @@ test('bisa menambah ruang praktikum baru', function () {
     expect(RuangPraktikum::where('kode_ruang', 'RG101')->exists())->toBeTrue();
 });
 
-test('kapasitas di luar 1-200 ditolak', function () {
+test('kapasitas di luar batas ditolak', function () {
     Livewire::test(RuangPraktikumIndex::class)
         ->call('openCreate')
         ->set('kode_ruang', 'RG102')
         ->set('nama_ruang', 'Lab Besar')
         ->set('lokasi', 'Gedung B')
-        ->set('kapasitas', 500)
+        ->set('kapasitas', 1500)
         ->call('save')
         ->assertHasErrors(['kapasitas']);
 });

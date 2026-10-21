@@ -5,13 +5,12 @@
             <h1 class="text-xl font-bold text-gray-900">Master Data — Fakultas</h1>
             <p class="text-gray-500 text-sm">Kelola data fakultas.</p>
         </div>
-        <button wire:click="openCreate"
-                class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">
-            + Tambah Fakultas
-        </button>
-        {{-- @role('super-admin')
-            <button wire:click="openDelete" class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">Hapus Fakultas</button>
-        @endrole --}}
+        @if(auth()->user()->hasRole('super-admin'))
+            <button wire:click="openCreate"
+                    class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">
+                + Tambah Fakultas
+            </button>
+        @endif
     </div>
 
     {{-- Notifikasi --}}
@@ -54,8 +53,12 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-right space-x-2">
-                            <button wire:click="openEdit({{ $f->id }})" class="text-primary-dark font-medium hover:underline">Edit</button>
-                            <button wire:click="confirmDelete({{ $f->id }})" class="text-red-600 font-medium hover:underline">Hapus</button>
+                            @if(auth()->user()->hasRole('super-admin') || auth()->user()->fakultas_id === $f->id)
+                                <button wire:click="openEdit({{ $f->id }})" class="text-primary-dark font-medium hover:underline">Edit</button>
+                            @endif
+                            @if(auth()->user()->hasRole('super-admin'))
+                                <button wire:click="confirmDelete({{ $f->id }})" class="text-red-600 font-medium hover:underline">Hapus</button>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -79,8 +82,12 @@
                     <h3 class="font-bold text-sm text-gray-900 leading-snug">{{ $f->nama_fakultas }}</h3>
                 </div>
                 <div class="flex items-center justify-end gap-2 pt-2.5 mt-3 border-t border-gray-100">
-                    <button wire:click="openEdit({{ $f->id }})" class="px-2.5 py-1 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/15 rounded-lg transition">Edit</button>
-                    <button wire:click="confirmDelete({{ $f->id }})" class="px-2.5 py-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Hapus</button>
+                    @if(auth()->user()->hasRole('super-admin') || auth()->user()->fakultas_id === $f->id)
+                        <button wire:click="openEdit({{ $f->id }})" class="px-2.5 py-1 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/15 rounded-lg transition">Edit</button>
+                    @endif
+                    @if(auth()->user()->hasRole('super-admin'))
+                        <button wire:click="confirmDelete({{ $f->id }})" class="px-2.5 py-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Hapus</button>
+                    @endif
                 </div>
             </div>
         @empty

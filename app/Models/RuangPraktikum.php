@@ -21,11 +21,21 @@ class RuangPraktikum extends Model
         return $this->hasMany(JadwalPraktikum::class);
     }
 
+    public function fakultas()
+    {
+        return $this->belongsTo(Fakultas::class);
+    }
+
+    public function programStudi()
+    {
+        return $this->belongsTo(ProgramStudi::class);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nama_ruang', 'kode_ruang', 'lokasi', 'kapasitas', 'status']) // field yang dicatat
-            ->logOnlyDirty()                                        // hanya catat yang berubah
+            ->logOnly(['nama_ruang', 'kode_ruang', 'lokasi', 'kapasitas', 'tipe_ruang', 'fakultas_id', 'program_studi_id', 'status'])
+            ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
 }

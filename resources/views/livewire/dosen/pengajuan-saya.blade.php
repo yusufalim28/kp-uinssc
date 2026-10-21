@@ -198,7 +198,7 @@
                             <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider">Tentukan Jadwal Baru</h3>
                             <div>
                                 <label class="text-xs text-gray-600 font-medium">Hari Baru</label>
-                                <select wire:model="hari_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                <select wire:model.live="hari_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                                     @foreach ($hariList as $h)
                                         <option value="{{ $h }}">{{ $h }}</option>
                                     @endforeach
@@ -207,11 +207,11 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-xs text-gray-600 font-medium">Jam Mulai Baru</label>
-                                    <input type="time" wire:model="jam_mulai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                    <input type="time" wire:model.live.debounce.300ms="jam_mulai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                                 </div>
                                 <div>
                                     <label class="text-xs text-gray-600 font-medium">Jam Selesai Baru</label>
-                                    <input type="time" wire:model="jam_selesai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                    <input type="time" wire:model.live.debounce.300ms="jam_selesai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                                 </div>
                             </div>
                         </div>
@@ -222,10 +222,12 @@
                             <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider">Pilih Ruang Praktikum Baru</h3>
                             <div>
                                 <label class="text-xs text-gray-600 font-medium">Ruang Lab yang Dikehendaki</label>
-                                <select wire:model="ruang_praktikum_id_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                <select wire:model.live="ruang_praktikum_id_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                                     <option value="">-- Pilih Ruang Baru --</option>
                                     @foreach ($ruangList as $r)
-                                        <option value="{{ $r->id }}">{{ $r->nama_ruang }} (Kapasitas {{ $r->kapasitas }})</option>
+                                        <option value="{{ $r->id }}">
+                                            {{ $r->nama_ruang }} ({{ $r->tipe_ruang === 'auditorium' ? 'Auditorium' : 'Lab' }} - Kapasitas {{ $r->kapasitas }})
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('ruang_praktikum_id_baru') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
@@ -238,16 +240,16 @@
                             <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider">Detail Kuliah Pengganti</h3>
                             <div>
                                 <label class="text-xs text-gray-600 font-medium">Tanggal Pengganti</label>
-                                <input type="date" wire:model="tanggal_pengganti" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                <input type="date" wire:model.live="tanggal_pengganti" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-xs text-gray-600 font-medium">Jam Mulai</label>
-                                    <input type="time" wire:model="jam_mulai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                    <input type="time" wire:model.live.debounce.300ms="jam_mulai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                                 </div>
                                 <div>
                                     <label class="text-xs text-gray-600 font-medium">Jam Selesai</label>
-                                    <input type="time" wire:model="jam_selesai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
+                                    <input type="time" wire:model.live.debounce.300ms="jam_selesai_baru" class="w-full rounded-lg border-gray-300 bg-white text-sm py-2 mt-1">
                                 </div>
                             </div>
                         </div>
@@ -260,6 +262,42 @@
                         </div>
                     @endif
 
+                    {{-- Live Conflict / Vacancy Indicator --}}
+                    @if ($jadwal_praktikum_id && $jenis_perubahan !== 'lainnya')
+                        <div wire:loading.remove wire:target="updatedJadwalPraktikumId, updatedJenisPerubahan, updatedHariBaru, updatedJamMulaiBaru, updatedJamSelesaiBaru, updatedRuangPraktikumIdBaru, updatedTanggalPengganti">
+                            @if ($isSlotAvailable)
+                                <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2.5 animate-in fade-in">
+                                    <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-emerald-950">Slot Ruangan Kosong & Bebas Bentrok!</p>
+                                        <p class="text-[11px] text-emerald-700 mt-0.5 leading-relaxed">
+                                            Ruangan dan jam yang Anda pilih saat ini sedang <strong>tidak digunakan</strong> oleh kelas lain. Anda dapat langsung memindahkan jadwal praktikum ini secara instan tanpa menunggu review operator.
+                                        </p>
+                                    </div>
+                                </div>
+                            @elseif ($conflictMessage)
+                                <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2.5 animate-in fade-in">
+                                    <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-amber-950">Slot Jadwal Bentrok / Terisi</p>
+                                        <p class="text-[11px] text-amber-800 mt-0.5 leading-relaxed">{{ $conflictMessage }}</p>
+                                        <p class="text-[10px] text-amber-600 mt-1">Anda dapat memilih jam/ruang lain yang kosong, atau tetap kirim pengajuan manual jika ingin dibantu koordinasi oleh operator.</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div wire:loading wire:target="updatedJadwalPraktikumId, updatedJenisPerubahan, updatedHariBaru, updatedJamMulaiBaru, updatedJamSelesaiBaru, updatedRuangPraktikumIdBaru, updatedTanggalPengganti"
+                             class="p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-500 text-xs flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-primary shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span>Memeriksa ketersediaan ruangan & jadwal dosen...</span>
+                        </div>
+                    @endif
+
                     <div>
                         <label class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Alasan Pengajuan (Wajib)</label>
                         <textarea wire:model="alasan" rows="3" placeholder="Jelaskan alasan pengajuan perubahan jadwal ini (mis. bentrok kegiatan akademik, dinas luar, perawatan perangkat lab)..." class="w-full rounded-xl border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2.5 mt-1 transition"></textarea>
@@ -268,14 +306,28 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2 shrink-0">
-                    <button wire:click="$set('showModal', false)" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-200/60 rounded-xl transition font-medium">
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
+                    <button wire:click="$set('showModal', false)" type="button" class="w-full sm:w-auto px-4 py-2 text-sm text-gray-600 hover:bg-gray-200/60 rounded-xl transition font-medium text-center">
                         Batal
                     </button>
-                    <button wire:click="save" wire:loading.attr="disabled" class="px-5 py-2 text-sm bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition shadow-sm disabled:opacity-50">
-                        <span wire:loading.remove wire:target="save">Kirim Pengajuan</span>
-                        <span wire:loading wire:target="save">Mengirim...</span>
-                    </button>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        @if ($isSlotAvailable)
+                            <button wire:click="save" wire:loading.attr="disabled" type="button" class="px-3.5 py-2 text-xs text-gray-600 hover:bg-gray-200/50 rounded-xl transition font-medium border border-gray-300">
+                                Pengajuan Biasa
+                            </button>
+                            <button wire:click="rescheduleInstant" wire:loading.attr="disabled" type="button" class="px-5 py-2 text-sm bg-emerald-700 text-white font-semibold rounded-xl hover:bg-emerald-800 transition shadow-sm inline-flex items-center justify-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span wire:loading.remove wire:target="rescheduleInstant">⚡ Pindahkan Langsung</span>
+                                <span wire:loading wire:target="rescheduleInstant">Memproses...</span>
+                            </button>
+                        @else
+                            <button wire:click="save" wire:loading.attr="disabled" type="button" class="w-full sm:w-auto px-5 py-2 text-sm bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition shadow-sm disabled:opacity-50">
+                                <span wire:loading.remove wire:target="save">Kirim Pengajuan</span>
+                                <span wire:loading wire:target="save">Mengirim...</span>
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

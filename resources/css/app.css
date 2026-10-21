@@ -70,6 +70,201 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+/* Alpine cloak utility */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Sembunyikan ikon mata bawaan browser (Microsoft Edge / Chromium) agar tidak dobel dengan tombol ikon mata kustom */
+input::-ms-reveal,
+input::-ms-clear,
+input::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
 body {
-    @apply bg-surface text-dark antialiased;
+    @apply bg-surface text-dark dark:bg-zinc-950 dark:text-zinc-100 antialiased;
+}
+
+/* ==========================================================================
+   GLOBAL DARK MODE ACCESSIBILITY & CONTRAST SYSTEM
+   ========================================================================== */
+
+/* 1. Native browser dark mode (controls native popups, scrollbars, dropdown options, date pickers) */
+html.dark,
+.dark {
+    color-scheme: dark !important;
+}
+
+/* 2. Global form controls in dark mode (Fixes white-on-white and invisible dropdowns) */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark select,
+.dark textarea {
+    background-color: #18181b !important;
+    color: #f4f4f5 !important;
+    border-color: #3f3f46 !important;
+}
+
+.dark select option,
+.dark select optgroup {
+    background-color: #18181b !important;
+    color: #f4f4f5 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: #71717a !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+    background-color: #18181b !important;
+    border-color: #10b981 !important;
+    outline: none !important;
+}
+
+/* Checkboxes & Radios */
+.dark input[type="checkbox"],
+.dark input[type="radio"] {
+    background-color: #27272a !important;
+    border-color: #52525b !important;
+    color: #10b981 !important;
+}
+
+/* 3. Surface & Card backgrounds in dark mode */
+.dark .bg-white:not([data-keep-light]) {
+    background-color: #18181b !important;
+    color: #f4f4f5;
+}
+
+.dark .bg-gray-50:not([data-keep-light]),
+.dark .bg-gray-50\/50:not([data-keep-light]),
+.dark .bg-gray-100:not([data-keep-light]),
+.dark .bg-zinc-50:not([data-keep-light]) {
+    background-color: #27272a !important;
+    color: #f4f4f5;
+}
+
+.dark .hover\:bg-gray-50:hover:not([data-keep-light]),
+.dark .hover\:bg-gray-50\/60:hover:not([data-keep-light]),
+.dark .hover\:bg-gray-100:hover:not([data-keep-light]),
+.dark .hover\:bg-gray-200:hover:not([data-keep-light]) {
+    background-color: #27272a !important;
+}
+
+/* 4. Borders in dark mode */
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-200\/60,
+.dark .border-gray-200\/80,
+.dark .border-gray-200\/90,
+.dark .border-gray-300,
+.dark .border-gray-300\/10,
+.dark .border-gray-300\/20,
+.dark .border-stone-100,
+.dark .border-stone-200,
+.dark .border-dark\/10 {
+    border-color: #27272a !important;
+}
+
+.dark .divide-gray-100 > :not(:last-child),
+.dark .divide-gray-200 > :not(:last-child),
+.dark .divide-stone-200 > :not(:last-child),
+.dark .divide-dark\/10 > :not(:last-child) {
+    border-color: #27272a !important;
+}
+
+/* 5. Text contrast in dark mode (Fixes dark text on dark backgrounds) */
+.dark .text-gray-900:not([data-keep-light]),
+.dark .text-gray-800:not([data-keep-light]),
+.dark .text-dark:not([data-keep-light]) {
+    color: #f4f4f5 !important;
+}
+
+.dark .text-gray-700:not([data-keep-light]),
+.dark .text-gray-600:not([data-keep-light]) {
+    color: #d4d4d8 !important;
+}
+
+.dark .text-gray-500:not([data-keep-light]),
+.dark .text-gray-400:not([data-keep-light]) {
+    color: #a1a1aa !important;
+}
+
+/* Primary text (headings, icons, links) become radiant emerald in dark mode */
+.dark .text-primary:not([data-keep-light]) {
+    color: #34d399 !important;
+}
+
+.dark .text-primary-dark:not([data-keep-light]) {
+    color: #6ee7b7 !important;
+}
+
+.dark .hover\:text-primary:hover:not([data-keep-light]) {
+    color: #6ee7b7 !important;
+}
+
+/* Primary translucent badges */
+.dark .bg-primary\/10 {
+    background-color: rgba(52, 211, 153, 0.15) !important;
+    color: #34d399 !important;
+}
+
+.dark .bg-primary\/5 {
+    background-color: rgba(52, 211, 153, 0.08) !important;
+}
+
+/* Status badges */
+.dark .bg-green-50,
+.dark .bg-emerald-50,
+.dark .bg-green-100 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+}
+.dark .bg-red-50,
+.dark .bg-red-100 {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+}
+.dark .bg-blue-50,
+.dark .bg-blue-100 {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+}
+.dark .bg-amber-50,
+.dark .bg-orange-50,
+.dark .bg-yellow-50 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+}
+.dark .bg-purple-50,
+.dark .bg-purple-100 {
+    background-color: rgba(168, 85, 247, 0.15) !important;
+    color: #c084fc !important;
+}
+
+/* Keep light elements protected (e.g. logo box, hero CTAs, green sidebar) */
+.dark [data-keep-light] {
+    color-scheme: light !important;
+}
+
+.dark [data-keep-light] .text-primary {
+    color: #005e3d !important;
+}
+.dark [data-keep-light] .text-gray-900 {
+    color: #111827 !important;
+}
+.dark [data-keep-light] .text-gray-700 {
+    color: #374151 !important;
+}
+.dark [data-keep-light] .text-gray-500 {
+    color: #6b7280 !important;
+}
+
+/* Modals & Dialog overlays */
+.dark .bg-black\/40,
+.dark .bg-black\/50 {
+    background-color: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(4px);
 }

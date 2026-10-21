@@ -44,14 +44,23 @@ class ProgramStudiIndex extends Component
 
     public function openCreate(): void
     {
+        $user = auth()->user();
         $this->reset(['editId', 'nama_program_studi', 'kode_program_studi', 'fakultas_id']);
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $this->fakultas_id = $user->fakultas_id;
+        }
         $this->status = 'aktif';
         $this->showModal = true;
     }
 
     public function openEdit(int $id): void
     {
+        $user = auth()->user();
         $prodi = ProgramStudi::findOrFail($id);
+
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            abort_if($prodi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengedit Program Studi di bawah fakultas sendiri.');
+        }
 
         $this->editId = $prodi->id;
         $this->nama_program_studi = $prodi->nama_program_studi;
@@ -63,6 +72,15 @@ class ProgramStudiIndex extends Component
 
     public function save(): void
     {
+        $user = auth()->user();
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $this->fakultas_id = $user->fakultas_id;
+            if ($this->editId) {
+                $prodi = ProgramStudi::findOrFail($this->editId);
+                abort_if($prodi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengedit Program Studi di bawah fakultas sendiri.');
+            }
+        }
+
         $validated = $this->validate();
 
         ProgramStudi::updateOrCreate(['id' => $this->editId], $validated);
@@ -74,14 +92,25 @@ class ProgramStudiIndex extends Component
 
     public function confirmDelete(int $id): void
     {
+        $user = auth()->user();
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $prodi = ProgramStudi::findOrFail($id);
+            abort_if($prodi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Program Studi di bawah fakultas sendiri.');
+        }
+
         $this->confirmDeleteId = $id;
     }
 
     public function delete(): void
     {
+        $user = auth()->user();
         $prodi = ProgramStudi::find($this->confirmDeleteId);
 
         if ($prodi) {
+            if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+                abort_if($prodi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Program Studi di bawah fakultas sendiri.');
+            }
+
             // Cegah hapus prodi yang masih punya kelas atau mata kuliah anak
             if ($prodi->kelas()->exists() || $prodi->mataKuliah()->exists()) {
                 session()->flash('error', 'Program Studi tidak bisa dihapus karena masih memiliki Kelas atau Mata Kuliah.');
@@ -96,16 +125,27 @@ class ProgramStudiIndex extends Component
 
     public function render()
     {
-        $prodi = ProgramStudi::query()
-            ->with('fakultas')   // <-- eager load supaya nama fakultas tampil tanpa N+1
+        $user = auth()->user();
+
+        $query = ProgramStudi::query()->with('fakultas');
+
+        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            $query->where('fakultas_id', $user->fakultas_id);
+        }
+
+        $prodi = $query
             ->when($this->search, fn ($q) => $q->where('nama_program_studi', 'like', "%{$this->search}%")
                 ->orWhere('kode_program_studi', 'like', "%{$this->search}%"))
             ->orderBy('nama_program_studi')
             ->paginate(10);
 
+        $fakultas = ($user && $user->hasRole('operator') && $user->fakultas_id)
+            ? Fakultas::where('id', $user->fakultas_id)->get()
+            : Fakultas::orderBy('nama_fakultas')->get();
+
         return view('livewire.admin.master-data.program-studi-index', [
             'prodi' => $prodi,
-            'fakultas' => Fakultas::orderBy('nama_fakultas')->get(),   // <-- untuk dropdown di form
+            'fakultas' => $fakultas,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Program Studi']);
     }
 }

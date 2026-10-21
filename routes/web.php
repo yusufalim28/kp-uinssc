@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\JadwalTemplateExport;
 use App\Http\Controllers\JadwalExportController;
 use App\Livewire\Admin\ActivityLogIndex;
 use App\Livewire\Admin\JadwalManage;
@@ -10,15 +11,20 @@ use App\Livewire\Admin\MasterData\MataKuliahIndex;
 use App\Livewire\Admin\MasterData\ProgramStudiIndex;
 use App\Livewire\Admin\MasterData\RuangPraktikumIndex;
 use App\Livewire\Admin\MasterData\TahunAkademikIndex;
+use App\Livewire\Admin\PanduanInternal;
 use App\Livewire\Admin\PengajuanIndex;
 use App\Livewire\Admin\SampahIndex;
+use App\Livewire\Admin\UserManage;
+use App\Livewire\Dosen\JadwalSaya;
 use App\Livewire\Dosen\NotifikasiSaya;
 use App\Livewire\Dosen\PengajuanSaya;
 use App\Livewire\Public\DaftarJadwal;
 use App\Livewire\Public\DetailJadwal;
 use App\Livewire\Public\Home;
 use App\Livewire\Public\KalenderJadwal;
+use App\Livewire\Public\PanduanPublik;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +35,7 @@ Route::get('/', Home::class)->name('home');
 Route::get('/jadwal', DaftarJadwal::class)->name('jadwal.index');
 Route::get('/jadwal/{jadwal}', DetailJadwal::class)->name('jadwal.detail');
 Route::get('/kalender', KalenderJadwal::class)->name('jadwal.kalender');
+Route::get('/panduan', PanduanPublik::class)->name('panduan.index');
 Route::get('/jadwal/export/pdf', [JadwalExportController::class, 'pdf'])->name('jadwal.export.pdf');
 Route::get('/jadwal/export/excel', [JadwalExportController::class, 'excel'])->name('jadwal.export.excel');
 
@@ -48,20 +55,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/master/tahun-akademik', TahunAkademikIndex::class)->name('tahunakademik.index');
 
         Route::get('/jadwal-manage', JadwalManage::class)->name('jadwal.manage');
+        Route::get('/jadwal/template/download', function () {
+            return Excel::download(new JadwalTemplateExport, 'template-jadwal-praktikum.xlsx');
+        })->name('jadwal.template.download');
         Route::get('/pengajuan', PengajuanIndex::class)->name('pengajuan.index');
     });
 
-    // Sampah & Activity Log — KHUSUS super-admin (lebih ketat dari operator)
+    // Sampah & Activity Log & User Management — KHUSUS super-admin
     Route::middleware('role:super-admin')->group(function () {
+        Route::get('/master/pengguna', UserManage::class)->name('users.index');
         Route::get('/sampah', SampahIndex::class)->name('sampah.index');
         Route::get('/log-aktivitas', ActivityLogIndex::class)->name('activitylog.index');
     });
 
     // Menu khusus dosen
     Route::middleware('role:dosen')->group(function () {
+        Route::get('/jadwal-saya', JadwalSaya::class)->name('jadwal.saya');
         Route::get('/pengajuan-saya', PengajuanSaya::class)->name('pengajuan.saya');
         Route::get('/notifikasi-saya', NotifikasiSaya::class)->name('notifikasi.saya');
     });
+
+    // Panduan & Aturan Internal (Super-admin, Operator, Dosen)
+    Route::get('/admin/panduan', PanduanInternal::class)->name('admin.panduan');
 });
 /*
 |--------------------------------------------------------------------------

@@ -1,12 +1,51 @@
 <div class="space-y-6">
 
-    <div>
-        <h1 class="text-xl font-bold text-gray-900">Riwayat Aktivitas</h1>
-        <p class="text-gray-500 text-sm">Catatan siapa mengubah apa, kapan — untuk keperluan audit.</p>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <h1 class="text-xl font-bold text-gray-900">Riwayat Aktivitas</h1>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                    {{ number_format($totalLogs) }} Log
+                </span>
+            </div>
+            <p class="text-gray-500 text-sm">Catatan audit siapa mengubah apa, kapan — untuk transparansi sistem.</p>
+        </div>
+
+        <button wire:click="openCleanModal" class="inline-flex items-center justify-center gap-2 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 font-semibold px-4 py-2.5 rounded-xl transition text-xs shadow-xs">
+            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Bersihkan Log Lama
+        </button>
     </div>
 
-    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari berdasarkan aksi atau jenis data..."
-           class="w-full md:w-96 rounded-xl border-gray-300 bg-white shadow-sm focus:border-primary focus:ring focus:ring-primary/20 text-sm px-4 py-2.5 transition">
+    @if (session('success'))
+        <div class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl px-4 py-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    {{-- Filter Bar --}}
+    <div class="flex items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-xs">
+        <div class="flex items-center gap-2.5">
+            <label class="text-xs font-semibold text-gray-700 uppercase tracking-wider shrink-0 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                Filter Jenis Aksi:
+            </label>
+            <select wire:model.live="filterAksi" class="rounded-xl border border-gray-300 bg-gray-50 focus:bg-white text-xs px-3.5 py-2 shadow-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition">
+                <option value="">Semua Aksi (Semua Riwayat)</option>
+                <option value="created">Tambah (Created)</option>
+                <option value="updated">Ubah (Updated)</option>
+                <option value="deleted">Hapus (Deleted)</option>
+                <option value="restored">Pulihkan (Restored)</option>
+            </select>
+        </div>
+
+        @if($filterAksi)
+            <button wire:click="$set('filterAksi', '')" class="text-xs text-red-600 hover:text-red-700 font-semibold px-2 py-1 hover:bg-red-50 rounded-lg transition">
+                Reset Filter
+            </button>
+        @endif
+    </div>
 
     {{-- Desktop Table --}}
     <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
@@ -130,5 +169,54 @@
     </div>
 
     {{ $logs->links() }}
+
+    {{-- Modal Bersihkan Log --}}
+    @if ($showCleanModal)
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-gray-900">Bersihkan Riwayat Log</h2>
+                        <p class="text-xs text-gray-500">Pilih kriteria data log lama yang ingin dihapus.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-1">
+                    <label class="text-xs font-semibold text-gray-700">Kriteria Penghapusan:</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-primary/50 cursor-pointer transition">
+                            <input type="radio" wire:model="cleanDays" value="30" class="text-primary focus:ring-primary">
+                            <span class="text-xs text-gray-700">Hapus log yang lebih lama dari <strong>30 hari</strong> (Direkomendasikan)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-primary/50 cursor-pointer transition">
+                            <input type="radio" wire:model="cleanDays" value="7" class="text-primary focus:ring-primary">
+                            <span class="text-xs text-gray-700">Hapus log yang lebih lama dari <strong>7 hari</strong></span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-primary/50 cursor-pointer transition">
+                            <input type="radio" wire:model="cleanDays" value="90" class="text-primary focus:ring-primary">
+                            <span class="text-xs text-gray-700">Hapus log yang lebih lama dari <strong>90 hari</strong></span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-red-200 bg-red-50/30 hover:border-red-400 cursor-pointer transition">
+                            <input type="radio" wire:model="cleanDays" value="0" class="text-red-600 focus:ring-red-500">
+                            <span class="text-xs text-red-700 font-medium">Kosongkan seluruh riwayat log aktivitas (Semua data)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
+                    <button wire:click="$set('showCleanModal', false)" type="button" class="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition">
+                        Batal
+                    </button>
+                    <button wire:click="cleanLogs" wire:loading.attr="disabled" type="button" class="px-5 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 text-white rounded-xl transition shadow-xs">
+                        <span wire:loading.remove wire:target="cleanLogs">Bersihkan Sekarang</span>
+                        <span wire:loading wire:target="cleanLogs">Menghapus...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
 </div>

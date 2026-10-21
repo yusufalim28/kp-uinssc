@@ -17,8 +17,31 @@
         <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">{{ session('error') }}</div>
     @endif
 
+    {{-- Banner Tahun Akademik Aktif --}}
+    @php
+        $tahunAktif = \App\Models\TahunAkademik::where('is_aktif', true)->first();
+    @endphp
+    @if ($tahunAktif)
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    📅
+                </span>
+                <div>
+                    <div class="text-xs font-semibold text-emerald-800 uppercase tracking-wider">Tahun Akademik Aktif Sistem</div>
+                    <div class="text-base font-bold text-gray-900">{{ $tahunAktif->nama }} (Semester {{ $tahunAktif->semester }})</div>
+                    <div class="text-xs text-gray-600">Seluruh jadwal baru, upload Excel, dan tampilan publik secara otomatis mengacu ke periode ini.</div>
+                </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shrink-0">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                Periode Aktif
+            </span>
+        </div>
+    @endif
+
     {{-- Desktop Table --}}
-    <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
+    <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden shadow-xs">
         <table class="w-full text-sm">
             <thead class="bg-primary text-white text-left">
                 <tr>
@@ -41,9 +64,11 @@
                         <td class="px-4 py-3 text-gray-600">{{ $t->tahun_mulai }}{{ $t->tahun_selesai ? ' / ' . $t->tahun_selesai : '' }}</td>
                         <td class="px-4 py-3">
                             @if ($t->is_aktif)
-                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Aktif</span>
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ Sedang Aktif</span>
                             @else
-                                <span class="px-2.5 py-1 rounded-full text-xs bg-gray-900/10 text-gray-900/50">Nonaktif</span>
+                                <button wire:click="setAktif({{ $t->id }})" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border border-gray-200 transition">
+                                    Aktifkan
+                                </button>
                             @endif
                         </td>
                         <td class="px-4 py-3 text-right space-x-2">
@@ -78,6 +103,9 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2.5 mt-3 border-t border-gray-100">
+                    @if (! $t->is_aktif)
+                        <button wire:click="setAktif({{ $t->id }})" class="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition border border-emerald-200">Aktifkan</button>
+                    @endif
                     <button wire:click="openEdit({{ $t->id }})" class="px-2.5 py-1 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/15 rounded-lg transition">Edit</button>
                     <button wire:click="confirmDelete({{ $t->id }})" class="px-2.5 py-1 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Hapus</button>
                 </div>

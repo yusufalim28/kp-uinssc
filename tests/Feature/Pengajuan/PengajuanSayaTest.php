@@ -4,6 +4,7 @@ use App\Livewire\Dosen\PengajuanSaya;
 use App\Models\Dosen;
 use App\Models\JadwalPraktikum;
 use App\Models\PengajuanPerubahan;
+use App\Models\RuangPraktikum;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
@@ -64,4 +65,55 @@ test('dosen hanya melihat riwayat pengajuannya sendiri, bukan milik dosen lain',
 
     Livewire::test(PengajuanSaya::class)
         ->assertDontSee('Punya dosen lain');
+});
+
+test('dosen bisa memindahkan jadwal langsung secara instan jika slot bebas bentrok', function () {
+    $ruangBaru = RuangPraktikum::factory()->create();
+
+    Livewire::test(PengajuanSaya::class)
+        ->call('openCreate')
+        ->set('jadwal_praktikum_id', $this->jadwal->id)
+        ->set('jenis_perubahan', 'ganti_jadwal_ruang')
+        ->set('hari_baru', 'Selasa')
+        ->set('jam_mulai_baru', '13:00')
+        ->set('jam_selesai_baru', '15:30')
+        ->set('ruang_praktikum_id_baru', $ruangBaru->id)
+        ->set('alasan', 'Ada workshop universitas')
+        ->assertSet('isSlotAvailable', true)
+        ->call('rescheduleInstant');
+
+    $this->jadwal->refresh();
+    expect($this->jadwal->hari)->toBe('Selasa');
+    expect($this->jadwal->ruang_praktikum_id)->toBe($ruangBaru->id);
+    expect($this->jadwal->status)->toBe('reschedule');
+
+    $pengajuan = PengajuanPerubahan::where('jadwal_praktikum_id', $this->jadwal->id)->latest()->first();
+    expect($pengajuan)->not->toBeNull();
+    expect($pengajuan->status)->toBe('disetujui');
+});
+
+test('dosen ditolak memindahkan instan jika ruangan bentrok dengan jadwal lain', function () {
+    $ruangBentrok = RuangPraktikum::factory()->create();
+
+    // Jadwal lain di ruang & waktu yang sama
+    JadwalPraktikum::factory()->create([
+        'ruang_praktikum_id' => $ruangBentrok->id,
+        'tahun_akademik_id' => $this->jadwal->tahun_akademik_id,
+        'hari' => 'Rabu',
+        'jam_mulai' => '08:00',
+        'jam_selesai' => '10:30',
+        'status' => 'aktif',
+    ]);
+
+    Livewire::test(PengajuanSaya::class)
+        ->call('openCreate')
+        ->set('jadwal_praktikum_id', $this->jadwal->id)
+        ->set('jenis_perubahan', 'ganti_jadwal_ruang')
+        ->set('hari_baru', 'Rabu')
+        ->set('jam_mulai_baru', '08:00')
+        ->set('jam_selesai_baru', '10:30')
+        ->set('ruang_praktikum_id_baru', $ruangBentrok->id)
+        ->set('alasan', 'Coba pindah ke slot yang bentrok')
+        ->assertSet('isSlotAvailable', false)
+        ->assertSet('conflictMessage', fn ($msg) => filled($msg));
 });

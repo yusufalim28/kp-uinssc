@@ -98,6 +98,17 @@ class TahunAkademikIndex extends Component
         session()->flash('success', $this->editId ? 'Tahun Akademik berhasil diperbarui.' : 'Tahun Akademik berhasil ditambahkan.');
     }
 
+    public function setAktif(int $id): void
+    {
+        abort_if(! auth()->user()->hasRole('super-admin'), 403);
+
+        TahunAkademik::where('id', '!=', $id)->update(['is_aktif' => false]);
+        $target = TahunAkademik::findOrFail($id);
+        $target->update(['is_aktif' => true]);
+
+        session()->flash('success', "Tahun Akademik {$target->nama} ({$target->semester}) berhasil diaktifkan sebagai periode aktif sistem.");
+    }
+
     public function confirmDelete(int $id): void
     {
         $this->confirmDeleteId = $id;

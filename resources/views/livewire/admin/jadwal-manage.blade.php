@@ -1,13 +1,32 @@
 <div class="space-y-6">
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-xl font-bold text-gray-900">Kelola Jadwal Praktikum</h1>
-            <p class="text-gray-500 text-sm">Setiap jadwal otomatis dicek bentrok ruang & dosen sebelum disimpan.</p>
+            <p class="text-gray-500 text-sm">
+                @if(auth()->user()->hasRole('operator') && auth()->user()->programStudi)
+                    Akses Operator Prodi: <strong class="text-primary">{{ auth()->user()->programStudi->nama_program_studi }}</strong>
+                @elseif(auth()->user()->hasRole('operator') && auth()->user()->fakultas)
+                    Akses Operator Fakultas: <strong class="text-primary">{{ auth()->user()->fakultas->nama_fakultas }}</strong>
+                @else
+                    Akses Penuh Administrator Kampus
+                @endif
+                — Setiap jadwal otomatis dicek bentrok ruang & dosen.
+            </p>
         </div>
-        <button wire:click="openCreate" class="bg-primary text-white font-medium px-4 py-2 rounded-lg hover:bg-primary-dark transition">
-            + Tambah Jadwal
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('jadwal.template.download') }}" class="inline-flex items-center gap-1.5 px-3 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition shadow-xs">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Unduh Format Excel</span>
+            </a>
+            <button wire:click="openImportModal" class="inline-flex items-center gap-1.5 px-3 py-2 border border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold rounded-xl transition shadow-xs">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Import Excel</span>
+            </button>
+            <button wire:click="openCreate" class="inline-flex items-center gap-1.5 bg-primary text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-primary-dark transition shadow-xs">
+                <span>+ Tambah Jadwal</span>
+            </button>
+        </div>
     </div>
 
     @if (session('success'))
@@ -16,6 +35,39 @@
     @if (session('error'))
         <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">{{ session('error') }}</div>
     @endif
+
+    {{-- Search & Filter Controls --}}
+    <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div class="relative flex-1 max-w-md">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari mata kuliah, dosen, kelas, atau ruang..."
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white shadow-xs focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm transition">
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+            <select wire:model.live="filterHari" class="rounded-xl border border-gray-200 bg-white text-xs px-3 py-2.5 shadow-xs focus:border-primary focus:ring-2 focus:ring-primary/20">
+                <option value="">Semua Hari</option>
+                @foreach ($hariList as $h)
+                    <option value="{{ $h }}">{{ $h }}</option>
+                @endforeach
+            </select>
+
+            <select wire:model.live="filterRuang" class="rounded-xl border border-gray-200 bg-white text-xs px-3 py-2.5 shadow-xs focus:border-primary focus:ring-2 focus:ring-primary/20">
+                <option value="">Semua Ruangan</option>
+                @foreach ($ruangList as $r)
+                    <option value="{{ $r->id }}">{{ $r->nama_ruang }}</option>
+                @endforeach
+            </select>
+
+            @if($search || $filterHari || $filterRuang)
+                <button wire:click="resetFilters" class="text-xs text-red-600 hover:text-red-700 font-semibold px-2.5 py-2 hover:bg-red-50 rounded-xl transition">
+                    Reset Filter
+                </button>
+            @endif
+        </div>
+    </div>
 
     {{-- Desktop Table --}}
     <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
@@ -252,6 +304,62 @@
                 <div class="flex justify-end gap-2">
                     <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-900/5 rounded-lg">Batal</button>
                     <button wire:click="delete" class="px-4 py-2 text-sm bg-red-600 text-white font-medium rounded-lg hover:bg-red-700">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal Import Excel --}}
+    @if ($showImportModal)
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        Import Jadwal Praktikum (Excel)
+                    </h2>
+                    <button wire:click="$set('showImportModal', false)" class="text-gray-400 hover:text-gray-600 rounded-lg p-1 hover:bg-gray-100 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="text-xs text-gray-600 leading-relaxed bg-emerald-50/70 border border-emerald-100 rounded-xl p-3.5 flex items-start gap-2.5">
+                    <svg class="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <div>
+                        <strong>Smart Importer Aktif:</strong> Anda dapat mengunggah file Excel jurusan secara langsung. Sistem secara otomatis membaca kolom, mendaftarkan mata kuliah/kelas baru, dan mendeteksi bentrok jadwal.
+                        <a href="{{ route('jadwal.template.download') }}" class="font-semibold text-primary underline block mt-1">Unduh Template Contoh (.xlsx)</a>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Pilih File Excel (.xlsx / .xls / .csv)</label>
+                    <input type="file" wire:model="excelFile" accept=".xlsx,.xls,.csv" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 border border-gray-200 rounded-xl p-1 bg-gray-50/50">
+                    @error('excelFile') <p class="text-red-600 text-xs mt-1.5">{{ $message }}</p> @enderror
+                </div>
+
+                @if($importErrors)
+                    <div class="max-h-40 overflow-y-auto bg-red-50 border border-red-200 rounded-xl p-3 space-y-1">
+                        <span class="text-xs font-bold text-red-800 block">Laporan Bentrok / Lewat ({{ count($importErrors) }} catatan):</span>
+                        @foreach($importErrors as $err)
+                            <p class="text-[11px] text-red-600 leading-tight">• {{ $err }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if($importSuccessCount > 0)
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-3 text-xs text-green-800">
+                        ✓ Berhasil mengimpor <strong>{{ $importSuccessCount }}</strong> jadwal praktikum!
+                    </div>
+                @endif
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-gray-100">
+                    <button wire:click="$set('showImportModal', false)" class="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition">
+                        Tutup
+                    </button>
+                    <button wire:click="importExcel" wire:loading.attr="disabled" class="px-4 py-2 text-xs font-semibold bg-primary hover:bg-primary-dark text-white rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-1.5">
+                        <span wire:loading.remove wire:target="importExcel">Proses Import</span>
+                        <span wire:loading wire:target="importExcel">Mengimpor data...</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -42,6 +42,8 @@ class FakultasIndex extends Component
 
     public function openCreate(): void
     {
+        abort_if(auth()->user()->hasRole('operator'), 403, 'Operator fakultas tidak diizinkan membuat fakultas baru.');
+
         $this->reset(['editId', 'nama_fakultas', 'kode_fakultas']);
         $this->status = 'aktif';
         $this->showModal = true;
@@ -49,6 +51,11 @@ class FakultasIndex extends Component
 
     public function openEdit(int $id): void
     {
+        $user = auth()->user();
+        if ($user->hasRole('operator')) {
+            abort_if($user->fakultas_id && $user->fakultas_id !== $id, 403, 'Operator hanya dapat mengedit data fakultas sendiri.');
+        }
+
         $fakultas = Fakultas::findOrFail($id);
 
         $this->editId = $fakultas->id;
@@ -60,6 +67,14 @@ class FakultasIndex extends Component
 
     public function save(): void
     {
+        $user = auth()->user();
+        if ($user->hasRole('operator')) {
+            if (! $this->editId) {
+                abort(403, 'Operator fakultas tidak diizinkan membuat fakultas baru.');
+            }
+            abort_if($user->fakultas_id && $user->fakultas_id !== $this->editId, 403, 'Operator hanya dapat mengedit data fakultas sendiri.');
+        }
+
         $validated = $this->validate();
 
         Fakultas::updateOrCreate(
@@ -74,11 +89,15 @@ class FakultasIndex extends Component
 
     public function confirmDelete(int $id): void
     {
+        abort_if(auth()->user()->hasRole('operator'), 403, 'Operator tidak berwenang menghapus fakultas.');
+
         $this->confirmDeleteId = $id;
     }
 
     public function delete(): void
     {
+        abort_if(auth()->user()->hasRole('operator'), 403, 'Operator tidak berwenang menghapus fakultas.');
+
         $fakultas = Fakultas::find($this->confirmDeleteId);
 
         if ($fakultas) {
