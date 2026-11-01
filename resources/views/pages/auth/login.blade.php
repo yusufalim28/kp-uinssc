@@ -11,7 +11,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     </svg>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">Portal Dosen & Pengelola Lab</h1>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">Portal Login</h1>
                 <p class="text-gray-500 dark:text-zinc-400 text-xs md:text-sm mt-1.5 leading-relaxed">
                     Sistem Informasi Jadwal Praktikum — UIN Siber Syekh Nurjati Cirebon
                 </p>
@@ -57,7 +57,7 @@
                             required
                             autofocus
                             autocomplete="username"
-                            placeholder="Contoh: 19850101... atau admin@uinssc.ac.id"
+                            placeholder="masukan NIP / NIDN / Email akun portal"
                             class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 bg-gray-50/50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:bg-white dark:focus:bg-zinc-800 transition"
                         />
                     </div>
@@ -93,7 +93,7 @@
                             :type="show ? 'text' : 'password'"
                             required
                             autocomplete="current-password"
-                            placeholder="Masukkan kata sandi portal"
+                            placeholder="Masukkan kata sandi"
                             class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 bg-gray-50/50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:bg-white dark:focus:bg-zinc-800 transition"
                         />
                         <button type="button" @click="show = !show" tabindex="-1" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:text-zinc-400 dark:hover:text-zinc-200 focus:outline-none">
@@ -132,7 +132,7 @@
             <!-- Footer Bantuan Kampus -->
             <div class="mt-8 pt-5 border-t border-gray-100 dark:border-zinc-800 text-center text-xs text-gray-400 dark:text-zinc-500 leading-relaxed">
                 <span class="block text-gray-500 dark:text-zinc-400 font-medium">Terintegrasi dengan PUSTIKOM UINSSC</span>
-                Kendala login akun atau permohonan hak akses laboratorium, hubungi Helpdesk PUSTIKOM Gedung Rektorat.
+                Kendala login akun atau permohonan hak akses laboratorium, hubungi Helpdesk PUSTIKOM Gedung K.
             </div>
         </div>
     </div>

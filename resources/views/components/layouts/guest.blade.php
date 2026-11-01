@@ -26,7 +26,10 @@
             <div data-keep-light class="bg-white text-gray-900 h-full flex items-center px-6 md:px-10 shadow-sm rounded-br-2xl">
                 <a href="{{ route('home') }}" class="flex items-center gap-3 font-bold text-base md:text-lg tracking-tight">
                     <img src="{{ asset('img/uinsscv2.png') }}" alt="Logo SJP" class="h-10 w-auto object-contain">
-                    <span class="text-primary font-extrabold hidden sm:inline">Jadwal Praktikum</span>
+                    <div class="hidden sm:flex flex-col justify-center leading-tight">
+                        <span class="text-primary dark:text-emerald-400 font-bold text-xs md:text-sm">UIN Siber Syekh Nurjati Cirebon</span>
+                        <span class="text-gray-600 dark:text-black font-semibold text-[11px] md:text-xs mt-0.5">Sistem Jadwal Praktikum</span>
+                    </div>
                 </a>
             </div>
 
@@ -64,7 +67,7 @@
                         <div class="px-4 py-1.5 text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Khusus Pengelola</div>
                         <a href="{{ route('login') }}" class="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-zinc-800 text-primary dark:text-emerald-400 font-semibold transition flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                            Login Dosen/Admin
+                            Login
                         </a>
                     </div>
                 </div>
