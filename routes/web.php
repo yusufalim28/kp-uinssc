@@ -4,6 +4,7 @@ use App\Exports\JadwalTemplateExport;
 use App\Http\Controllers\JadwalExportController;
 use App\Livewire\Admin\ActivityLogIndex;
 use App\Livewire\Admin\JadwalManage;
+use App\Livewire\Admin\KelolaPanduan;
 use App\Livewire\Admin\MasterData\DosenIndex;
 use App\Livewire\Admin\MasterData\FakultasIndex;
 use App\Livewire\Admin\MasterData\KelasIndex;
@@ -21,6 +22,7 @@ use App\Livewire\Dosen\PengajuanSaya;
 use App\Livewire\Public\DaftarJadwal;
 use App\Livewire\Public\DetailJadwal;
 use App\Livewire\Public\Home;
+use App\Livewire\Public\JadwalRuangan;
 use App\Livewire\Public\KalenderJadwal;
 use App\Livewire\Public\PanduanPublik;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +37,7 @@ Route::get('/', Home::class)->name('home');
 Route::get('/jadwal', DaftarJadwal::class)->name('jadwal.index');
 Route::get('/jadwal/{jadwal}', DetailJadwal::class)->name('jadwal.detail');
 Route::get('/kalender', KalenderJadwal::class)->name('jadwal.kalender');
+Route::get('/jadwal-ruang', JadwalRuangan::class)->name('jadwal.ruang');
 Route::get('/panduan', PanduanPublik::class)->name('panduan.index');
 Route::get('/jadwal/export/pdf', [JadwalExportController::class, 'pdf'])->name('jadwal.export.pdf');
 Route::get('/jadwal/export/excel', [JadwalExportController::class, 'excel'])->name('jadwal.export.excel');
@@ -66,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/master/pengguna', UserManage::class)->name('users.index');
         Route::get('/sampah', SampahIndex::class)->name('sampah.index');
         Route::get('/log-aktivitas', ActivityLogIndex::class)->name('activitylog.index');
+        Route::get('/kelola-panduan', KelolaPanduan::class)->name('panduan.manage');
     });
 
     // Menu khusus dosen

@@ -1,22 +1,25 @@
 <div class="space-y-6">
 
     <div>
-        <h1 class="text-xl font-bold text-gray-900">Pengajuan Perubahan Jadwal</h1>
-        <p class="text-gray-500 text-sm">Review pengajuan dari dosen, lalu terapkan manual di Kelola Jadwal kalau disetujui.</p>
+        <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-zinc-100 tracking-tight">Pengajuan Perubahan Jadwal</h1>
+        <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Review permohonan pergantian jadwal atau ruang dari dosen pengampu untuk ditindaklanjuti.</p>
     </div>
 
     @if (session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-3">{{ session('success') }}</div>
+        <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs rounded-xl px-4 py-3 shadow-2xs flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>{{ session('success') }}</span>
+        </div>
     @endif
 
     {{-- Filter status --}}
-    <div class="flex gap-2">
+    <div class="flex items-center gap-2 flex-wrap">
         @foreach (['menunggu' => 'Menunggu', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak', '' => 'Semua'] as $value => $label)
             <button wire:click="$set('filterStatus', '{{ $value }}')"
                     @class([
-                        'px-3 py-1.5 rounded-lg text-sm border',
-                        'bg-gray-900 text-white border-gray-300' => $filterStatus === $value,
-                        'border-gray-300/20 text-gray-600 hover:bg-gray-900/5' => $filterStatus !== $value,
+                        'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs',
+                        'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterStatus === $value,
+                        'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => $filterStatus !== $value,
                     ])>
                 {{ $label }}
             </button>
@@ -24,35 +27,35 @@
     </div>
 
     {{-- Desktop Table --}}
-    <div class="hidden md:block bg-white border border-gray-300/10 rounded-xl overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-primary text-white text-left">
+    <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
+        <table class="w-full text-xs text-left">
+            <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 <tr>
-                    <th class="px-4 py-3">Dosen</th>
-                    <th class="px-4 py-3">Jadwal</th>
-                    <th class="px-4 py-3">Perubahan Diminta</th>
-                    <th class="px-4 py-3">Alasan</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
+                    <th class="px-5 py-3.5 w-48">Dosen Pengampu</th>
+                    <th class="px-5 py-3.5">Jadwal Praktikum</th>
+                    <th class="px-5 py-3.5">Perubahan Diminta</th>
+                    <th class="px-5 py-3.5">Alasan</th>
+                    <th class="px-5 py-3.5 w-32">Status</th>
+                    <th class="px-5 py-3.5 text-right w-44">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-dark/10">
+            <tbody class="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-800 dark:text-zinc-200">
                 @forelse ($pengajuan as $p)
-                    <tr class="hover:bg-primary/5">
-                        <td class="px-4 py-3 font-medium text-gray-900">{{ $p->dosen->nama }}</td>
-                        <td class="px-4 py-3 text-gray-600">
-                            <span class="font-medium text-gray-900 block">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</span>
-                            <span class="text-xs text-gray-500">{{ $p->jadwalPraktikum->hari }} ({{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }})</span>
+                    <tr class="hover:bg-emerald-50/30 dark:hover:bg-zinc-800/40 transition">
+                        <td class="px-5 py-3.5 font-bold text-gray-900 dark:text-zinc-100">{{ $p->dosen->nama }}</td>
+                        <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300">
+                            <span class="font-bold text-gray-900 dark:text-zinc-100 block">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</span>
+                            <span class="text-xs text-gray-400 font-mono">{{ $p->jadwalPraktikum->hari }} ({{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }})</span>
                         </td>
-                        <td class="px-4 py-3 text-gray-800">
+                        <td class="px-5 py-3.5 text-gray-800 dark:text-zinc-200">
                             @if ($p->jenis_perubahan)
                                 <span @class([
-                                    'px-2 py-0.5 rounded text-[11px] font-semibold inline-block mb-1',
-                                    'bg-blue-50 text-blue-700 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
-                                    'bg-purple-50 text-purple-700 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
-                                    'bg-emerald-50 text-emerald-700 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
-                                    'bg-amber-50 text-amber-700 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
-                                    'bg-gray-100 text-gray-700 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
+                                    'px-2 py-0.5 rounded text-[10px] font-bold inline-block mb-1',
+                                    'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
+                                    'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
+                                    'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
+                                    'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
+                                    'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
                                 ])>
                                     {{ match($p->jenis_perubahan) {
                                         'ganti_jadwal' => 'Pindah Jadwal',
@@ -65,28 +68,29 @@
                             @endif
                             <p class="font-medium text-xs">{{ $p->perubahan }}</p>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">{{ $p->alasan }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-400 text-xs">{{ $p->alasan }}</td>
+                        <td class="px-5 py-3.5">
                             <span @class([
-                                'px-2 py-1 rounded-full text-xs font-semibold',
-                                'bg-yellow-100 text-yellow-800' => $p->status === 'menunggu',
-                                'bg-green-100 text-green-700' => $p->status === 'disetujui',
-                                'bg-red-100 text-red-700' => $p->status === 'ditolak',
+                                'px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5',
+                                'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40' => $p->status === 'menunggu',
+                                'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40' => $p->status === 'disetujui',
+                                'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40' => $p->status === 'ditolak',
                             ])>
+                                <span class="w-1.5 h-1.5 rounded-full {{ $p->status === 'disetujui' ? 'bg-emerald-500' : ($p->status === 'menunggu' ? 'bg-amber-500' : 'bg-rose-500') }}"></span>
                                 {{ ucfirst($p->status) }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-right space-x-2">
+                        <td class="px-5 py-3.5 text-right space-x-2">
                             @if ($p->status === 'menunggu')
-                                <button wire:click="openApprove({{ $p->id }})" class="text-green-700 font-medium hover:underline">Setujui</button>
-                                <button wire:click="openReject({{ $p->id }})" class="text-red-600 font-medium hover:underline">Tolak</button>
+                                <button wire:click="openApprove({{ $p->id }})" class="font-bold text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition">Setujui</button>
+                                <button wire:click="openReject({{ $p->id }})" class="font-bold text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition">Tolak</button>
                             @else
-                                <span class="text-gray-900/30 text-xs">Sudah diproses</span>
+                                <span class="text-gray-400 dark:text-zinc-500 text-xs italic">Selesai</span>
                             @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-900/50">Tidak ada pengajuan.</td></tr>
+                    <tr><td colspan="6" class="px-5 py-8 text-center text-gray-400 dark:text-zinc-500 text-sm">Tidak ada permohonan pengajuan.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -95,34 +99,34 @@
     {{-- Mobile Card View --}}
     <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         @forelse ($pengajuan as $p)
-            <div class="bg-white border border-gray-100 rounded-xl p-3.5 shadow-xs hover:border-gray-200 transition flex flex-col justify-between">
+            <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
                 <div>
-                    <div class="flex items-start justify-between gap-2 mb-1.5">
+                    <div class="flex items-start justify-between gap-2 mb-2">
                         <div class="min-w-0">
-                            <h3 class="font-bold text-sm text-gray-900 leading-snug truncate">{{ $p->dosen->nama }}</h3>
-                            <p class="text-xs text-gray-600 font-medium truncate mt-0.5">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</p>
+                            <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug truncate">{{ $p->dosen->nama }}</h3>
+                            <p class="text-xs text-emerald-700 dark:text-emerald-400 font-semibold truncate mt-0.5">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</p>
                         </div>
                         <span @class([
-                            'px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0',
-                            'bg-yellow-100 text-yellow-800' => $p->status === 'menunggu',
-                            'bg-emerald-100 text-emerald-800' => $p->status === 'disetujui',
-                            'bg-red-100 text-red-700' => $p->status === 'ditolak',
+                            'px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0',
+                            'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60' => $p->status === 'menunggu',
+                            'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60' => $p->status === 'disetujui',
+                            'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60' => $p->status === 'ditolak',
                         ])>
                             {{ ucfirst($p->status) }}
                         </span>
                     </div>
 
-                    <div class="bg-gray-50 rounded-lg p-2.5 space-y-1.5 border border-gray-100 text-xs mt-2">
+                    <div class="bg-gray-50/80 dark:bg-zinc-800/60 rounded-xl p-3 space-y-1.5 border border-gray-100 dark:border-zinc-700/80 text-xs mt-2">
                         <div>
-                            <span class="text-gray-400 block text-[10px] font-semibold uppercase">Perubahan Diminta:</span>
+                            <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Perubahan Diminta:</span>
                             @if ($p->jenis_perubahan)
                                 <span @class([
-                                    'px-1.5 py-0.5 rounded text-[10px] font-semibold inline-block my-0.5',
-                                    'bg-blue-50 text-blue-700 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
-                                    'bg-purple-50 text-purple-700 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
-                                    'bg-emerald-50 text-emerald-700 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
-                                    'bg-amber-50 text-amber-700 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
-                                    'bg-gray-100 text-gray-700 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
+                                    'px-1.5 py-0.5 rounded text-[10px] font-bold inline-block my-0.5',
+                                    'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
+                                    'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
+                                    'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
+                                    'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
+                                    'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
                                 ])>
                                     {{ match($p->jenis_perubahan) {
                                         'ganti_jadwal' => 'Pindah Jadwal',
@@ -133,29 +137,29 @@
                                     } }}
                                 </span>
                             @endif
-                            <p class="font-medium text-gray-800 text-xs">{{ $p->perubahan }}</p>
+                            <p class="font-medium text-gray-800 dark:text-zinc-200 text-xs">{{ $p->perubahan }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 block text-[10px] font-semibold uppercase">Alasan:</span>
-                            <p class="text-gray-600 text-xs line-clamp-2">{{ $p->alasan }}</p>
+                            <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Alasan:</span>
+                            <p class="text-gray-600 dark:text-zinc-300 text-xs line-clamp-2">{{ $p->alasan }}</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-2.5 mt-3 border-t border-gray-100 flex items-center justify-end">
+                <div class="pt-3 mt-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-end">
                     @if ($p->status === 'menunggu')
-                        <div class="flex items-center gap-1.5">
-                            <button wire:click="openApprove({{ $p->id }})" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-semibold hover:bg-emerald-100 transition text-xs">Setujui</button>
-                            <button wire:click="openReject({{ $p->id }})" class="px-2.5 py-1 rounded-lg bg-red-50 text-red-700 font-semibold hover:bg-red-100 transition text-xs">Tolak</button>
+                        <div class="flex items-center gap-2">
+                            <button wire:click="openApprove({{ $p->id }})" class="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold hover:bg-emerald-100 transition text-xs">Setujui</button>
+                            <button wire:click="openReject({{ $p->id }})" class="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-bold hover:bg-rose-100 transition text-xs">Tolak</button>
                         </div>
                     @else
-                        <span class="text-gray-400 text-xs italic">Sudah diproses</span>
+                        <span class="text-gray-400 dark:text-zinc-500 text-xs italic">Selesai</span>
                     @endif
                 </div>
             </div>
         @empty
-            <div class="sm:col-span-2 bg-white rounded-xl p-8 text-center border border-gray-100 text-gray-500 text-sm">
-                Tidak ada pengajuan.
+            <div class="sm:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-200/80 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 text-sm">
+                Tidak ada permohonan pengajuan.
             </div>
         @endforelse
     </div>
@@ -164,16 +168,20 @@
 
     {{-- Modal konfirmasi approve --}}
     @if ($processId && $processAction === 'approve')
-        <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-            <div class="bg-white rounded-xl w-full max-w-sm p-6 space-y-4">
-                <h2 class="text-lg font-semibold text-gray-900">Setujui Pengajuan?</h2>
-                <p class="text-sm text-gray-500">
-                    Setelah disetujui, terapkan perubahannya secara manual di menu Kelola Jadwal
-                    supaya tetap melewati pengecekan bentrok.
-                </p>
-                <div class="flex justify-end gap-2">
-                    <button wire:click="$set('processId', null)" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-900/5 rounded-lg">Batal</button>
-                    <button wire:click="confirmProcess" class="px-4 py-2 text-sm bg-green-600 text-white font-medium rounded-lg hover:bg-green-700">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 animate-in fade-in zoom-in-95 duration-150">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div class="text-center">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100">Setujui Pengajuan?</h2>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+                        Setelah disetujui, terapkan perubahannya di menu Kelola Jadwal agar jadwal resmi terbaharui.
+                    </p>
+                </div>
+                <div class="flex justify-center gap-2 pt-2">
+                    <button wire:click="$set('processId', null)" class="px-4 py-2 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 font-semibold rounded-xl transition">Batal</button>
+                    <button wire:click="confirmProcess" class="px-4 py-2 text-xs bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs transition">
                         Ya, Setujui
                     </button>
                 </div>
@@ -183,17 +191,23 @@
 
     {{-- Modal konfirmasi reject --}}
     @if ($processId && $processAction === 'reject')
-        <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-            <div class="bg-white rounded-xl w-full max-w-sm p-6 space-y-4">
-                <h2 class="text-lg font-semibold text-gray-900">Tolak Pengajuan</h2>
-                <div>
-                    <label class="text-sm text-gray-600">Catatan Penolakan (wajib diisi)</label>
-                    <textarea wire:model="catatan_penolakan" rows="3" class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-primary focus:ring focus:ring-primary/20 text-sm py-2 mt-1 transition"></textarea>
-                    @error('catatan_penolakan') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 animate-in fade-in zoom-in-95 duration-150">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </div>
-                <div class="flex justify-end gap-2">
-                    <button wire:click="$set('processId', null)" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-900/5 rounded-lg">Batal</button>
-                    <button wire:click="confirmProcess" class="px-4 py-2 text-sm bg-red-600 text-white font-medium rounded-lg hover:bg-red-700">
+                <div class="text-center">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100">Tolak Pengajuan</h2>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Berikan alasan penolakan untuk diinformasikan kepada dosen.</p>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Catatan Penolakan (Wajib)</label>
+                    <textarea wire:model="catatan_penolakan" rows="3" placeholder="mis. Ruangan bentrok dengan ujian praktikum..." class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition"></textarea>
+                    @error('catatan_penolakan') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="flex justify-center gap-2 pt-2">
+                    <button wire:click="$set('processId', null)" class="px-4 py-2 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 font-semibold rounded-xl transition">Batal</button>
+                    <button wire:click="confirmProcess" class="px-4 py-2 text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-xs transition">
                         Ya, Tolak
                     </button>
                 </div>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -29,6 +30,12 @@ class ProgramStudi extends Model
     public function kelas()
     {
         return $this->hasMany(Kelas::class);
+    }
+
+    public function ruangPraktikumKhusus(): BelongsToMany
+    {
+        return $this->belongsToMany(RuangPraktikum::class, 'ruang_praktikum_prodi', 'program_studi_id', 'ruang_praktikum_id')
+            ->withTimestamps();
     }
 
     public function getActivitylogOptions(): LogOptions

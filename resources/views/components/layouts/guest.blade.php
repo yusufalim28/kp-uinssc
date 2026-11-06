@@ -34,10 +34,11 @@
             </div>
 
             {{-- Bagian Tengah / Menu Navigasi Utama (Desktop) --}}
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium px-6">
+            <nav class="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium px-6">
                 <a href="{{ route('home') }}" class="hover:text-white/80 transition py-2 border-b-2 {{ request()->routeIs('home') ? 'border-white' : 'border-transparent' }}">Beranda</a>
                 <a href="{{ route('jadwal.index') }}" class="hover:text-white/80 transition py-2 border-b-2 {{ request()->routeIs('jadwal.index') ? 'border-white' : 'border-transparent' }}">Daftar Jadwal</a>
                 <a href="{{ route('jadwal.kalender') }}" class="hover:text-white/80 transition py-2 border-b-2 {{ request()->routeIs('jadwal.kalender') ? 'border-white' : 'border-transparent' }}">Kalender</a>
+                <a href="{{ route('jadwal.ruang') }}" class="hover:text-white/80 transition py-2 border-b-2 {{ request()->routeIs('jadwal.ruang') ? 'border-white' : 'border-transparent' }}">Jadwal Ruangan</a>
                 <a href="{{ route('panduan.index') }}" class="hover:text-white/80 transition py-2 border-b-2 {{ request()->routeIs('panduan.index') ? 'border-white' : 'border-transparent' }}">Panduan & Aturan</a>
             </nav>
 
@@ -95,10 +96,11 @@
             <a href="{{ route('home') }}" class="hover:text-white/80 py-1">Beranda</a>
             <a href="{{ route('jadwal.index') }}" class="hover:text-white/80 py-1">Daftar Jadwal</a>
             <a href="{{ route('jadwal.kalender') }}" class="hover:text-white/80 py-1">Kalender</a>
+            <a href="{{ route('jadwal.ruang') }}" class="hover:text-white/80 py-1">Jadwal Ruangan</a>
             <a href="{{ route('panduan.index') }}" class="hover:text-white/80 py-1">Panduan & Aturan</a>
             <div class="pt-2 border-t border-white/10 mt-1">
                 <a data-keep-light href="{{ route('login') }}" class="flex items-center justify-center gap-2 bg-white text-primary font-semibold px-4 py-2.5 rounded-xl text-center shadow">
-                    Login Dosen / Admin
+                    Login
                 </a>
             </div>
         </div>

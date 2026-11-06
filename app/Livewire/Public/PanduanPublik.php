@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Public;
 
+use App\Models\Panduan;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -17,7 +18,13 @@ class PanduanPublik extends Component
 
     public function render()
     {
-        return view('livewire.public.panduan-publik')
-            ->layout('components.layouts.guest', ['title' => 'Tata Tertib & Informasi Praktikum']);
+        $panduan = Panduan::where('kategori', 'publik')
+            ->where('is_active', true)
+            ->orderBy('urutan')
+            ->get();
+
+        return view('livewire.public.panduan-publik', [
+            'panduan' => $panduan,
+        ])->layout('components.layouts.guest', ['title' => 'Tata Tertib & Informasi Praktikum']);
     }
 }

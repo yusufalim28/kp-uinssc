@@ -147,8 +147,8 @@ class JadwalImport implements ToCollection
 
             // Normalisasi Hari
             $hari = $this->normalizeHari($hariRaw);
-            if (! $hari) {
-                $this->errors[] = "Baris {$rowNumber}: Nama hari '{$hariRaw}' tidak dikenali. Gunakan Senin, Selasa, Rabu, Kamis, Jumat, atau Sabtu.";
+            if (! $hari || in_array($hari, ['Sabtu', 'Minggu'])) {
+                $this->errors[] = "Baris {$rowNumber}: Hari '{$hariRaw}' tidak valid untuk praktikum. Jadwal praktikum hanya berlangsung Senin–Jum'at (Sabtu & Minggu libur).";
                 $this->skippedCount++;
 
                 continue;

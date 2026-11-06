@@ -70,7 +70,8 @@ class PustikomBridgeAuthService
         $timeout = (int) config('services.pustikom_bridge.timeout', 4);
 
         try {
-            $loginResponse = Http::timeout($timeout)
+            $loginResponse = Http::withoutVerifying()
+                ->timeout($timeout)
                 ->asForm()
                 ->acceptJson()
                 ->post("{$baseUrl}/api/v2/portal/login", [
@@ -88,7 +89,8 @@ class PustikomBridgeAuthService
             }
 
             // Ambil profil pengguna dari API
-            $profilResponse = Http::timeout($timeout)
+            $profilResponse = Http::withoutVerifying()
+                ->timeout($timeout)
                 ->withToken($token)
                 ->acceptJson()
                 ->get("{$baseUrl}/api/v2/profil");

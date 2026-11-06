@@ -55,7 +55,7 @@ class JadwalTemplateExport implements FromCollection, ShouldAutoSize, WithHeadin
             'Nama Kelas',
             'NIDN / NIP Dosen',
             'Kode Ruang',
-            'Hari (Senin/Selasa/Rabu/Kamis/Jum\'at/Sabtu)',
+            'Hari (Senin/Selasa/Rabu/Kamis/Jum\'at)',
             'Jam Mulai (HH:MM)',
             'Jam Selesai (HH:MM)',
             'Tahun Akademik (Opsional - default: tahun aktif)',

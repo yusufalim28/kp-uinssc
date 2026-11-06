@@ -5,6 +5,7 @@ namespace App\Livewire\Dosen;
 use App\Models\Dosen;
 use App\Models\JadwalPraktikum;
 use App\Models\PengajuanPerubahan;
+use App\Models\ProgramStudi;
 use App\Models\RuangPraktikum;
 use App\Services\JadwalConflictService;
 use Illuminate\Support\Carbon;
@@ -45,7 +46,7 @@ class PengajuanSaya extends Component
 
     public ?string $conflictMessage = null;
 
-    public array $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
+    public array $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at"];
 
     public function mount(): void
     {
@@ -162,6 +163,19 @@ class PengajuanSaya extends Component
 
         $conflictService = new JadwalConflictService;
 
+        // 0. Cek hak akses ruangan berdasarkan cakupan_akses
+        if (in_array($this->jenis_perubahan, ['ganti_ruang', 'ganti_jadwal_ruang'])) {
+            $ruangBaru = RuangPraktikum::find($targetRuangId);
+            if ($ruangBaru) {
+                $prodiId = $jadwal->mataKuliah?->program_studi_id;
+                if ($prodiId && ! $ruangBaru->canBeUsedByProdi($prodiId)) {
+                    $this->conflictMessage = "Ruangan {$ruangBaru->nama_ruang} tidak diizinkan untuk program studi mata kuliah ini.";
+
+                    return;
+                }
+            }
+        }
+
         // 1. Cek bentrok ruang
         $bentrokRuang = $conflictService->cekBentrokRuang(
             (int) $targetRuangId,
@@ -212,8 +226,7 @@ class PengajuanSaya extends Component
                 3 => 'Rabu',
                 4 => 'Kamis',
                 5 => "Jum'at",
-                6 => 'Sabtu',
-                default => 'Minggu',
+                default => 'Senin',
             };
         } catch (\Throwable) {
             return 'Senin';
@@ -378,9 +391,37 @@ class PengajuanSaya extends Component
             ->with(['mataKuliah', 'ruangPraktikum'])
             ->get();
 
-        $ruangList = RuangPraktikum::whereIn('status', ['aktif', 'tersedia'])
-            ->orderBy('nama_ruang')
-            ->get();
+        // Ambil prodi & fakultas yang terkait dengan jadwal dosen ini
+        $prodiIds = $jadwalSaya->pluck('mataKuliah.program_studi_id')->filter()->unique()->values();
+        $fakultasIds = ProgramStudi::whereIn('id', $prodiIds)->pluck('fakultas_id')->filter()->unique()->values();
+
+        $ruangQuery = RuangPraktikum::whereIn('status', ['aktif', 'tersedia']);
+
+        if ($prodiIds->isNotEmpty()) {
+            $ruangQuery->where(function ($q) use ($prodiIds, $fakultasIds) {
+                // Ruang umum universitas → semua dosen boleh
+                $q->where('cakupan_akses', 'umum_universitas')
+                    // Ruang tanpa fakultas → dianggap umum
+                    ->orWhereNull('fakultas_id')
+                    // Ruang eksklusif milik prodi dosen
+                    ->orWhere(function ($sub) use ($prodiIds) {
+                        $sub->where('cakupan_akses', 'eksklusif')
+                            ->whereIn('program_studi_id', $prodiIds);
+                    })
+                    // Ruang multi-prodi yang mencakup prodi dosen
+                    ->orWhere(function ($sub) use ($prodiIds) {
+                        $sub->where('cakupan_akses', 'khusus_multi_prodi')
+                            ->whereHas('prodiPengguna', fn ($p) => $p->whereIn('program_studi.id', $prodiIds));
+                    })
+                    // Ruang bersama fakultas dosen
+                    ->orWhere(function ($sub) use ($fakultasIds) {
+                        $sub->where('cakupan_akses', 'bersama_fakultas')
+                            ->whereIn('fakultas_id', $fakultasIds);
+                    });
+            });
+        }
+
+        $ruangList = $ruangQuery->orderBy('nama_ruang')->get();
 
         return view('livewire.dosen.pengajuan-saya', [
             'pengajuan' => $pengajuan,

@@ -17,16 +17,24 @@ class JadwalExportController extends Controller
     protected function filteredJadwal(Request $request)
     {
         return JadwalPraktikum::query()
-            ->with(['mataKuliah', 'dosen', 'kelas', 'ruangPraktikum'])
+            ->with(['mataKuliah.programStudi', 'dosen', 'kelas', 'ruangPraktikum.fakultas'])
             ->where('status', 'aktif')
+            ->when($request->query('tahun_akademik_id'), fn ($q, $id) => $q->where('tahun_akademik_id', $id))
+            ->when($request->query('fakultas_id'), function ($q, $fid) {
+                $q->where(function ($sub) use ($fid) {
+                    $sub->whereHas('mataKuliah.programStudi', fn ($ps) => $ps->where('fakultas_id', $fid))
+                        ->orWhereHas('ruangPraktikum', fn ($r) => $r->where('fakultas_id', $fid));
+                });
+            })
             ->when($request->query('program_studi_id'), fn ($q, $id) => $q->whereHas(
                 'mataKuliah',
                 fn ($q2) => $q2->where('program_studi_id', $id)
             ))
+            ->when($request->query('ruang_praktikum_id'), fn ($q, $id) => $q->where('ruang_praktikum_id', $id))
             ->when($request->query('mata_kuliah_id'), fn ($q, $id) => $q->where('mata_kuliah_id', $id))
             ->when($request->query('dosen_id'), fn ($q, $id) => $q->where('dosen_id', $id))
             ->when($request->query('hari'), fn ($q, $hari) => $q->where('hari', $hari))
-            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END")
+            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 ELSE 6 END")
             ->orderBy('jam_mulai')
             ->get();
     }

@@ -50,6 +50,8 @@ class JadwalManage extends Component
 
     public ?int $filterRuang = null;
 
+    public ?int $filterTahunAkademik = null;
+
     // Excel Import Properties
     public bool $showImportModal = false;
 
@@ -67,7 +69,14 @@ class JadwalManage extends Component
     // supaya bisa menunjukkan jadwal mana yang bentrok.
     public ?string $conflictMessage = null;
 
-    public array $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
+    public array $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at"];
+
+    public function mount(): void
+    {
+        if (is_null($this->filterTahunAkademik)) {
+            $this->filterTahunAkademik = TahunAkademik::where('is_aktif', true)->value('id');
+        }
+    }
 
     public function updatingSearch(): void
     {
@@ -84,9 +93,16 @@ class JadwalManage extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterTahunAkademik(): void
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters(): void
     {
+        $taAktifId = TahunAkademik::where('is_aktif', true)->value('id');
         $this->reset(['search', 'filterHari', 'filterRuang']);
+        $this->filterTahunAkademik = $taAktifId;
         $this->resetPage();
     }
 
@@ -98,7 +114,7 @@ class JadwalManage extends Component
             'dosen_id' => 'required|exists:dosen,id',
             'ruang_praktikum_id' => 'required|exists:ruang_praktikum,id',
             'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
-            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jum\'at,Sabtu',
+            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jum\'at',
             'jam_mulai' => 'required|date_format:H:i',
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'status' => 'required|in:aktif,nonaktif,dibatalkan,reschedule',
@@ -177,6 +193,18 @@ class JadwalManage extends Component
     {
         $validated = $this->validate();
 
+        // Validasi hak pakai ruang terhadap program studi mata kuliah
+        $mk = MataKuliah::with('programStudi')->find($this->mata_kuliah_id);
+        $ruang = RuangPraktikum::with('prodiPengguna')->find($this->ruang_praktikum_id);
+
+        if ($mk && $ruang && ! $ruang->canBeUsedByProdi($mk->program_studi_id, $mk->programStudi?->fakultas_id)) {
+            $namaRuang = $ruang->nama_ruang;
+            $namaProdi = $mk->programStudi?->nama_program_studi ?? 'prodi terkait';
+            $this->addError('ruang_praktikum_id', "Ruangan '{$namaRuang}' tidak diizinkan untuk digunakan oleh program studi {$namaProdi}.");
+
+            return;
+        }
+
         $this->conflictMessage = JadwalConflictService::checkConflict(
             ruangPraktikumId: $this->ruang_praktikum_id,
             dosenId: $this->dosen_id,
@@ -243,13 +271,24 @@ class JadwalManage extends Component
                 $mkQuery->where('program_studi_id', $user->program_studi_id);
                 $kelasQuery->where('program_studi_id', $user->program_studi_id);
 
-                // Ruang: lab milik fakultas dari operator atau milik prodi operator
+                // Ruang: lab milik prodi, lab multi-prodi terdaftar, lab bersama fakultas, atau umum universitas
                 $ruangQuery->where(function ($q) use ($user) {
+                    $q->where('cakupan_akses', 'umum_universitas')
+                        ->orWhereNull('fakultas_id')
+                        ->orWhere(function ($sub) use ($user) {
+                            $sub->where('program_studi_id', $user->program_studi_id)
+                                ->where('cakupan_akses', 'eksklusif');
+                        })
+                        ->orWhere(function ($sub) use ($user) {
+                            $sub->where('cakupan_akses', 'khusus_multi_prodi')
+                                ->whereHas('prodiPengguna', fn ($p) => $p->where('program_studi.id', $user->program_studi_id));
+                        });
+
                     if ($user->fakultas_id) {
-                        $q->where('fakultas_id', $user->fakultas_id);
-                    }
-                    if ($user->program_studi_id) {
-                        $q->orWhere('program_studi_id', $user->program_studi_id);
+                        $q->orWhere(function ($sub) use ($user) {
+                            $sub->where('fakultas_id', $user->fakultas_id)
+                                ->where('cakupan_akses', 'bersama_fakultas');
+                        });
                     }
                 });
             } elseif ($user->fakultas_id) {
@@ -258,8 +297,16 @@ class JadwalManage extends Component
                 $mkQuery->whereHas('programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id));
                 $kelasQuery->whereHas('programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id));
 
-                // Ruang: seluruh ruang laboratorium milik fakultas
-                $ruangQuery->where('fakultas_id', $user->fakultas_id);
+                // Ruang: seluruh ruang milik fakultas, ruang multi-prodi yang mencakup prodi fakultas ini, atau umum universitas
+                $ruangQuery->where(function ($q) use ($user) {
+                    $q->where('fakultas_id', $user->fakultas_id)
+                        ->orWhere('cakupan_akses', 'umum_universitas')
+                        ->orWhereNull('fakultas_id')
+                        ->orWhere(function ($sub) use ($user) {
+                            $sub->where('cakupan_akses', 'khusus_multi_prodi')
+                                ->whereHas('prodiPengguna', fn ($p) => $p->where('fakultas_id', $user->fakultas_id));
+                        });
+                });
             }
         }
 
@@ -280,8 +327,12 @@ class JadwalManage extends Component
             $jadwalQuery->where('ruang_praktikum_id', $this->filterRuang);
         }
 
+        if ($this->filterTahunAkademik) {
+            $jadwalQuery->where('tahun_akademik_id', $this->filterTahunAkademik);
+        }
+
         $jadwal = $jadwalQuery
-            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 WHEN 'Sabtu' THEN 6 ELSE 7 END")
+            ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 ELSE 6 END")
             ->orderBy('jam_mulai')
             ->paginate(10);
 

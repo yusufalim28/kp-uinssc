@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Panduan;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -17,7 +18,13 @@ class PanduanInternal extends Component
 
     public function render()
     {
-        return view('livewire.admin.panduan-internal')
-            ->layout('components.layouts.admin', ['title' => 'Panduan & SOP Pengelola']);
+        $panduan = Panduan::where('kategori', 'internal')
+            ->where('is_active', true)
+            ->orderBy('urutan')
+            ->get();
+
+        return view('livewire.admin.panduan-internal', [
+            'panduan' => $panduan,
+        ])->layout('components.layouts.admin', ['title' => 'Panduan & SOP Pengelola']);
     }
 }

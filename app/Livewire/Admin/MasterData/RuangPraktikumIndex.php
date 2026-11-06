@@ -28,6 +28,10 @@ class RuangPraktikumIndex extends Component
 
     public string $tipe_ruang = 'laboratorium';
 
+    public string $cakupan_akses = 'bersama_fakultas';
+
+    public array $selected_prodi_ids = [];
+
     public string $status = 'aktif';
 
     public bool $showModal = false;
@@ -35,6 +39,8 @@ class RuangPraktikumIndex extends Component
     public string $search = '';
 
     public string $filterTipe = '';
+
+    public string $filterCakupan = '';
 
     public ?int $confirmDeleteId = null;
 
@@ -48,6 +54,9 @@ class RuangPraktikumIndex extends Component
             'lokasi' => 'required|string|max:150',
             'kapasitas' => 'required|integer|min:1|max:1000',
             'tipe_ruang' => 'required|in:laboratorium,auditorium,studio,kelas',
+            'cakupan_akses' => 'required|in:bersama_fakultas,eksklusif,khusus_multi_prodi,umum_universitas',
+            'selected_prodi_ids' => 'array',
+            'selected_prodi_ids.*' => 'exists:program_studi,id',
             'status' => 'required|in:aktif,nonaktif,perbaikan,tersedia',
         ];
     }
@@ -62,10 +71,15 @@ class RuangPraktikumIndex extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterCakupan(): void
+    {
+        $this->resetPage();
+    }
+
     public function openCreate(): void
     {
         $user = auth()->user();
-        $this->reset(['editId', 'fakultas_id', 'program_studi_id', 'kode_ruang', 'nama_ruang', 'lokasi', 'kapasitas']);
+        $this->reset(['editId', 'fakultas_id', 'program_studi_id', 'kode_ruang', 'nama_ruang', 'lokasi', 'kapasitas', 'selected_prodi_ids']);
 
         if ($user && $user->hasRole('operator')) {
             $this->fakultas_id = $user->fakultas_id;
@@ -73,6 +87,7 @@ class RuangPraktikumIndex extends Component
         }
 
         $this->tipe_ruang = 'laboratorium';
+        $this->cakupan_akses = 'bersama_fakultas';
         $this->status = 'aktif';
 
         $this->showModal = true;
@@ -81,10 +96,14 @@ class RuangPraktikumIndex extends Component
     public function openEdit(int $id): void
     {
         $user = auth()->user();
-        $ruang = RuangPraktikum::findOrFail($id);
+        $ruang = RuangPraktikum::with('prodiPengguna')->findOrFail($id);
 
         if ($user && $user->hasRole('operator')) {
-            abort_if($user->fakultas_id && $ruang->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengelola ruangan di bawah fakultas sendiri.');
+            $hasAccess = ($user->fakultas_id && $ruang->fakultas_id === $user->fakultas_id)
+                || ($user->program_studi_id && $ruang->program_studi_id === $user->program_studi_id)
+                || $ruang->prodiPengguna->contains(fn ($p) => $p->fakultas_id === $user->fakultas_id);
+
+            abort_if(! $hasAccess, 403, 'Operator hanya dapat mengelola ruangan di bawah wewenang fakultas sendiri.');
         }
 
         $this->editId = $ruang->id;
@@ -95,6 +114,8 @@ class RuangPraktikumIndex extends Component
         $this->lokasi = $ruang->lokasi;
         $this->kapasitas = $ruang->kapasitas;
         $this->tipe_ruang = $ruang->tipe_ruang ?? 'laboratorium';
+        $this->cakupan_akses = $ruang->cakupan_akses ?? 'bersama_fakultas';
+        $this->selected_prodi_ids = $ruang->prodiPengguna->pluck('id')->toArray();
         $this->status = $ruang->status;
         $this->showModal = true;
     }
@@ -104,20 +125,43 @@ class RuangPraktikumIndex extends Component
         $user = auth()->user();
         if ($user && $user->hasRole('operator')) {
             if ($this->editId) {
-                $existing = RuangPraktikum::findOrFail($this->editId);
-                abort_if($user->fakultas_id && $existing->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengelola ruangan di bawah fakultas sendiri.');
+                $existing = RuangPraktikum::with('prodiPengguna')->findOrFail($this->editId);
+                $hasAccess = ($user->fakultas_id && $existing->fakultas_id === $user->fakultas_id)
+                    || ($user->program_studi_id && $existing->program_studi_id === $user->program_studi_id)
+                    || $existing->prodiPengguna->contains(fn ($p) => $p->fakultas_id === $user->fakultas_id);
+
+                abort_if(! $hasAccess, 403, 'Operator hanya dapat mengelola ruangan di bawah wewenang fakultas sendiri.');
             }
-            if ($user->fakultas_id) {
+            if ($user->fakultas_id && ! $this->fakultas_id) {
                 $this->fakultas_id = $user->fakultas_id;
             }
         }
 
-        $validated = $this->validate();
+        if ($this->cakupan_akses === 'khusus_multi_prodi' && empty($this->selected_prodi_ids)) {
+            $this->addError('selected_prodi_ids', 'Pilih minimal satu program studi pemakai untuk ruangan bertipe khusus multi-prodi.');
 
-        RuangPraktikum::updateOrCreate(['id' => $this->editId], $validated);
+            return;
+        }
+
+        if ($this->cakupan_akses === 'eksklusif' && empty($this->program_studi_id)) {
+            $this->addError('program_studi_id', 'Program studi wajib dipilih jika hak pakai ruangan bersifat eksklusif prodi.');
+
+            return;
+        }
+
+        $validated = $this->validate();
+        unset($validated['selected_prodi_ids']);
+
+        $ruang = RuangPraktikum::updateOrCreate(['id' => $this->editId], $validated);
+
+        if ($this->cakupan_akses === 'khusus_multi_prodi') {
+            $ruang->prodiPengguna()->sync($this->selected_prodi_ids);
+        } else {
+            $ruang->prodiPengguna()->detach();
+        }
 
         $this->showModal = false;
-        $this->reset(['editId', 'fakultas_id', 'program_studi_id', 'kode_ruang', 'nama_ruang', 'lokasi', 'kapasitas']);
+        $this->reset(['editId', 'fakultas_id', 'program_studi_id', 'kode_ruang', 'nama_ruang', 'lokasi', 'kapasitas', 'selected_prodi_ids']);
         session()->flash('success', $this->editId ? 'Ruang berhasil diperbarui.' : 'Ruang berhasil ditambahkan.');
     }
 
@@ -157,23 +201,30 @@ class RuangPraktikumIndex extends Component
     {
         $user = auth()->user();
 
-        $query = RuangPraktikum::query()->with(['fakultas', 'programStudi']);
+        $query = RuangPraktikum::query()->with(['fakultas', 'programStudi', 'prodiPengguna.fakultas']);
 
         // Scoping akses operator
         if ($user && $user->hasRole('operator')) {
             $query->where(function ($q) use ($user) {
                 if ($user->fakultas_id) {
-                    $q->where('fakultas_id', $user->fakultas_id);
+                    $q->where('fakultas_id', $user->fakultas_id)
+                        ->orWhereHas('prodiPengguna', fn ($p) => $p->where('fakultas_id', $user->fakultas_id));
                 }
                 if ($user->program_studi_id) {
-                    $q->orWhere('program_studi_id', $user->program_studi_id);
+                    $q->orWhere('program_studi_id', $user->program_studi_id)
+                        ->orWhereHas('prodiPengguna', fn ($p) => $p->where('program_studi.id', $user->program_studi_id));
                 }
-                $q->orWhereNull('fakultas_id');
+                $q->orWhere('cakupan_akses', 'umum_universitas')
+                    ->orWhereNull('fakultas_id');
             });
         }
 
         if ($this->filterTipe) {
             $query->where('tipe_ruang', $this->filterTipe);
+        }
+
+        if ($this->filterCakupan) {
+            $query->where('cakupan_akses', $this->filterCakupan);
         }
 
         $ruang = $query
@@ -194,10 +245,17 @@ class RuangPraktikumIndex extends Component
             ? ProgramStudi::where('fakultas_id', $user->fakultas_id)->orderBy('nama_program_studi')->get()
             : ProgramStudi::orderBy('nama_program_studi')->get();
 
+        $allProdiGrouped = ProgramStudi::with('fakultas')
+            ->where('status', 'aktif')
+            ->orderBy('nama_program_studi')
+            ->get()
+            ->groupBy(fn ($p) => $p->fakultas?->nama_fakultas ?? 'Fakultas / Unit Lain');
+
         return view('livewire.admin.master-data.ruang-praktikum-index', [
             'ruang' => $ruang,
             'fakultasList' => $fakultasList,
             'prodiList' => $prodiList,
+            'allProdiGrouped' => $allProdiGrouped,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Ruang & Auditorium']);
     }
 }
