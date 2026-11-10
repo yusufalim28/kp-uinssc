@@ -16,6 +16,8 @@ class PengajuanSaya extends Component
 {
     use WithPagination;
 
+    public string $viewMode = 'grid';
+
     public ?int $jadwal_praktikum_id = null;
 
     public string $perubahan = '';
@@ -381,9 +383,9 @@ class PengajuanSaya extends Component
 
         $pengajuan = PengajuanPerubahan::query()
             ->where('dosen_id', $dosen?->id ?? 0)
-            ->with(['jadwalPraktikum.mataKuliah', 'jadwalPraktikum.ruangPraktikum'])
+            ->with(['jadwalPraktikum.mataKuliah', 'jadwalPraktikum.ruangPraktikum', 'jadwalPraktikum.kelas'])
             ->latest()
-            ->paginate(10);
+            ->paginate(12);
 
         $jadwalSaya = JadwalPraktikum::query()
             ->where('dosen_id', $dosen?->id ?? 0)

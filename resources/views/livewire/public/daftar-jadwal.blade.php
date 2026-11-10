@@ -236,7 +236,11 @@
                                     <span class="text-xs text-gray-400 font-mono">{{ $j->mataKuliah->kode_mk }} • {{ $j->mataKuliah->sks }} SKS</span>
                                 </td>
                                 <td class="px-4 py-3.5">
-                                    <span class="font-semibold text-gray-800 dark:text-zinc-200 block text-xs">{{ $j->kelas->nama_kelas }}</span>
+                                    @if($j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-')
+                                        <span class="font-semibold text-gray-800 dark:text-zinc-200 block text-xs">{{ $j->kelas->nama_kelas }}</span>
+                                    @else
+                                        <span class="text-gray-400 text-xs italic block">Non-Kelas</span>
+                                    @endif
                                     <span class="text-[11px] text-gray-400 block truncate max-w-[140px]">{{ $j->mataKuliah->programStudi->nama_program_studi ?? '-' }}</span>
                                 </td>
                                 <td class="px-4 py-3.5">
@@ -286,7 +290,7 @@
                         <div class="flex items-start justify-between gap-2">
                             <div>
                                 <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug">{{ $j->mataKuliah->nama_mk }}</h3>
-                                <p class="text-xs text-gray-400 mt-0.5">{{ $j->mataKuliah->kode_mk }} • Kelas {{ $j->kelas->nama_kelas }}</p>
+                                <p class="text-xs text-gray-400 mt-0.5">{{ $j->mataKuliah->kode_mk }} • {{ $j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-' ? 'Kelas ' . $j->kelas->nama_kelas : 'Non-Kelas' }}</p>
                             </div>
                             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary dark:bg-emerald-500/10 dark:text-emerald-400 shrink-0">
                                 {{ $j->hari }}

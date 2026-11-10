@@ -25,6 +25,8 @@ class ProgramStudiIndex extends Component
 
     public string $search = '';
 
+    public string $viewMode = 'grid';
+
     public ?int $confirmDeleteId = null;
 
     protected function rules(): array
@@ -127,7 +129,9 @@ class ProgramStudiIndex extends Component
     {
         $user = auth()->user();
 
-        $query = ProgramStudi::query()->with('fakultas');
+        $query = ProgramStudi::query()
+            ->with('fakultas')
+            ->withCount(['kelas', 'mataKuliah']);
 
         if ($user && $user->hasRole('operator') && $user->fakultas_id) {
             $query->where('fakultas_id', $user->fakultas_id);

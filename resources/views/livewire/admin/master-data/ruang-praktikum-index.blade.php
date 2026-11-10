@@ -50,10 +50,103 @@
                 <option value="studio">Studio</option>
                 <option value="kelas">Kelas Praktikum</option>
             </select>
+
+            <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl">
+                <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
+                        @class([
+                            'p-1.5 rounded-lg transition',
+                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'grid',
+                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'grid',
+                        ])>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                </button>
+                <button wire:click="$set('viewMode', 'table')" title="Tampilan Tabel"
+                        @class([
+                            'p-1.5 rounded-lg transition',
+                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'table',
+                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'table',
+                        ])>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 
-    {{-- Desktop Table --}}
+    @if ($viewMode === 'grid')
+        {{-- Grid Card View --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @forelse ($ruang as $r)
+                <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:border-emerald-500/40 hover:shadow-xs transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="font-mono text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                <span>{{ $r->kode_ruang }}</span>
+                            </span>
+
+                            <span @class([
+                                'px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1',
+                                'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60' => in_array($r->status, ['aktif', 'tersedia']),
+                                'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60' => $r->status === 'perbaikan',
+                                'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400' => !in_array($r->status, ['aktif', 'tersedia', 'perbaikan']),
+                            ])>
+                                <span class="w-1.5 h-1.5 rounded-full {{ in_array($r->status, ['aktif', 'tersedia']) ? 'bg-emerald-500' : ($r->status === 'perbaikan' ? 'bg-amber-500' : 'bg-gray-400') }}"></span>
+                                {{ $r->status === 'perbaikan' ? 'Perbaikan' : ucfirst($r->status) }}
+                            </span>
+                        </div>
+
+                        <h3 class="font-bold text-base text-gray-900 dark:text-zinc-100 leading-snug">{{ $r->nama_ruang }}</h3>
+
+                        <div class="flex items-center gap-1.5 flex-wrap mt-2">
+                            @if($r->tipe_ruang === 'auditorium')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/60">Auditorium</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60">{{ ucfirst($r->tipe_ruang) }}</span>
+                            @endif
+
+                            @if($r->cakupan_akses === 'khusus_multi_prodi')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200/60">Multi-Prodi</span>
+                            @elseif($r->cakupan_akses === 'eksklusif')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60">Eksklusif</span>
+                            @elseif($r->cakupan_akses === 'umum_universitas')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/60">Umum Kampus</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700">Bersama Fak</span>
+                            @endif
+                        </div>
+
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-2 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span class="truncate">{{ $r->lokasi }}</span>
+                        </p>
+
+                        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                            <span class="text-gray-500 dark:text-zinc-400">Kapasitas: <strong class="text-gray-900 dark:text-zinc-100">{{ $r->kapasitas }} org</strong></span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60">
+                                {{ $r->jadwal_praktikum_count ?? 0 }} Jadwal
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3.5 mt-3.5 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-end gap-1.5">
+                        @if(auth()->user()->hasRole('super-admin') || (auth()->user()->fakultas_id && auth()->user()->fakultas_id === $r->fakultas_id))
+                            <button wire:click="openEdit({{ $r->id }})" class="p-1.5 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-zinc-800 rounded-lg transition" title="Edit Ruangan">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </button>
+                            <button wire:click="confirmDelete({{ $r->id }})" class="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-zinc-800 rounded-lg transition" title="Hapus Ruangan">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full bg-white dark:bg-zinc-900 rounded-2xl p-10 text-center border border-gray-200/80 dark:border-zinc-800">
+                    <p class="text-sm font-bold text-gray-700 dark:text-zinc-300">Tidak ada data ruangan ditemukan.</p>
+                </div>
+            @endforelse
+        </div>
+    @else
+        {{-- Desktop Table --}}
     <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
         <table class="w-full text-xs text-left">
             <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -253,6 +346,7 @@
             </div>
         @endforelse
     </div>
+    @endif
 
     {{ $ruang->links() }}
 

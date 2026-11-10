@@ -46,6 +46,11 @@ class User extends Authenticatable implements PasskeyUser
         return $this->belongsTo(ProgramStudi::class);
     }
 
+    public function dosen()
+    {
+        return $this->hasOne(Dosen::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

@@ -23,7 +23,9 @@ class JadwalPraktikum extends Model
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(Kelas::class)->withDefault([
+            'nama_kelas' => '-',
+        ]);
     }
 
     public function dosen()

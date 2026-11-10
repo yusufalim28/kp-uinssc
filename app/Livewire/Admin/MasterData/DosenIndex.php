@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\MasterData;
 
 use App\Models\Dosen;
+use App\Models\Fakultas;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -28,6 +29,15 @@ class DosenIndex extends Component
 
     public ?int $confirmDeleteId = null;
 
+    // Filter Fakultas khusus Super Admin
+    public string $filterFakultas = '';
+
+    // Scope untuk Operator: 'fakultas' = Dosen di fakultasnya, 'semua' = Seluruh dosen universitas
+    public string $viewScope = 'fakultas';
+
+    // Mode tampilan: 'grid' (card) atau 'table'
+    public string $viewMode = 'grid';
+
     public function updatedKodeDosen(string $value): void
     {
         $this->nidn = $value;
@@ -44,12 +54,22 @@ class DosenIndex extends Component
             'nidn' => 'required|string|max:30|unique:dosen,nidn,'.$this->editId,
             'kode_dosen' => 'nullable|string|max:30',
             'nama' => 'required|string|max:150',
-            'email' => 'required|email|max:150|unique:dosen,email,'.$this->editId,
+            'email' => 'nullable|email|max:150|unique:dosen,email,'.$this->editId,
             'status' => 'required|in:aktif,nonaktif,cuti,keluar',
         ];
     }
 
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterFakultas(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingViewScope(): void
     {
         $this->resetPage();
     }
@@ -87,6 +107,11 @@ class DosenIndex extends Component
         $validated['nidn'] = $this->nidn;
         unset($validated['kode_dosen']);
 
+        // Jika email tidak diisi oleh operator, buat alias institusi berbasis NIDN untuk kesesuaian API Bridge Pustikom
+        if (empty($validated['email'])) {
+            $validated['email'] = "{$this->nidn}@uinssc.ac.id";
+        }
+
         Dosen::updateOrCreate(['id' => $this->editId], $validated);
 
         $this->showModal = false;
@@ -117,14 +142,57 @@ class DosenIndex extends Component
 
     public function render()
     {
-        $dosen = Dosen::query()
-            ->when($this->search, fn ($q) => $q->where('nama', 'like', "%{$this->search}%")
-                ->orWhere('nidn', 'like', "%{$this->search}%"))
-            ->orderBy('nama')
-            ->paginate(10);
+        $user = auth()->user();
+        $query = Dosen::query()
+            ->with([
+                'user.fakultas',
+                'jadwalPraktikum' => function ($jq) {
+                    $jq->with(['mataKuliah.programStudi.fakultas', 'ruangPraktikum.fakultas']);
+                },
+            ]);
+
+        // Filter role Operator: hanya dosen yang mengajar / berjadwal di fakultas operator
+        if ($user && $user->hasRole('operator') && $user->fakultas_id && $this->viewScope === 'fakultas') {
+            $fakultasId = $user->fakultas_id;
+            $query->where(function ($q) use ($fakultasId) {
+                $q->whereHas('jadwalPraktikum', function ($jq) use ($fakultasId) {
+                    $jq->whereHas('mataKuliah.programStudi', fn ($ps) => $ps->where('fakultas_id', $fakultasId))
+                        ->orWhereHas('ruangPraktikum', fn ($rq) => $rq->where('fakultas_id', $fakultasId));
+                })
+                    ->orWhereHas('user', fn ($uq) => $uq->where('fakultas_id', $fakultasId));
+            });
+        }
+
+        // Filter tab Fakultas untuk Super Admin
+        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+            $fakultasId = (int) $this->filterFakultas;
+            $query->where(function ($q) use ($fakultasId) {
+                $q->whereHas('jadwalPraktikum', function ($jq) use ($fakultasId) {
+                    $jq->whereHas('mataKuliah.programStudi', fn ($ps) => $ps->where('fakultas_id', $fakultasId))
+                        ->orWhereHas('ruangPraktikum', fn ($rq) => $rq->where('fakultas_id', $fakultasId));
+                })
+                    ->orWhereHas('user', fn ($uq) => $uq->where('fakultas_id', $fakultasId));
+            });
+        }
+
+        // Fitur pencarian NIDN, Nama, atau Email
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('nama', 'like', "%{$this->search}%")
+                    ->orWhere('nidn', 'like', "%{$this->search}%")
+                    ->orWhere('email', 'like', "%{$this->search}%");
+            });
+        }
+
+        $dosen = $query->orderBy('nama')->paginate(12);
+        $fakultasList = Fakultas::orderBy('nama_fakultas')->get();
 
         return view('livewire.admin.master-data.dosen-index', [
             'dosen' => $dosen,
+            'fakultasList' => $fakultasList,
+            'userFakultas' => $user?->fakultas,
+            'isOperator' => $user && $user->hasRole('operator'),
+            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Dosen']);
     }
 }

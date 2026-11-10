@@ -5,12 +5,34 @@
             <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-zinc-100 tracking-tight">Pengajuan Perubahan Saya</h1>
             <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Ajukan permohonan pemindahan jadwal atau reschedule kuliah praktikum yang Anda ampu.</p>
         </div>
-        @if (! $tidakAdaProfilDosen)
-            <button wire:click="openCreate" class="inline-flex items-center gap-2 bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs self-start sm:self-auto">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>Ajukan Perubahan</span>
-            </button>
-        @endif
+        <div class="flex items-center gap-3 flex-wrap self-start sm:self-auto">
+            {{-- View Mode Toggle --}}
+            <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl">
+                <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
+                        @class([
+                            'p-1.5 rounded-lg transition',
+                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'grid',
+                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200' => $viewMode !== 'grid',
+                        ])>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                </button>
+                <button wire:click="$set('viewMode', 'table')" title="Tampilan Tabel"
+                        @class([
+                            'p-1.5 rounded-lg transition',
+                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'table',
+                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200' => $viewMode !== 'table',
+                        ])>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+
+            @if (! $tidakAdaProfilDosen)
+                <button wire:click="openCreate" class="inline-flex items-center gap-2 bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>Ajukan Perubahan</span>
+                </button>
+            @endif
+        </div>
     </div>
 
     @if ($tidakAdaProfilDosen)
@@ -32,50 +54,32 @@
         </div>
     @endif
 
-    {{-- Desktop Table --}}
-    <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl shadow-2xs overflow-hidden">
-        <table class="w-full text-xs text-left">
-            <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                <tr>
-                    <th class="px-5 py-3.5">Jadwal Praktikum</th>
-                    <th class="px-5 py-3.5">Jenis & Permintaan Perubahan</th>
-                    <th class="px-5 py-3.5">Alasan</th>
-                    <th class="px-5 py-3.5 w-32">Status</th>
-                    <th class="px-5 py-3.5">Catatan Operator</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-800 dark:text-zinc-200">
-                @forelse ($pengajuan as $p)
-                    <tr class="hover:bg-emerald-50/30 dark:hover:bg-zinc-800/40 transition">
-                        <td class="px-5 py-3.5">
-                            <span class="font-bold text-gray-900 dark:text-zinc-100 block">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</span>
-                            <span class="text-xs text-gray-400 font-mono">{{ $p->jadwalPraktikum->hari }}, {{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }} ({{ $p->jadwalPraktikum->ruangPraktikum->nama_ruang ?? 'Ruang TBD' }})</span>
-                        </td>
-                        <td class="px-5 py-3.5">
-                            @if ($p->jenis_perubahan)
-                                <span @class([
-                                    'px-2 py-0.5 rounded text-[10px] font-bold inline-block mb-1',
-                                    'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
-                                    'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
-                                    'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
-                                    'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
-                                    'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
-                                ])>
-                                    {{ match($p->jenis_perubahan) {
-                                        'ganti_jadwal' => 'Pindah Jadwal',
-                                        'ganti_ruang' => 'Pindah Ruang',
-                                        'ganti_jadwal_ruang' => 'Pindah Jadwal & Ruang',
-                                        'reschedule' => 'Kuliah Pengganti',
-                                        default => 'Permintaan Khusus',
-                                    } }}
-                                </span>
-                            @endif
-                            <p class="text-gray-800 dark:text-zinc-200 font-medium text-xs">{{ $p->perubahan }}</p>
-                        </td>
-                        <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-400 text-xs">{{ $p->alasan }}</td>
-                        <td class="px-5 py-3.5">
+    @if ($viewMode === 'grid')
+        {{-- Modern Grid Cards Layout --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4.5">
+            @forelse ($pengajuan as $p)
+                <div class="group bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 rounded-2xl p-5 shadow-2xs hover:shadow-md transition duration-200 flex flex-col justify-between">
+                    <div>
+                        {{-- Top Header Row --}}
+                        <div class="flex items-start justify-between gap-2 mb-3">
                             <span @class([
-                                'px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5',
+                                'px-2 py-0.5 rounded text-[10px] font-bold inline-block',
+                                'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40' => $p->jenis_perubahan === 'ganti_jadwal',
+                                'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40' => $p->jenis_perubahan === 'ganti_ruang',
+                                'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
+                                'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40' => $p->jenis_perubahan === 'reschedule',
+                                'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
+                            ])>
+                                {{ match($p->jenis_perubahan) {
+                                    'ganti_jadwal' => 'Pindah Jadwal',
+                                    'ganti_ruang' => 'Pindah Ruang',
+                                    'ganti_jadwal_ruang' => 'Pindah Jadwal & Ruang',
+                                    'reschedule' => 'Kuliah Pengganti',
+                                    default => 'Permintaan Khusus',
+                                } }}
+                            </span>
+                            <span @class([
+                                'px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0 inline-flex items-center gap-1.5',
                                 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40' => strtolower($p->status) === 'menunggu',
                                 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40' => strtolower($p->status) === 'disetujui',
                                 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40' => strtolower($p->status) === 'ditolak',
@@ -83,78 +87,178 @@
                                 <span class="w-1.5 h-1.5 rounded-full {{ strtolower($p->status) === 'disetujui' ? 'bg-emerald-500' : (strtolower($p->status) === 'menunggu' ? 'bg-amber-500' : 'bg-rose-500') }}"></span>
                                 {{ ucfirst($p->status) }}
                             </span>
-                        </td>
-                        <td class="px-5 py-3.5 text-gray-500 dark:text-zinc-400 text-xs font-medium">{{ $p->catatan_penolakan ?: '—' }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="5" class="px-5 py-10 text-center text-gray-400 dark:text-zinc-500 text-sm">Belum pernah mengajukan perubahan jadwal.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    {{-- Mobile Card View --}}
-    <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        @forelse ($pengajuan as $p)
-            <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <div class="flex items-start justify-between gap-2 mb-2">
-                        <div class="min-w-0">
-                            <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug truncate">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</h3>
-                            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5 truncate font-mono">{{ $p->jadwalPraktikum->hari }}, {{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }}</p>
                         </div>
-                        <span @class([
-                            'px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0',
-                            'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60' => strtolower($p->status) === 'menunggu',
-                            'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60' => strtolower($p->status) === 'disetujui',
-                            'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60' => strtolower($p->status) === 'ditolak',
-                        ])>
-                            {{ ucfirst($p->status) }}
-                        </span>
+
+                        {{-- Mata Kuliah Title --}}
+                        <div class="mb-3">
+                            <h3 class="font-bold text-sm sm:text-base text-gray-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-snug">
+                                {{ $p->jadwalPraktikum->mataKuliah->nama_mk }}
+                            </h3>
+                            <p class="text-[11px] text-gray-500 dark:text-zinc-400 font-mono mt-0.5">
+                                {{ $p->jadwalPraktikum->hari }}, {{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }} ({{ $p->jadwalPraktikum->ruangPraktikum->nama_ruang ?? 'Ruang TBD' }})
+                            </p>
+                        </div>
+
+                        {{-- Permintaan & Alasan --}}
+                        <div class="bg-gray-50/80 dark:bg-zinc-800/60 rounded-xl p-3 border border-gray-100 dark:border-zinc-700/80 text-xs space-y-2">
+                            <div>
+                                <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Permintaan Perubahan:</span>
+                                <p class="font-medium text-gray-800 dark:text-zinc-200 text-xs mt-0.5">{{ $p->perubahan }}</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Alasan:</span>
+                                <p class="text-gray-600 dark:text-zinc-300 text-xs line-clamp-2 mt-0.5">{{ $p->alasan }}</p>
+                            </div>
+                            @if ($p->catatan_penolakan)
+                                <div class="pt-2 border-t border-gray-200/60 dark:border-zinc-700">
+                                    <span class="text-rose-500 block text-[10px] font-bold uppercase">Catatan Operator:</span>
+                                    <p class="text-rose-700 dark:text-rose-300 font-medium text-xs mt-0.5">{{ $p->catatan_penolakan }}</p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
-                    <div class="bg-gray-50/80 dark:bg-zinc-800/60 rounded-xl p-3 space-y-1.5 border border-gray-100 dark:border-zinc-700/80 text-xs mt-2">
-                        <div>
-                            <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Permintaan Perubahan:</span>
-                            @if ($p->jenis_perubahan)
-                                <span @class([
-                                    'px-1.5 py-0.5 rounded text-[10px] font-bold inline-block my-0.5',
-                                    'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
-                                    'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
-                                    'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
-                                    'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
-                                    'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
-                                ])>
-                                    {{ match($p->jenis_perubahan) {
-                                        'ganti_jadwal' => 'Pindah Jadwal',
-                                        'ganti_ruang' => 'Pindah Ruang',
-                                        'ganti_jadwal_ruang' => 'Pindah Jadwal & Ruang',
-                                        'reschedule' => 'Kuliah Pengganti',
-                                        default => 'Permintaan Khusus',
-                                    } }}
-                                </span>
-                            @endif
-                            <p class="font-medium text-gray-800 dark:text-zinc-200 text-xs">{{ $p->perubahan }}</p>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Alasan:</span>
-                            <p class="text-gray-600 dark:text-zinc-300 text-xs line-clamp-2">{{ $p->alasan }}</p>
-                        </div>
-                        @if ($p->catatan_penolakan)
-                            <div class="pt-1.5 border-t border-gray-200/60 dark:border-zinc-700">
-                                <span class="text-rose-500 block text-[10px] font-bold uppercase">Catatan Operator:</span>
-                                <p class="text-rose-700 dark:text-rose-300 font-medium text-xs">{{ $p->catatan_penolakan }}</p>
-                            </div>
+                    {{-- Bottom Footer --}}
+                    <div class="pt-3.5 mt-4 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between text-[11px] text-gray-400 dark:text-zinc-500 font-mono">
+                        <span>Diajukan: {{ $p->created_at->diffForHumans() }}</span>
+                        @if(strtolower($p->status) === 'menunggu')
+                            <span class="text-amber-600 dark:text-amber-400 font-sans font-semibold">Sedang ditinjau</span>
                         @endif
                     </div>
                 </div>
-            </div>
-        @empty
-            <div class="sm:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-200/80 dark:border-zinc-800 text-gray-400 dark:text-zinc-500 text-sm">
-                Belum pernah mengajukan perubahan.
-            </div>
-        @endforelse
-    </div>
+            @empty
+                <div class="col-span-full bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center border border-gray-200/80 dark:border-zinc-800">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Belum pernah mengajukan perubahan</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">Klik tombol "Ajukan Perubahan" di atas untuk memohon jadwal atau ruang praktikum pengganti.</p>
+                </div>
+            @endforelse
+        </div>
+    @else
+        {{-- Desktop Table --}}
+        <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl shadow-2xs overflow-hidden">
+            <table class="w-full text-xs text-left">
+                <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-5 py-3.5">Jadwal Praktikum</th>
+                        <th class="px-5 py-3.5">Jenis & Permintaan Perubahan</th>
+                        <th class="px-5 py-3.5">Alasan</th>
+                        <th class="px-5 py-3.5 w-32">Status</th>
+                        <th class="px-5 py-3.5">Catatan Operator</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-800 dark:text-zinc-200">
+                    @forelse ($pengajuan as $p)
+                        <tr class="hover:bg-emerald-50/30 dark:hover:bg-zinc-800/40 transition">
+                            <td class="px-5 py-3.5">
+                                <span class="font-bold text-gray-900 dark:text-zinc-100 block">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</span>
+                                <span class="text-xs text-gray-400 font-mono">{{ $p->jadwalPraktikum->hari }}, {{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }} ({{ $p->jadwalPraktikum->ruangPraktikum->nama_ruang ?? 'Ruang TBD' }})</span>
+                            </td>
+                            <td class="px-5 py-3.5">
+                                @if ($p->jenis_perubahan)
+                                    <span @class([
+                                        'px-2 py-0.5 rounded text-[10px] font-bold inline-block mb-1',
+                                        'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
+                                        'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
+                                        'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
+                                        'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
+                                        'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
+                                    ])>
+                                        {{ match($p->jenis_perubahan) {
+                                            'ganti_jadwal' => 'Pindah Jadwal',
+                                            'ganti_ruang' => 'Pindah Ruang',
+                                            'ganti_jadwal_ruang' => 'Pindah Jadwal & Ruang',
+                                            'reschedule' => 'Kuliah Pengganti',
+                                            default => 'Permintaan Khusus',
+                                        } }}
+                                    </span>
+                                @endif
+                                <p class="text-gray-800 dark:text-zinc-200 font-medium text-xs">{{ $p->perubahan }}</p>
+                            </td>
+                            <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-400 text-xs">{{ $p->alasan }}</td>
+                            <td class="px-5 py-3.5">
+                                <span @class([
+                                    'px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5',
+                                    'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40' => strtolower($p->status) === 'menunggu',
+                                    'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40' => strtolower($p->status) === 'disetujui',
+                                    'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40' => strtolower($p->status) === 'ditolak',
+                                ])>
+                                    <span class="w-1.5 h-1.5 rounded-full {{ strtolower($p->status) === 'disetujui' ? 'bg-emerald-500' : (strtolower($p->status) === 'menunggu' ? 'bg-amber-500' : 'bg-rose-500') }}"></span>
+                                    {{ ucfirst($p->status) }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 text-gray-500 dark:text-zinc-400 text-xs font-medium">{{ $p->catatan_penolakan ?: '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="px-5 py-10 text-center text-gray-400 dark:text-zinc-500 text-sm">Belum pernah mengajukan perubahan jadwal.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Mobile Card View when Table is selected on mobile --}}
+        <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            @forelse ($pengajuan as $p)
+                <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug truncate">{{ $p->jadwalPraktikum->mataKuliah->nama_mk }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5 truncate font-mono">{{ $p->jadwalPraktikum->hari }}, {{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($p->jadwalPraktikum->jam_selesai, 5, '') }}</p>
+                            </div>
+                            <span @class([
+                                'px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0',
+                                'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60' => strtolower($p->status) === 'menunggu',
+                                'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60' => strtolower($p->status) === 'disetujui',
+                                'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60' => strtolower($p->status) === 'ditolak',
+                            ])>
+                                {{ ucfirst($p->status) }}
+                            </span>
+                        </div>
+
+                        <div class="bg-gray-50/80 dark:bg-zinc-800/60 rounded-xl p-3 space-y-1.5 border border-gray-100 dark:border-zinc-700/80 text-xs mt-2">
+                            <div>
+                                <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Permintaan Perubahan:</span>
+                                @if ($p->jenis_perubahan)
+                                    <span @class([
+                                        'px-1.5 py-0.5 rounded text-[10px] font-bold inline-block my-0.5',
+                                        'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200' => $p->jenis_perubahan === 'ganti_jadwal',
+                                        'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200' => $p->jenis_perubahan === 'ganti_ruang',
+                                        'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200' => $p->jenis_perubahan === 'ganti_jadwal_ruang',
+                                        'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200' => $p->jenis_perubahan === 'reschedule',
+                                        'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200' => !in_array($p->jenis_perubahan, ['ganti_jadwal', 'ganti_ruang', 'ganti_jadwal_ruang', 'reschedule']),
+                                    ])>
+                                        {{ match($p->jenis_perubahan) {
+                                            'ganti_jadwal' => 'Pindah Jadwal',
+                                            'ganti_ruang' => 'Pindah Ruang',
+                                            'ganti_jadwal_ruang' => 'Pindah Jadwal & Ruang',
+                                            'reschedule' => 'Kuliah Pengganti',
+                                            default => 'Permintaan Khusus',
+                                        } }}
+                                    </span>
+                                @endif
+                                <p class="font-medium text-gray-800 dark:text-zinc-200 text-xs">{{ $p->perubahan }}</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-400 dark:text-zinc-400 block text-[10px] font-semibold uppercase">Alasan:</span>
+                                <p class="text-gray-600 dark:text-zinc-300 text-xs line-clamp-2">{{ $p->alasan }}</p>
+                            </div>
+                            @if ($p->catatan_penolakan)
+                                <div class="pt-1.5 border-t border-gray-200/60 dark:border-zinc-700">
+                                    <span class="text-rose-500 block text-[10px] font-bold uppercase">Catatan Operator:</span>
+                                    <p class="text-rose-700 dark:text-rose-300 font-medium text-xs">{{ $p->catatan_penolakan }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="sm:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-200/80 dark:border-zinc-800 text-gray-400 dark:text-zinc-500 text-sm">
+                    Belum pernah mengajukan perubahan.
+                </div>
+            @endforelse
+        </div>
+    @endif
 
     {{ $pengajuan->links() }}
 

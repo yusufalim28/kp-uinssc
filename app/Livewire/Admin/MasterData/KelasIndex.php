@@ -25,6 +25,8 @@ class KelasIndex extends Component
 
     public string $search = '';
 
+    public string $viewMode = 'grid';
+
     public ?int $confirmDeleteId = null;
 
     protected function rules(): array
@@ -124,7 +126,9 @@ class KelasIndex extends Component
     {
         $user = auth()->user();
 
-        $query = Kelas::query()->with('programStudi');
+        $query = Kelas::query()
+            ->with(['programStudi.fakultas'])
+            ->withCount('jadwalPraktikum');
 
         if ($user && $user->hasRole('operator') && $user->fakultas_id) {
             $query->whereHas('programStudi', fn ($q) => $q->where('fakultas_id', $user->fakultas_id));
@@ -133,7 +137,7 @@ class KelasIndex extends Component
         $kelas = $query
             ->when($this->search, fn ($q) => $q->where('nama_kelas', 'like', "%{$this->search}%"))
             ->orderBy('nama_kelas')
-            ->paginate(10);
+            ->paginate(12);
 
         $programStudi = ($user && $user->hasRole('operator') && $user->fakultas_id)
             ? ProgramStudi::where('fakultas_id', $user->fakultas_id)->orderBy('nama_program_studi')->get()

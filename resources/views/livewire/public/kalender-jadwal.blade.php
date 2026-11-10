@@ -178,9 +178,11 @@
                                     <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-primary/10 text-primary dark:bg-emerald-500/15 dark:text-emerald-300">
                                         {{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}
                                     </span>
-                                    <span class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 px-1.5 py-0.5 rounded">
-                                        {{ $j->kelas->nama_kelas }}
-                                    </span>
+                                    @if($j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-')
+                                        <span class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 px-1.5 py-0.5 rounded">
+                                            {{ $j->kelas->nama_kelas }}
+                                        </span>
+                                    @endif
                                 </div>
 
                                 {{-- Mata Kuliah --}}

@@ -11,6 +11,8 @@ class PengajuanIndex extends Component
 {
     use WithPagination;
 
+    public string $viewMode = 'grid';
+
     public string $filterStatus = 'menunggu';
 
     public ?int $processId = null;
@@ -79,10 +81,10 @@ class PengajuanIndex extends Component
     public function render()
     {
         $pengajuan = PengajuanPerubahan::query()
-            ->with(['dosen', 'jadwalPraktikum.mataKuliah'])
+            ->with(['dosen', 'jadwalPraktikum.mataKuliah.programStudi', 'jadwalPraktikum.ruangPraktikum', 'jadwalPraktikum.kelas'])
             ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
             ->latest()
-            ->paginate(10);
+            ->paginate(12);
 
         return view('livewire.admin.pengajuan-index', [
             'pengajuan' => $pengajuan,

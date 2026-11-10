@@ -115,9 +115,9 @@ class JadwalImport implements ToCollection
                 continue;
             }
 
-            // Validasi data esensial
-            if (! $mkRaw || ! $kelasRaw || ! $dosenRaw || ! $ruangRaw || ! $hariRaw) {
-                $this->errors[] = "Baris {$rowNumber}: Data tidak lengkap. Pastikan kolom Mata Kuliah, Kelas, Dosen, Ruang, dan Hari terisi.";
+            // Validasi data esensial (Kelas kini opsional)
+            if (! $mkRaw || ! $dosenRaw || ! $ruangRaw || ! $hariRaw) {
+                $this->errors[] = "Baris {$rowNumber}: Data tidak lengkap. Pastikan kolom Mata Kuliah, Dosen, Ruang, dan Hari terisi.";
                 $this->skippedCount++;
 
                 continue;
@@ -193,14 +193,17 @@ class JadwalImport implements ToCollection
                 ]);
             }
 
-            // Kelas (Auto-Create jika belum ada)
-            $kelas = Kelas::where('nama_kelas', $kelasRaw)->first();
-            if (! $kelas) {
-                $kelas = Kelas::create([
-                    'nama_kelas' => $kelasRaw,
-                    'program_studi_id' => $mk->program_studi_id ?? $defaultProdiId,
-                    'semester' => $mk->semester ?? 1,
-                ]);
+            // Kelas (Opsional, Auto-Create jika diisi)
+            $kelas = null;
+            if ($kelasRaw && trim($kelasRaw) !== '' && trim($kelasRaw) !== '-') {
+                $kelas = Kelas::where('nama_kelas', $kelasRaw)->first();
+                if (! $kelas) {
+                    $kelas = Kelas::create([
+                        'nama_kelas' => $kelasRaw,
+                        'program_studi_id' => $mk->program_studi_id ?? $defaultProdiId,
+                        'semester' => $mk->semester ?? 1,
+                    ]);
+                }
             }
 
             // Dosen (Auto-Create jika belum ada)
@@ -284,7 +287,7 @@ class JadwalImport implements ToCollection
             // Simpan Jadwal Praktikum
             JadwalPraktikum::create([
                 'mata_kuliah_id' => $mk->id,
-                'kelas_id' => $kelas->id,
+                'kelas_id' => $kelas?->id,
                 'dosen_id' => $dosen->id,
                 'ruang_praktikum_id' => $ruang->id,
                 'tahun_akademik_id' => $tahun->id,

@@ -52,6 +52,8 @@ class JadwalManage extends Component
 
     public ?int $filterTahunAkademik = null;
 
+    public string $viewMode = 'grid';
+
     // Excel Import Properties
     public bool $showImportModal = false;
 
@@ -110,7 +112,7 @@ class JadwalManage extends Component
     {
         return [
             'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
-            'kelas_id' => 'required|exists:kelas,id',
+            'kelas_id' => 'nullable|exists:kelas,id',
             'dosen_id' => 'required|exists:dosen,id',
             'ruang_praktikum_id' => 'required|exists:ruang_praktikum,id',
             'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
@@ -334,7 +336,7 @@ class JadwalManage extends Component
         $jadwal = $jadwalQuery
             ->orderByRaw("CASE hari WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Jum''at' THEN 5 ELSE 6 END")
             ->orderBy('jam_mulai')
-            ->paginate(10);
+            ->paginate(12);
 
         return view('livewire.admin.jadwal-manage', [
             'jadwal' => $jadwal,

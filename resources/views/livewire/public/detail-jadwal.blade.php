@@ -28,7 +28,7 @@
                 <dt class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Kelas</dt>
                 <dd class="font-medium text-gray-900 dark:text-zinc-100 flex items-center gap-2">
                     <svg class="w-5 h-5 text-primary dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    {{ $jadwal->kelas->nama_kelas }}
+                    {{ ($jadwal->kelas && $jadwal->kelas->nama_kelas !== '-') ? $jadwal->kelas->nama_kelas : 'Tanpa Kelas / Non-Kelas' }}
                 </dd>
             </div>
             

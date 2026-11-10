@@ -3,14 +3,15 @@
     <style>
         @media print {
             @page {
-                size: landscape;
-                margin: 5mm 8mm;
+                size: A4 landscape;
+                margin: 5mm 6mm;
             }
             body {
                 background: white !important;
                 color: black !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                width: 100% !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -30,6 +31,8 @@
             th, td {
                 border: 1px solid #000 !important;
                 page-break-inside: avoid !important;
+                word-break: break-word !important;
+                padding: 2px 1px !important;
             }
         }
     </style>
@@ -198,17 +201,17 @@
                 </div>
 
                 {{-- Tabel Grid Matriks 100% Lebar (Tanpa Scroll Horizontal, Minisize Responsif) --}}
-                <div class="w-full">
-                    <table class="w-full table-fixed border-collapse border border-gray-300 dark:border-zinc-700 print:border-black text-center">
+                <div class="w-full overflow-x-hidden">
+                    <table class="w-full table-fixed border-collapse border border-gray-300 dark:border-zinc-700 print:border-black text-center select-none">
                         <thead>
                             <tr class="bg-gray-100 dark:bg-zinc-800 print:bg-gray-100 text-gray-800 dark:text-zinc-200 print:text-black font-bold">
-                                <th class="border border-gray-300 dark:border-zinc-700 print:border-black py-1.5 px-0.5 w-12 sm:w-16 md:w-20 print:w-14 uppercase tracking-wider text-[8px] sm:text-[10px] md:text-xs print:text-[7pt] font-extrabold text-gray-900 dark:text-zinc-100 print:text-black">
+                                <th class="border border-gray-300 dark:border-zinc-700 print:border-black py-1 px-0.5 w-9 sm:w-12 md:w-16 print:w-12 uppercase tracking-wider text-[7px] sm:text-[9px] md:text-xs print:text-[7pt] font-extrabold text-gray-900 dark:text-zinc-100 print:text-black">
                                     Hari
                                 </th>
                                 @foreach($timeSlots as $slot)
-                                    <th class="border border-gray-300 dark:border-zinc-700 print:border-black p-0.5 sm:p-1 print:p-0.5 text-center">
-                                        <span class="block font-bold text-[8px] sm:text-[9px] md:text-[10px] print:text-[7pt] text-gray-900 dark:text-zinc-100 print:text-black leading-none">{{ substr($slot['start'], 0, 5) }}</span>
-                                        <span class="block text-[6.5px] sm:text-[7.5px] md:text-[8.5px] print:text-[6pt] text-gray-400 dark:text-zinc-500 print:text-black leading-none mt-0.5 font-normal">{{ substr($slot['end'], 0, 5) }}</span>
+                                    <th class="border border-gray-300 dark:border-zinc-700 print:border-black p-0.5 text-center">
+                                        <span class="block font-bold text-[6.5px] sm:text-[8px] md:text-[9.5px] print:text-[6.5pt] text-gray-900 dark:text-zinc-100 print:text-black leading-none">{{ substr($slot['start'], 0, 5) }}</span>
+                                        <span class="block text-[5.5px] sm:text-[7px] md:text-[8px] print:text-[5.5pt] text-gray-400 dark:text-zinc-500 print:text-black leading-none mt-0.5 font-normal">{{ substr($slot['end'], 0, 5) }}</span>
                                     </th>
                                 @endforeach
                             </tr>
@@ -217,7 +220,7 @@
                             @foreach($hariList as $hari)
                                 <tr class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/40 transition">
                                     {{-- Kolom Hari --}}
-                                    <td class="border border-gray-300 dark:border-zinc-700 print:border-black py-2 px-0.5 font-bold text-gray-900 dark:text-zinc-100 print:text-black text-[9px] sm:text-xs print:text-[8pt] text-center bg-gray-50/50 dark:bg-zinc-900/50 print:bg-white">
+                                    <td class="border border-gray-300 dark:border-zinc-700 print:border-black py-1.5 px-0.5 font-bold text-gray-900 dark:text-zinc-100 print:text-black text-[7.5px] sm:text-[9.5px] md:text-xs print:text-[7.5pt] text-center bg-gray-50/50 dark:bg-zinc-900/50 print:bg-white">
                                         {{ $hari }}
                                     </td>
 
@@ -229,18 +232,20 @@
                                             </td>
                                         @elseif($cell['type'] === 'jadwal')
                                             @php $j = $cell['jadwal']; @endphp
-                                            <td colspan="{{ $cell['colspan'] }}" class="border border-gray-400 dark:border-zinc-600 print:border-black p-0.5 sm:p-1 md:p-1.5 print:p-0.5 bg-emerald-50/95 dark:bg-emerald-950/50 print:bg-emerald-50/20 text-gray-900 dark:text-zinc-100 print:text-black align-middle text-left shadow-2xs">
+                                            <td colspan="{{ $cell['colspan'] }}" class="border border-gray-400 dark:border-zinc-600 print:border-black p-0.5 sm:p-1 print:p-0.5 bg-emerald-50/95 dark:bg-emerald-950/50 print:bg-emerald-50/20 text-gray-900 dark:text-zinc-100 print:text-black align-middle text-left shadow-2xs overflow-hidden">
                                                 <div class="space-y-0.5 leading-tight">
-                                                    <div class="font-bold text-[8px] sm:text-[10px] md:text-[11px] print:text-[7.5pt] text-emerald-950 dark:text-emerald-200 print:text-black break-words line-clamp-2">
+                                                    <div class="font-bold text-[7px] sm:text-[8.5px] md:text-[10px] print:text-[7pt] text-emerald-950 dark:text-emerald-200 print:text-black break-words line-clamp-2">
                                                         {{ $j->mataKuliah->nama_mk }}
                                                     </div>
-                                                    <div class="text-[7px] sm:text-[8.5px] md:text-[9.5px] print:text-[6.5pt] font-semibold text-emerald-800 dark:text-emerald-300 print:text-black truncate">
-                                                        ({{ $j->kelas->nama_kelas }})
-                                                    </div>
-                                                    <div class="text-[7px] sm:text-[8px] md:text-[9px] print:text-[6.5pt] text-gray-700 dark:text-zinc-300 print:text-black italic truncate">
+                                                    @if($j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-')
+                                                        <div class="text-[6px] sm:text-[7.5px] md:text-[8.5px] print:text-[6pt] font-semibold text-emerald-800 dark:text-emerald-300 print:text-black truncate">
+                                                            ({{ $j->kelas->nama_kelas }})
+                                                        </div>
+                                                    @endif
+                                                    <div class="text-[6px] sm:text-[7px] md:text-[8px] print:text-[5.5pt] text-gray-700 dark:text-zinc-300 print:text-black italic truncate">
                                                         {{ $j->dosen->nama }}
                                                     </div>
-                                                    <div class="text-[6.5px] sm:text-[7.5px] md:text-[8.5px] print:text-[5.5pt] text-gray-500 dark:text-zinc-400 print:text-black pt-0.5 border-t border-emerald-200/50 dark:border-emerald-800/50 print:border-black font-mono">
+                                                    <div class="text-[5.5px] sm:text-[6.5px] md:text-[7.5px] print:text-[5pt] text-gray-500 dark:text-zinc-400 print:text-black pt-0.5 border-t border-emerald-200/50 dark:border-emerald-800/50 print:border-black font-mono">
                                                         {{ substr($j->jam_mulai, 0, 5) }} - {{ substr($j->jam_selesai, 0, 5) }}
                                                     </div>
                                                 </div>

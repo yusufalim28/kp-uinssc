@@ -26,7 +26,16 @@ class TahunAkademikIndex extends Component
 
     public bool $showModal = false;
 
+    public string $search = '';
+
+    public string $viewMode = 'grid';
+
     public ?int $confirmDeleteId = null;
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function updatedStatusAktif($value): void
     {
@@ -133,8 +142,10 @@ class TahunAkademikIndex extends Component
     public function render()
     {
         $tahun = TahunAkademik::query()
+            ->withCount('jadwalPraktikum')
+            ->when($this->search, fn ($q) => $q->where('nama', 'like', "%{$this->search}%"))
             ->orderByDesc('tahun_mulai')
-            ->paginate(10);
+            ->paginate(12);
 
         return view('livewire.admin.master-data.tahun-akademik-index', [
             'tahun' => $tahun,

@@ -29,8 +29,8 @@
         {{-- Brand / Header Sidebar --}}
         <div class="h-16 shrink-0 bg-[#0F352A] border-b border-white/8 flex items-center justify-between px-5">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 font-bold text-white tracking-tight">
-                <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shadow-2xs">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <div class="w-10 h-10 rounded-lg bg-white/2 border border-emerald-400/30 flex items-center justify-center     text-emerald-300 shadow-2xs">
+                    <img class="h-7" src="{{ asset('img/uinsscv2.png') }}" alt="logo uinssc">
                 </div>
                 <div class="flex flex-col leading-tight">
                     <span class="text-white font-black text-sm tracking-wide">UINSSC</span>

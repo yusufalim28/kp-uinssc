@@ -62,19 +62,59 @@ class SampahIndex extends Component
         session()->flash('success', 'Data berhasil dihapus permanen dan tidak bisa dikembalikan.');
     }
 
-    public function render()
+    /**
+     * Pulihkan semua data di tempat sampah (sesuai filter aktif atau seluruhnya)
+     */
+    public function restoreAll(): void
     {
-        $jenisMap = $this->jenisMap();
-        $items = collect();
-
-        foreach ($jenisMap as $key => $config) {
+        $count = 0;
+        foreach ($this->jenisMap() as $key => $config) {
             if ($this->filterJenis && $this->filterJenis !== $key) {
                 continue;
             }
 
-            $rows = $config['model']::onlyTrashed()->get();
+            $count += $config['model']::onlyTrashed()->restore();
+        }
 
-            foreach ($rows as $row) {
+        session()->flash('success', "Berhasil memulihkan {$count} data dari tempat sampah.");
+    }
+
+    /**
+     * Kosongkan tempat sampah (Hapus permanen semua data sesuai filter atau seluruhnya)
+     */
+    public function forceDeleteAll(): void
+    {
+        $count = 0;
+        foreach ($this->jenisMap() as $key => $config) {
+            if ($this->filterJenis && $this->filterJenis !== $key) {
+                continue;
+            }
+
+            $trashed = $config['model']::onlyTrashed()->get();
+            $count += $trashed->count();
+            foreach ($trashed as $item) {
+                $item->forceDelete();
+            }
+        }
+
+        session()->flash('success', "Tempat sampah berhasil dikosongkan. {$count} data telah dihapus permanen.");
+    }
+
+    public function render()
+    {
+        $jenisMap = $this->jenisMap();
+        $items = collect();
+        $totalSampahCount = 0;
+
+        foreach ($jenisMap as $key => $config) {
+            $trashedRows = $config['model']::onlyTrashed()->get();
+            $totalSampahCount += $trashedRows->count();
+
+            if ($this->filterJenis && $this->filterJenis !== $key) {
+                continue;
+            }
+
+            foreach ($trashedRows as $row) {
                 $nama = $config['nameField']
                     ? $row->{$config['nameField']}
                     : (($row->mataKuliah->nama_mk ?? 'Mata kuliah terhapus').' — '.$row->hari);
@@ -105,6 +145,7 @@ class SampahIndex extends Component
         return view('livewire.admin.sampah-index', [
             'items' => $paged,
             'jenisMap' => $jenisMap,
+            'totalSampahCount' => $totalSampahCount,
         ])->layout('components.layouts.admin', ['title' => 'Sampah — Data Terhapus']);
     }
 }

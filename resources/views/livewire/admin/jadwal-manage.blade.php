@@ -74,112 +74,234 @@
                     Reset Filter
                 </button>
             @endif
+
+            {{-- View Mode Toggle --}}
+            <div class="flex items-center gap-1.5 self-end sm:self-auto bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl">
+                <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
+                        @class([
+                            'p-1.5 rounded-lg transition',
+                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'grid',
+                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200' => $viewMode !== 'grid',
+                        ])>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                </button>
+                <button wire:click="$set('viewMode', 'table')" title="Tampilan Tabel"
+                        @class([
+                            'p-1.5 rounded-lg transition',
+                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'table',
+                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200' => $viewMode !== 'table',
+                        ])>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 
-    {{-- Desktop Table --}}
-    <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
-        <table class="w-full text-xs text-left">
-            <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                <tr>
-                    <th class="px-5 py-3.5">Mata Kuliah</th>
-                    <th class="px-5 py-3.5 w-24">Kelas</th>
-                    <th class="px-5 py-3.5">Dosen Pengampu</th>
-                    <th class="px-5 py-3.5 w-44">Hari / Sesi Jam</th>
-                    <th class="px-5 py-3.5">Ruang Lab</th>
-                    <th class="px-5 py-3.5 w-32">Status</th>
-                    <th class="px-5 py-3.5 text-right w-36">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-800 dark:text-zinc-200">
-                @forelse ($jadwal as $j)
-                    <tr class="hover:bg-emerald-50/30 dark:hover:bg-zinc-800/40 transition">
-                        <td class="px-5 py-3.5 font-bold text-gray-900 dark:text-zinc-100">
-                            {{ $j->mataKuliah->nama_mk }}
-                        </td>
-                        <td class="px-5 py-3.5">
-                            <span class="px-2 py-0.5 rounded font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/50 dark:border-emerald-800/40 text-[11px]">
-                                {{ $j->kelas->nama_kelas }}
+    @if ($viewMode === 'grid')
+        {{-- Modern Grid Cards Layout --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4.5">
+            @forelse ($jadwal as $j)
+                <div class="group bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 rounded-2xl p-5 shadow-2xs hover:shadow-md transition duration-200 flex flex-col justify-between">
+                    <div>
+                        {{-- Top Badge Row --}}
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+                                <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ $j->hari }}, {{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}
                             </span>
-                        </td>
-                        <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300 font-medium">{{ $j->dosen->nama }}</td>
-                        <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300">
-                            <span class="font-bold text-gray-900 dark:text-zinc-100">{{ $j->hari }}</span>, 
-                            <span class="font-mono text-[11px]">{{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}</span>
-                        </td>
-                        <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300 font-medium">{{ $j->ruangPraktikum->nama_ruang }}</td>
-                        <td class="px-5 py-3.5">
                             @if($j->status === 'aktif')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                     Aktif
                                 </span>
                             @elseif($j->status === 'reschedule')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                     Reschedule
                                 </span>
                             @elseif($j->status === 'dibatalkan')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                     Dibatalkan
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-500">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-500">
                                     Nonaktif
                                 </span>
                             @endif
-                        </td>
-                        <td class="px-5 py-3.5 text-right space-x-2">
-                            <button wire:click="openEdit({{ $j->id }})" class="font-bold text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition">Edit</button>
-                            <button wire:click="confirmDelete({{ $j->id }})" class="font-bold text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition">Hapus</button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="7" class="px-5 py-8 text-center text-gray-400 dark:text-zinc-500">Belum ada jadwal praktikum.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                        </div>
 
-    {{-- Mobile Cards Grid --}}
-    <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        @forelse ($jadwal as $j)
-            <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between gap-2 mb-2">
-                        <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
-                            {{ $j->hari }}, {{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}
-                        </span>
-                        <span @class([
-                            'px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0',
-                            'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60' => $j->status === 'aktif',
-                            'bg-gray-100 dark:bg-zinc-800 text-gray-500' => $j->status === 'nonaktif',
-                            'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60' => $j->status === 'dibatalkan',
-                            'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60' => $j->status === 'reschedule',
-                        ])>
-                            {{ ucfirst($j->status) }}
-                        </span>
+                        {{-- Mata Kuliah Title --}}
+                        <div class="mb-3">
+                            <h3 class="font-bold text-sm sm:text-base text-gray-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-snug">
+                                {{ $j->mataKuliah->nama_mk }}
+                            </h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="font-mono text-[11px] text-gray-500 dark:text-zinc-400">{{ $j->mataKuliah->kode_mk }}</span>
+                                @if($j->mataKuliah->programStudi)
+                                    <span class="text-gray-300 dark:text-zinc-600">•</span>
+                                    <span class="text-[11px] text-gray-500 dark:text-zinc-400 truncate">{{ $j->mataKuliah->programStudi->nama_prodi }}</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Details List --}}
+                        <div class="space-y-2 pt-2.5 border-t border-gray-100 dark:border-zinc-800/80 text-xs">
+                            {{-- Ruang Lab --}}
+                            <div class="flex items-center gap-2 text-gray-700 dark:text-zinc-300">
+                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                <span class="font-medium truncate">{{ $j->ruangPraktikum->nama_ruang }}</span>
+                            </div>
+
+                            {{-- Kelas --}}
+                            <div class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                @if($j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-')
+                                    <span class="px-2 py-0.5 rounded font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/50 dark:border-emerald-800/40 text-[11px]">
+                                        Kelas {{ $j->kelas->nama_kelas }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 dark:text-zinc-500 italic text-[11px]">Non-Kelas</span>
+                                @endif
+                            </div>
+
+                            {{-- Dosen Pengampu --}}
+                            <div class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span class="truncate font-medium">{{ $j->dosen->nama }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug">{{ $j->mataKuliah->nama_mk }}</h3>
-                    <div class="flex flex-wrap items-center gap-1.5 mt-2 text-xs">
-                        <span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">Kelas {{ $j->kelas->nama_kelas }}</span>
-                        <span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">{{ $j->ruangPraktikum->nama_ruang }}</span>
+
+                    {{-- Bottom Action Buttons --}}
+                    <div class="flex items-center justify-end gap-2 pt-3.5 mt-4 border-t border-gray-100 dark:border-zinc-800">
+                        <button wire:click="openEdit({{ $j->id }})" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 rounded-xl transition">
+                            Edit
+                        </button>
+                        <button wire:click="confirmDelete({{ $j->id }})" class="px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl transition">
+                            Hapus
+                        </button>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-2 truncate flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        <span class="truncate">{{ $j->dosen->nama }}</span>
-                    </p>
                 </div>
-                <div class="flex items-center justify-end gap-2 pt-3 mt-3 border-t border-gray-100 dark:border-zinc-800">
-                    <button wire:click="openEdit({{ $j->id }})" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 rounded-xl transition">Edit</button>
-                    <button wire:click="confirmDelete({{ $j->id }})" class="px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 rounded-xl transition">Hapus</button>
+            @empty
+                <div class="col-span-full bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center border border-gray-200/80 dark:border-zinc-800">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Belum ada jadwal praktikum</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">Gunakan tombol "Tambah Jadwal" atau sesuaikan filter pencarian.</p>
                 </div>
-            </div>
-        @empty
-            <div class="sm:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-200/80 dark:border-zinc-800">
-                <p class="text-gray-500 dark:text-zinc-400 text-sm">Belum ada jadwal.</p>
-            </div>
-        @endforelse
-    </div>
+            @endforelse
+        </div>
+    @else
+        {{-- Desktop Table --}}
+        <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
+            <table class="w-full text-xs text-left">
+                <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-5 py-3.5">Mata Kuliah</th>
+                        <th class="px-5 py-3.5 w-24">Kelas</th>
+                        <th class="px-5 py-3.5">Dosen Pengampu</th>
+                        <th class="px-5 py-3.5 w-44">Hari / Sesi Jam</th>
+                        <th class="px-5 py-3.5">Ruang Lab</th>
+                        <th class="px-5 py-3.5 w-32">Status</th>
+                        <th class="px-5 py-3.5 text-right w-36">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-zinc-800 text-gray-800 dark:text-zinc-200">
+                    @forelse ($jadwal as $j)
+                        <tr class="hover:bg-emerald-50/30 dark:hover:bg-zinc-800/40 transition">
+                            <td class="px-5 py-3.5 font-bold text-gray-900 dark:text-zinc-100">
+                                {{ $j->mataKuliah->nama_mk }}
+                            </td>
+                            <td class="px-5 py-3.5">
+                                @if($j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-')
+                                    <span class="px-2 py-0.5 rounded font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/50 dark:border-emerald-800/40 text-[11px]">
+                                        {{ $j->kelas->nama_kelas }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 dark:text-zinc-500 text-[11px] italic">Non-Kelas</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300 font-medium">{{ $j->dosen->nama }}</td>
+                            <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300">
+                                <span class="font-bold text-gray-900 dark:text-zinc-100">{{ $j->hari }}</span>, 
+                                <span class="font-mono text-[11px]">{{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-gray-600 dark:text-zinc-300 font-medium">{{ $j->ruangPraktikum->nama_ruang }}</td>
+                            <td class="px-5 py-3.5">
+                                @if($j->status === 'aktif')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Aktif
+                                    </span>
+                                @elseif($j->status === 'reschedule')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40">
+                                        Reschedule
+                                    </span>
+                                @elseif($j->status === 'dibatalkan')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40">
+                                        Dibatalkan
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-500">
+                                        Nonaktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3.5 text-right space-x-2">
+                                <button wire:click="openEdit({{ $j->id }})" class="font-bold text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition">Edit</button>
+                                <button wire:click="confirmDelete({{ $j->id }})" class="font-bold text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition">Hapus</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="7" class="px-5 py-8 text-center text-gray-400 dark:text-zinc-500">Belum ada jadwal praktikum.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Mobile Cards Fallback when table view is chosen on small screens --}}
+        <div class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            @forelse ($jadwal as $j)
+                <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+                                {{ $j->hari }}, {{ \Illuminate\Support\Str::limit($j->jam_mulai, 5, '') }}–{{ \Illuminate\Support\Str::limit($j->jam_selesai, 5, '') }}
+                            </span>
+                            <span @class([
+                                'px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0',
+                                'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60' => $j->status === 'aktif',
+                                'bg-gray-100 dark:bg-zinc-800 text-gray-500' => $j->status === 'nonaktif',
+                                'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60' => $j->status === 'dibatalkan',
+                                'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60' => $j->status === 'reschedule',
+                            ])>
+                                {{ ucfirst($j->status) }}
+                            </span>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug">{{ $j->mataKuliah->nama_mk }}</h3>
+                        <div class="flex flex-wrap items-center gap-1.5 mt-2 text-xs">
+                            @if($j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-')
+                                <span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">Kelas {{ $j->kelas->nama_kelas }}</span>
+                            @endif
+                            <span class="px-2 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-medium">{{ $j->ruangPraktikum->nama_ruang }}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-2 truncate flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <span class="truncate">{{ $j->dosen->nama }}</span>
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 pt-3 mt-3 border-t border-gray-100 dark:border-zinc-800">
+                        <button wire:click="openEdit({{ $j->id }})" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 rounded-xl transition">Edit</button>
+                        <button wire:click="confirmDelete({{ $j->id }})" class="px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 rounded-xl transition">Hapus</button>
+                    </div>
+                </div>
+            @empty
+                <div class="sm:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-200/80 dark:border-zinc-800">
+                    <p class="text-gray-500 dark:text-zinc-400 text-sm">Belum ada jadwal.</p>
+                </div>
+            @endforelse
+        </div>
+    @endif
 
     {{ $jadwal->links() }}
 
@@ -224,9 +346,9 @@
                         </div>
 
                         <div>
-                            <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Kelas *</label>
+                            <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Kelas (Opsional)</label>
                             <select wire:model="kelas_id" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
-                                <option value="">-- Pilih Kelas --</option>
+                                <option value="">-- Tanpa Kelas / Rombel Tunggal --</option>
                                 @foreach ($kelasList as $k)
                                     <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
                                 @endforeach

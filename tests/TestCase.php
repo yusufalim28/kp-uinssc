@@ -16,6 +16,9 @@ abstract class TestCase extends BaseTestCase
         putenv('DB_DATABASE=:memory:');
         $_ENV['DB_DATABASE'] = ':memory:';
         $_SERVER['DB_DATABASE'] = ':memory:';
+        putenv('CACHE_STORE=array');
+        $_ENV['CACHE_STORE'] = 'array';
+        $_SERVER['CACHE_STORE'] = 'array';
 
         $app = require __DIR__.'/../bootstrap/app.php';
 
@@ -23,6 +26,8 @@ abstract class TestCase extends BaseTestCase
 
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', ':memory:');
+        $app['config']->set('cache.default', 'array');
+        $app['config']->set('session.driver', 'array');
 
         return $app;
     }

@@ -42,6 +42,8 @@ class RuangPraktikumIndex extends Component
 
     public string $filterCakupan = '';
 
+    public string $viewMode = 'grid';
+
     public ?int $confirmDeleteId = null;
 
     protected function rules(): array
@@ -201,7 +203,9 @@ class RuangPraktikumIndex extends Component
     {
         $user = auth()->user();
 
-        $query = RuangPraktikum::query()->with(['fakultas', 'programStudi', 'prodiPengguna.fakultas']);
+        $query = RuangPraktikum::query()
+            ->with(['fakultas', 'programStudi', 'prodiPengguna.fakultas'])
+            ->withCount('jadwalPraktikum');
 
         // Scoping akses operator
         if ($user && $user->hasRole('operator')) {
@@ -235,7 +239,7 @@ class RuangPraktikumIndex extends Component
             }))
             ->orderByRaw("CASE WHEN tipe_ruang = 'auditorium' THEN 1 ELSE 2 END")
             ->orderBy('nama_ruang')
-            ->paginate(10);
+            ->paginate(12);
 
         $fakultasList = ($user && $user->hasRole('operator') && $user->fakultas_id)
             ? Fakultas::where('id', $user->fakultas_id)->get()

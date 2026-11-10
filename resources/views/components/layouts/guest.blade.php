@@ -23,12 +23,30 @@
         <div class="max-w-7xl mx-auto flex items-center justify-between h-13">
             
             {{-- Bagian Kiri: Logo dengan Background Putih Penuh sampai Ujung Kiri --}}
-            <div data-keep-light class="bg-white text-gray-900 h-full flex items-center px-6 md:px-10 shadow-sm rounded-br-2xl">
-                <a href="{{ route('home') }}" class="flex items-center gap-3 font-bold text-base md:text-lg tracking-tight">
-                    <img src="{{ asset('img/uinsscv2.png') }}" alt="Logo SJP" class="h-10 w-auto object-contain">
+            <div class="bg-white dark:bg-gray-900
+                        text-gray-900 dark:text-gray-100
+                        h-full flex items-center px-6 md:px-10
+                        shadow-sm dark:shadow-black/20
+                        rounded-br-2xl
+                        transition-colors duration-300">
+
+                <a href="{{ route('home') }}"
+                class="flex items-center gap-3 font-bold text-base md:text-lg tracking-tight">
+
+                    <img src="{{ asset('img/uinsscv2.png') }}"
+                        alt="Logo SJP"
+                        class="h-10 w-auto object-contain">
+
                     <div class="hidden sm:flex flex-col justify-center leading-tight">
-                        <span class="text-primary dark:text-emerald-400 font-bold text-xs md:text-sm">UIN Siber Syekh Nurjati Cirebon</span>
-                        <span class="text-gray-600 dark:text-black font-semibold text-[11px] md:text-xs mt-0.5">Sistem Jadwal Praktikum</span>
+
+                        <span class="text-primary dark:text-emerald-400 font-bold text-xs md:text-sm">
+                            UIN Siber Syekh Nurjati Cirebon
+                        </span>
+
+                        <span class="text-gray-600 dark:text-gray-200 font-semibold text-[11px] md:text-xs mt-0.5">
+                            Sistem Jadwal Praktikum
+                        </span>
+
                     </div>
                 </a>
             </div>

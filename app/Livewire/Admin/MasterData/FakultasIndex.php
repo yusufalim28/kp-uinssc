@@ -23,6 +23,8 @@ class FakultasIndex extends Component
 
     public string $search = '';
 
+    public string $viewMode = 'grid';
+
     // State konfirmasi hapus
     public ?int $confirmDeleteId = null;
 
@@ -116,10 +118,11 @@ class FakultasIndex extends Component
     public function render()
     {
         $fakultas = Fakultas::query()
+            ->withCount(['programStudi', 'ruangPraktikum'])
             ->when($this->search, fn ($q) => $q->where('nama_fakultas', 'like', "%{$this->search}%")
                 ->orWhere('kode_fakultas', 'like', "%{$this->search}%"))
             ->orderBy('nama_fakultas')
-            ->paginate(10);
+            ->paginate(12);
 
         return view('livewire.admin.master-data.fakultas-index', [
             'fakultas' => $fakultas,
