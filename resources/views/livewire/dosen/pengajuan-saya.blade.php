@@ -264,8 +264,9 @@
 
     {{-- Modal Pengajuan Perubahan --}}
     @if ($showModal)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 sm:p-6 overflow-hidden">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 overflow-y-auto p-4 sm:p-6">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
                 <!-- Header -->
                 <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900 shrink-0">
                     <div>
@@ -444,6 +445,7 @@
                     </div>
                 </div>
             </div>
+          </div>
         </div>
     @endif
 

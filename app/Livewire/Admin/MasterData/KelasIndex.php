@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\MasterData;
 
+use App\Models\Fakultas;
 use App\Models\Kelas;
 use App\Models\ProgramStudi;
 use Livewire\Component;
@@ -16,6 +17,8 @@ class KelasIndex extends Component
     public string $nama_kelas = '';
 
     public ?int $program_studi_id = null;
+
+    public ?int $filterFakultas = null;
 
     public ?int $semester = null;
 
@@ -40,6 +43,11 @@ class KelasIndex extends Component
     }
 
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterFakultas(): void
     {
         $this->resetPage();
     }
@@ -134,6 +142,11 @@ class KelasIndex extends Component
             $query->whereHas('programStudi', fn ($q) => $q->where('fakultas_id', $user->fakultas_id));
         }
 
+        // Poin 6: Filter Fakultas untuk Super Admin
+        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+            $query->whereHas('programStudi', fn ($q) => $q->where('fakultas_id', (int) $this->filterFakultas));
+        }
+
         $kelas = $query
             ->when($this->search, fn ($q) => $q->where('nama_kelas', 'like', "%{$this->search}%"))
             ->orderBy('nama_kelas')
@@ -146,6 +159,9 @@ class KelasIndex extends Component
         return view('livewire.admin.master-data.kelas-index', [
             'kelas' => $kelas,
             'programStudi' => $programStudi,
+            'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
+            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'userFakultas' => $user?->fakultas,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Kelas']);
     }
 }

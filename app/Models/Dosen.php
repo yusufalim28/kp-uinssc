@@ -41,10 +41,29 @@ class Dosen extends Model
         $this->attributes['nidn'] = $value;
     }
 
+    public function getLabelKategoriAttribute(): string
+    {
+        return match ($this->kategori) {
+            'tutor' => 'Tutor Lab',
+            'asisten' => 'Asisten Lab',
+            default => 'Dosen Pengampu',
+        };
+    }
+
+    public function isDosen(): bool
+    {
+        return ($this->kategori ?? 'dosen') === 'dosen';
+    }
+
+    public function isTutor(): bool
+    {
+        return in_array($this->kategori ?? 'dosen', ['tutor', 'asisten']);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nama', 'nidn', 'email', 'status']) // field yang dicatat
+            ->logOnly(['nama', 'nidn', 'email', 'kategori', 'status']) // field yang dicatat
             ->logOnlyDirty()                                        // hanya catat yang berubah
             ->dontLogEmptyChanges();
     }

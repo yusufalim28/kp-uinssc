@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             SampleDataSeeder::class,
             PanduanSeeder::class,
-            DummyDataSeeder::class,
+            // DummyDataSeeder::class, // Dinonaktifkan untuk persiapan data riil kampus
         ]);
     }
 }

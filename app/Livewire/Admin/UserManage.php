@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Fakultas;
 use App\Models\ProgramStudi;
+use App\Models\RuangPraktikum;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Title;
@@ -30,6 +31,8 @@ class UserManage extends Component
 
     public ?int $program_studi_id = null;
 
+    public ?int $ruang_praktikum_id = null;
+
     public bool $showModal = false;
 
     public ?int $confirmDeleteId = null;
@@ -51,11 +54,12 @@ class UserManage extends Component
     public function updatedFakultasId(): void
     {
         $this->program_studi_id = null;
+        $this->ruang_praktikum_id = null;
     }
 
     public function openCreate(): void
     {
-        $this->reset(['editId', 'name', 'email', 'password', 'fakultas_id', 'program_studi_id']);
+        $this->reset(['editId', 'name', 'email', 'password', 'fakultas_id', 'program_studi_id', 'ruang_praktikum_id']);
         $this->role = 'operator';
         $this->showModal = true;
     }
@@ -71,6 +75,7 @@ class UserManage extends Component
         $this->role = $u->roles->first()?->name ?? 'operator';
         $this->fakultas_id = $u->fakultas_id;
         $this->program_studi_id = $u->program_studi_id;
+        $this->ruang_praktikum_id = $u->ruang_praktikum_id;
         $this->showModal = true;
     }
 
@@ -79,9 +84,10 @@ class UserManage extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$this->editId,
-            'role' => 'required|in:super-admin,operator,dosen',
+            'role' => 'required|in:super-admin,operator,ketua-lab,dosen',
             'fakultas_id' => 'nullable|exists:fakultas,id',
             'program_studi_id' => 'nullable|exists:program_studi,id',
+            'ruang_praktikum_id' => 'nullable|exists:ruang_praktikum,id',
         ];
 
         if (! $this->editId) {
@@ -95,8 +101,9 @@ class UserManage extends Component
         $data = [
             'name' => $this->name,
             'email' => $this->email,
-            'fakultas_id' => $this->role === 'operator' ? $this->fakultas_id : null,
+            'fakultas_id' => in_array($this->role, ['operator', 'ketua-lab']) ? $this->fakultas_id : null,
             'program_studi_id' => $this->role === 'operator' ? $this->program_studi_id : null,
+            'ruang_praktikum_id' => $this->role === 'ketua-lab' ? $this->ruang_praktikum_id : null,
         ];
 
         if (! empty($this->password)) {
@@ -151,7 +158,7 @@ class UserManage extends Component
     {
         abort_if(! auth()->user()->hasRole('super-admin'), 403);
 
-        $query = User::with(['fakultas', 'programStudi', 'roles']);
+        $query = User::with(['fakultas', 'programStudi', 'ruangPraktikum', 'roles']);
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -170,11 +177,15 @@ class UserManage extends Component
         $prodiList = $this->fakultas_id
             ? ProgramStudi::where('fakultas_id', $this->fakultas_id)->orderBy('nama_program_studi')->get()
             : collect();
+        $ruangList = $this->fakultas_id
+            ? RuangPraktikum::where('fakultas_id', $this->fakultas_id)->orderBy('nama_ruang')->get()
+            : RuangPraktikum::orderBy('nama_ruang')->get();
 
         return view('livewire.admin.user-manage', [
             'users' => $users,
             'fakultasList' => $fakultasList,
             'prodiList' => $prodiList,
+            'ruangList' => $ruangList,
             'roles' => Role::all(),
         ])->layout('components.layouts.admin', ['title' => 'Kelola Pengguna & Operator']);
     }

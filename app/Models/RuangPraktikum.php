@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
@@ -32,6 +33,36 @@ class RuangPraktikum extends Model
         return $this->belongsTo(ProgramStudi::class);
     }
 
+    public function pengelolaUsers()
+    {
+        return $this->hasMany(User::class, 'ruang_praktikum_id');
+    }
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        if ($this->foto && Storage::disk('public')->exists($this->foto)) {
+            return Storage::url($this->foto);
+        }
+
+        return null;
+    }
+
+    public function isKapasitasFleksibel(): bool
+    {
+        return ($this->tipe_kapasitas ?? 'tetap') === 'fleksibel';
+    }
+
+    public function getLabelKapasitasAttribute(): string
+    {
+        if ($this->isKapasitasFleksibel()) {
+            return $this->kapasitas_maksimal
+                ? "Fleksibel (Maks. {$this->kapasitas_maksimal} Mahasiswa)"
+                : 'Fleksibel / Open Space';
+        }
+
+        return "{$this->kapasitas} Workstation";
+    }
+
     public function prodiPengguna(): BelongsToMany
     {
         return $this->belongsToMany(ProgramStudi::class, 'ruang_praktikum_prodi', 'ruang_praktikum_id', 'program_studi_id')
@@ -39,24 +70,33 @@ class RuangPraktikum extends Model
     }
 
     /**
-     * Mengecek apakah ruangan ini diizinkan untuk digunakan oleh program studi tertentu.
+     * Mengecek apakah ruangan ini diizinkan untuk digunakan oleh program studi / fakultas tertentu.
      */
     public function canBeUsedByProdi(?int $prodiId, ?int $fakultasId = null): bool
     {
-        if (! $prodiId) {
-            return false;
-        }
-
         $cakupan = $this->cakupan_akses ?? 'bersama_fakultas';
 
-        // 1. Umum Universitas: bisa dipakai semua prodi
+        // 1. Umum Universitas: bisa dipakai semua prodi / fakultas
         if ($cakupan === 'umum_universitas') {
             return true;
         }
 
+        // Jika prodiId tidak ada (misal MK Bersama Fakultas tanpa kelas spesifik), cek kecocokan fakultas
+        if (! $prodiId) {
+            if ($cakupan === 'bersama_fakultas') {
+                if (is_null($this->fakultas_id)) {
+                    return true;
+                }
+
+                return $fakultasId && (int) $this->fakultas_id === (int) $fakultasId;
+            }
+
+            return false;
+        }
+
         // 2. Eksklusif Prodi: hanya prodi yang bersangkutan
         if ($cakupan === 'eksklusif') {
-            return $this->program_studi_id === $prodiId;
+            return (int) $this->program_studi_id === (int) $prodiId;
         }
 
         // 3. Khusus Multi-Prodi: harus terdaftar di tabel pivot prodiPengguna
@@ -75,12 +115,12 @@ class RuangPraktikum extends Model
             }
 
             if ($fakultasId && $this->fakultas_id) {
-                return $this->fakultas_id === $fakultasId;
+                return (int) $this->fakultas_id === (int) $fakultasId;
             }
 
             $prodi = ProgramStudi::find($prodiId);
 
-            return $prodi && $prodi->fakultas_id === $this->fakultas_id;
+            return $prodi && (int) $prodi->fakultas_id === (int) $this->fakultas_id;
         }
 
         return false;
@@ -89,7 +129,7 @@ class RuangPraktikum extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nama_ruang', 'kode_ruang', 'lokasi', 'kapasitas', 'tipe_ruang', 'cakupan_akses', 'fakultas_id', 'program_studi_id', 'status'])
+            ->logOnly(['nama_ruang', 'kode_ruang', 'lokasi', 'kapasitas', 'tipe_kapasitas', 'kapasitas_maksimal', 'tipe_ruang', 'cakupan_akses', 'fakultas_id', 'program_studi_id', 'status'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }

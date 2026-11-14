@@ -7,13 +7,14 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Laravel\Passkeys\Actions\DeletePasskey;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 
-new #[Title('Security settings')] class extends Component {
+new #[Title('Pengaturan Keamanan'), Layout('components.layouts.admin')] class extends Component {
     use PasswordValidationRules;
 
     public string $current_password = '';
@@ -84,6 +85,8 @@ new #[Title('Security settings')] class extends Component {
         ]);
 
         $this->reset('current_password', 'password', 'password_confirmation');
+
+        session()->flash('status', 'Kata sandi akun Anda berhasil diperbarui.');
 
         Flux::toast(variant: 'success', text: __('Password updated.'));
     }
@@ -169,41 +172,55 @@ new #[Title('Security settings')] class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <flux:heading level="2" class="sr-only">{{ __('Security settings') }}</flux:heading>
+    <flux:heading level="2" class="sr-only">{{ __('Update password') }}</flux:heading>
 
-    <x-pages::settings.layout :heading="__('Update password')" :subheading="__('Ensure your account is using a long, random password to stay secure')">
-        <form method="POST" wire:submit="updatePassword" class="mt-6 space-y-6">
-            <flux:input
-                wire:model="current_password"
-                :label="__('Current password')"
-                type="password"
-                required
-                autocomplete="current-password"
-                viewable
-            />
-            <flux:input
-                wire:model="password"
-                :label="__('New password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                viewable
-            />
-            <flux:input
-                wire:model="password_confirmation"
-                :label="__('Confirm password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                passwordrules="{{ \Illuminate\Validation\Rules\Password::defaults()->toPasswordRulesString() }}"
-                viewable
-            />
+    <x-pages::settings.layout heading="Kata Sandi & Keamanan" subheading="Pastikan akun Anda menggunakan kata sandi yang kuat dan unik untuk menjaga keamanan.">
+        @if (session('status'))
+            <div class="mb-5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs rounded-2xl p-4 flex items-center gap-2.5 shadow-2xs">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>{{ session('status') }}</span>
+            </div>
+        @endif
 
-            <div class="flex items-center gap-4">
-                <flux:button variant="primary" type="submit" data-test="update-password-button">
-                    {{ __('Save') }}
-                </flux:button>
+        <form method="POST" wire:submit="updatePassword" class="max-w-lg space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1">
+                    Kata Sandi Saat Ini <span class="text-rose-500">*</span>
+                </label>
+                <input type="password" wire:model="current_password" required autocomplete="current-password" placeholder="Masukkan kata sandi lama Anda"
+                       class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition">
+                @error('current_password') <p class="text-rose-600 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1">
+                    Kata Sandi Baru <span class="text-rose-500">*</span>
+                </label>
+                <input type="password" wire:model="password" required autocomplete="new-password" placeholder="Minimal 8 karakter kombinasi huruf & angka"
+                       class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition">
+                @error('password') <p class="text-rose-600 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1">
+                    Konfirmasi Kata Sandi Baru <span class="text-rose-500">*</span>
+                </label>
+                <input type="password" wire:model="password_confirmation" required autocomplete="new-password" placeholder="Ketik ulang kata sandi baru"
+                       class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition">
+                @error('password_confirmation') <p class="text-rose-600 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="pt-2 flex items-center justify-between">
+                <button type="submit" data-test="update-password-button"
+                        class="inline-flex items-center gap-2 bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span>Perbarui Kata Sandi</span>
+                </button>
+
+                <span wire:loading wire:target="updatePassword" class="text-xs text-gray-500 flex items-center gap-1.5">
+                    <svg class="animate-spin h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span>Memperbarui...</span>
+                </span>
             </div>
         </form>
 

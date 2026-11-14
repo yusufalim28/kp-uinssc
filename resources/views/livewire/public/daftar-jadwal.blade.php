@@ -232,7 +232,15 @@
                         @forelse ($jadwal as $j)
                             <tr class="hover:bg-primary/5 dark:hover:bg-zinc-800/40 transition">
                                 <td class="px-5 py-3.5">
-                                    <span class="font-bold text-gray-900 dark:text-zinc-100 block">{{ $j->mataKuliah->nama_mk }}</span>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-bold text-gray-900 dark:text-zinc-100">{{ $j->mataKuliah->nama_mk }}</span>
+                                        @if($j->mataKuliah->hasModul())
+                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" title="Modul Praktikum Tersedia">
+                                                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                <span>Modul</span>
+                                            </span>
+                                        @endif
+                                    </div>
                                     <span class="text-xs text-gray-400 font-mono">{{ $j->mataKuliah->kode_mk }} • {{ $j->mataKuliah->sks }} SKS</span>
                                 </td>
                                 <td class="px-4 py-3.5">
@@ -289,7 +297,14 @@
                     <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl p-4 shadow-xs space-y-3">
                         <div class="flex items-start justify-between gap-2">
                             <div>
-                                <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug">{{ $j->mataKuliah->nama_mk }}</h3>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <h3 class="font-bold text-sm text-gray-900 dark:text-zinc-100 leading-snug">{{ $j->mataKuliah->nama_mk }}</h3>
+                                    @if($j->mataKuliah->hasModul())
+                                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                            📄 Modul
+                                        </span>
+                                    @endif
+                                </div>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ $j->mataKuliah->kode_mk }} • {{ $j->kelas_id && $j->kelas && $j->kelas->nama_kelas !== '-' ? 'Kelas ' . $j->kelas->nama_kelas : 'Non-Kelas' }}</p>
                             </div>
                             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary dark:bg-emerald-500/10 dark:text-emerald-400 shrink-0">

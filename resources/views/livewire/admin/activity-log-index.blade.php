@@ -174,48 +174,50 @@
 
     {{-- Modal Bersihkan Log --}}
     @if ($showCleanModal)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 animate-in fade-in zoom-in-95 duration-150">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-800">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 overflow-y-auto p-4 sm:p-6">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 my-auto animate-in fade-in zoom-in-95 duration-150">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-800">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">Bersihkan Riwayat Log</h2>
+                            <p class="text-xs text-gray-500 dark:text-zinc-400">Pilih kriteria data log audit lama yang ingin dihapus.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">Bersihkan Riwayat Log</h2>
-                        <p class="text-xs text-gray-500 dark:text-zinc-400">Pilih kriteria data log audit lama yang ingin dihapus.</p>
-                    </div>
-                </div>
 
-                <div class="space-y-2 pt-1">
-                    <label class="text-xs font-bold text-gray-700 dark:text-zinc-300">Kriteria Penghapusan:</label>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-3 p-3 rounded-2xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 cursor-pointer transition">
-                            <input type="radio" wire:model="cleanDays" value="30" class="text-emerald-600 focus:ring-emerald-500">
-                            <span class="text-xs text-gray-700 dark:text-zinc-300">Hapus log lebih lama dari <strong class="text-emerald-700 dark:text-emerald-400">30 hari</strong> (Direkomendasikan)</span>
-                        </label>
-                        <label class="flex items-center gap-3 p-3 rounded-2xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 cursor-pointer transition">
-                            <input type="radio" wire:model="cleanDays" value="7" class="text-emerald-600 focus:ring-emerald-500">
-                            <span class="text-xs text-gray-700 dark:text-zinc-300">Hapus log lebih lama dari <strong>7 hari</strong></span>
-                        </label>
-                        <label class="flex items-center gap-3 p-3 rounded-2xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 cursor-pointer transition">
-                            <input type="radio" wire:model="cleanDays" value="90" class="text-emerald-600 focus:ring-emerald-500">
-                            <span class="text-xs text-gray-700 dark:text-zinc-300">Hapus log lebih lama dari <strong>90 hari</strong></span>
-                        </label>
-                        <label class="flex items-center gap-3 p-3 rounded-2xl border border-rose-200 dark:border-rose-800 bg-rose-50/30 dark:bg-rose-950/30 hover:border-rose-400 cursor-pointer transition">
-                            <input type="radio" wire:model="cleanDays" value="0" class="text-rose-600 focus:ring-rose-500">
-                            <span class="text-xs text-rose-700 dark:text-rose-300 font-semibold">Kosongkan seluruh riwayat log aktivitas (Semua data)</span>
-                        </label>
+                    <div class="space-y-2 pt-1">
+                        <label class="text-xs font-bold text-gray-700 dark:text-zinc-300">Kriteria Penghapusan:</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 cursor-pointer transition">
+                                <input type="radio" wire:model="cleanDays" value="30" class="text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-xs text-gray-700 dark:text-zinc-300">Hapus log lebih lama dari <strong class="text-emerald-700 dark:text-emerald-400">30 hari</strong> (Direkomendasikan)</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 cursor-pointer transition">
+                                <input type="radio" wire:model="cleanDays" value="7" class="text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-xs text-gray-700 dark:text-zinc-300">Hapus log lebih lama dari <strong>7 hari</strong></span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-500 cursor-pointer transition">
+                                <input type="radio" wire:model="cleanDays" value="90" class="text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-xs text-gray-700 dark:text-zinc-300">Hapus log lebih lama dari <strong>90 hari</strong></span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-2xl border border-rose-200 dark:border-rose-800 bg-rose-50/30 dark:bg-rose-950/30 hover:border-rose-400 cursor-pointer transition">
+                                <input type="radio" wire:model="cleanDays" value="0" class="text-rose-600 focus:ring-rose-500">
+                                <span class="text-xs text-rose-700 dark:text-rose-300 font-semibold">Kosongkan seluruh riwayat log aktivitas (Semua data)</span>
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
-                    <button wire:click="$set('showCleanModal', false)" type="button" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">
-                        Batal
-                    </button>
-                    <button wire:click="cleanLogs" wire:loading.attr="disabled" type="button" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition shadow-xs">
-                        <span wire:loading.remove wire:target="cleanLogs">Bersihkan Sekarang</span>
-                        <span wire:loading wire:target="cleanLogs">Menghapus...</span>
-                    </button>
+                    <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
+                        <button wire:click="$set('showCleanModal', false)" type="button" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">
+                            Batal
+                        </button>
+                        <button wire:click="cleanLogs" wire:loading.attr="disabled" type="button" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition shadow-xs">
+                            <span wire:loading.remove wire:target="cleanLogs">Bersihkan Sekarang</span>
+                            <span wire:loading wire:target="cleanLogs">Menghapus...</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

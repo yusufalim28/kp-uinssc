@@ -48,6 +48,7 @@
                 <option value="">Semua Peran (Role)</option>
                 <option value="super-admin">Super Admin</option>
                 <option value="operator">Operator Fakultas/Prodi</option>
+                <option value="ketua-lab">Ketua Laboratorium</option>
                 <option value="dosen">Dosen</option>
             </select>
         </div>
@@ -81,6 +82,10 @@
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50">
                                         💼 Operator
                                     </span>
+                                @elseif($r->name === 'ketua-lab')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50">
+                                        🔬 Ketua Lab
+                                    </span>
                                 @elseif($r->name === 'dosen')
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
                                         🎓 Dosen
@@ -91,7 +96,12 @@
                             @endforeach
                         </td>
                         <td class="px-5 py-3.5 text-xs text-gray-600 dark:text-zinc-300">
-                            @if ($u->fakultas)
+                            @if ($u->ruangPraktikum)
+                                <div class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                                    <span>🔬</span> <span>{{ $u->ruangPraktikum->nama_ruang }}</span>
+                                </div>
+                                <div class="text-[11px] text-gray-500 dark:text-zinc-400">🏛️ {{ $u->fakultas?->nama_fakultas ?? 'Fasilitas Terpusat' }}</div>
+                            @elseif ($u->fakultas)
                                 <div class="font-semibold text-gray-900 dark:text-zinc-100">🏛️ {{ $u->fakultas->nama_fakultas }}</div>
                                 @if ($u->programStudi)
                                     <div class="text-gray-400 dark:text-zinc-400 font-normal">Prodi: {{ $u->programStudi->nama_program_studi }}</div>
@@ -201,11 +211,43 @@
                             <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Peran / Hak Akses (Role) *</label>
                             <select wire:model.live="role" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
                                 <option value="operator">Operator (Pengelola Jadwal Prodi / Fakultas)</option>
+                                <option value="ketua-lab">Ketua Laboratorium (Otonomi Lab Tertentu)</option>
                                 <option value="dosen">Dosen Pengampu</option>
                                 <option value="super-admin">Super Admin (Otoritas Penuh)</option>
                             </select>
                             @error('role') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
+
+                        @if ($role === 'ketua-lab')
+                            <div class="border-t border-gray-100 dark:border-zinc-800 pt-3 space-y-3 bg-amber-50/40 dark:bg-amber-950/30 p-3.5 rounded-2xl border border-amber-200/60 dark:border-amber-800/40">
+                                <div class="text-xs font-bold text-amber-950 dark:text-amber-300 flex items-center gap-1.5">
+                                    <span>🔬</span> Laboratorium yang Dinaungi Ketua Lab
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Fakultas Penanggung Jawab *</label>
+                                    <select wire:model.live="fakultas_id" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
+                                        <option value="">-- Pilih Fakultas --</option>
+                                        @foreach ($fakultasList as $f)
+                                            <option value="{{ $f->id }}">{{ $f->nama_fakultas }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('fakultas_id') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Ruangan Laboratorium Spesifik *</label>
+                                    <select wire:model="ruang_praktikum_id" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
+                                        <option value="">-- Pilih Ruang Laboratorium --</option>
+                                        @foreach ($ruangList as $rl)
+                                            <option value="{{ $rl->id }}">{{ $rl->nama_ruang }} ({{ $rl->kode_ruang }})</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="text-[11px] text-amber-800 dark:text-amber-400 mt-1">Ketua Lab memiliki otonomi mengelola jadwal & menyetujui pengajuan dosen untuk lab ini.</p>
+                                    @error('ruang_praktikum_id') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
+                        @endif
 
                         @if ($role === 'operator')
                             <div class="border-t border-gray-100 dark:border-zinc-800 pt-3 space-y-3 bg-emerald-50/30 dark:bg-emerald-950/30 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-800/40">
@@ -253,18 +295,20 @@
 
     {{-- Delete Confirmation Modal --}}
     @if ($confirmDeleteId)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 animate-in fade-in zoom-in-95 duration-150">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-800">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
-                <div class="text-center">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-zinc-100">Konfirmasi Hapus Pengguna</h3>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Apakah Anda yakin ingin menghapus akun pengguna ini? Tindakan ini tidak dapat dibatalkan.</p>
-                </div>
-                <div class="flex items-center justify-center gap-2 pt-2">
-                    <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
-                    <button wire:click="delete" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Hapus Pengguna</button>
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 overflow-y-auto p-4 sm:p-6">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 my-auto animate-in fade-in zoom-in-95 duration-150">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-zinc-100">Konfirmasi Hapus Pengguna</h3>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Apakah Anda yakin ingin menghapus akun pengguna ini? Tindakan ini tidak dapat dibatalkan.</p>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 pt-2">
+                        <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
+                        <button wire:click="delete" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Hapus Pengguna</button>
+                    </div>
                 </div>
             </div>
         </div>

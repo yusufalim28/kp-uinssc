@@ -54,9 +54,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/master/kelas', KelasIndex::class)->name('kelas.index');
         Route::get('/master/mata-kuliah', MataKuliahIndex::class)->name('matakuliah.index');
         Route::get('/master/dosen', DosenIndex::class)->name('dosen.index');
-        Route::get('/master/ruang', RuangPraktikumIndex::class)->name('ruang.index');
         Route::get('/master/tahun-akademik', TahunAkademikIndex::class)->name('tahunakademik.index');
+    });
 
+    // Ruang, Jadwal & Pengajuan — super-admin, operator, dan ketua-lab
+    Route::middleware('role:super-admin|operator|ketua-lab')->group(function () {
+        Route::get('/master/ruang', RuangPraktikumIndex::class)->name('ruang.index');
         Route::get('/jadwal-manage', JadwalManage::class)->name('jadwal.manage');
         Route::get('/jadwal/template/download', function () {
             return Excel::download(new JadwalTemplateExport, 'template-jadwal-praktikum.xlsx');

@@ -73,6 +73,59 @@
                     <dd class="text-gray-700 dark:text-zinc-300 leading-relaxed">{{ $jadwal->keterangan }}</dd>
                 </div>
             @endif
+
+            {{-- Modul Ajar Praktikum (Buku Petunjuk Lab) untuk Mahasiswa --}}
+            <div class="md:col-span-2 pt-6 border-t border-gray-100 dark:border-zinc-800">
+                <div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-50/70 to-teal-50/30 dark:from-emerald-950/30 dark:to-zinc-900 border border-emerald-200/60 dark:border-emerald-800/50 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-zinc-100">Buku Petunjuk / Modul Ajar Praktikum</h3>
+                                <p class="text-xs text-gray-500 dark:text-zinc-400">Mahasiswa dapat mengunduh panduan praktikum sebelum pelaksanaan praktikum di laboratorium.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if ($jadwal->mataKuliah->hasModul())
+                        @if ($jadwal->mataKuliah->deskripsi_modul)
+                            <div class="text-xs text-gray-700 dark:text-zinc-300 bg-white/70 dark:bg-zinc-800/70 p-3 rounded-xl border border-emerald-100 dark:border-zinc-700">
+                                <strong class="font-semibold block text-emerald-950 dark:text-emerald-300 mb-0.5">Petunjuk Dosen / Lab:</strong>
+                                {{ $jadwal->mataKuliah->deskripsi_modul }}
+                            </div>
+                        @endif
+
+                        <div class="flex items-center gap-2.5 flex-wrap pt-1">
+                            @if ($jadwal->mataKuliah->file_modul)
+                                <a href="{{ asset('storage/'.$jadwal->mataKuliah->file_modul) }}"
+                                   target="_blank"
+                                   download
+                                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-xs transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <span>Unduh Modul Praktikum (PDF)</span>
+                                </a>
+                            @endif
+
+                            @if ($jadwal->mataKuliah->tautan_modul)
+                                <a href="{{ $jadwal->mataKuliah->tautan_modul }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-2xs transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    <span>Buka Dokumen Modul (Cloud / Drive)</span>
+                                </a>
+                            @endif
+                        </div>
+                    @else
+                        <div class="text-xs text-gray-500 dark:text-zinc-400 bg-white/50 dark:bg-zinc-800/40 p-3 rounded-xl border border-gray-200/60 dark:border-zinc-800 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Modul ajar digital untuk mata kuliah ini belum diunggah oleh pengelola laboratorium. Silakan tanyakan ke instruktur/dosen pengampu saat pertemuan praktikum.</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 </div>

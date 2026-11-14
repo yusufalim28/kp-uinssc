@@ -29,7 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'fakultas_id', 'program_studi_id'])]
+#[Fillable(['name', 'email', 'password', 'fakultas_id', 'program_studi_id', 'ruang_praktikum_id'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -44,6 +44,16 @@ class User extends Authenticatable implements PasskeyUser
     public function programStudi()
     {
         return $this->belongsTo(ProgramStudi::class);
+    }
+
+    public function ruangPraktikum()
+    {
+        return $this->belongsTo(RuangPraktikum::class);
+    }
+
+    public function isKetuaLab(): bool
+    {
+        return $this->hasRole('ketua-lab');
     }
 
     public function dosen()

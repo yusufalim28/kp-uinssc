@@ -189,8 +189,9 @@
 
     {{-- Modal Tambah / Edit Fakultas --}}
     @if ($showModal)
-        <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div class="fixed inset-0 bg-black/60 z-50 overflow-y-auto p-4 sm:p-6 backdrop-blur-xs">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 my-auto animate-in fade-in zoom-in-95 duration-150">
                 <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-zinc-800">
                     <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">
                         {{ $editId ? 'Edit Fakultas' : 'Tambah Fakultas Baru' }}
@@ -228,23 +229,26 @@
                     <button type="button" wire:click="save" class="px-4 py-2 text-xs font-bold bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white rounded-xl shadow-xs transition">Simpan Fakultas</button>
                 </div>
             </div>
+          </div>
         </div>
     @endif
 
     {{-- Modal Konfirmasi Hapus --}}
     @if ($confirmDeleteId)
-        <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-100 dark:border-rose-900/40">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </div>
-                <div class="text-center">
-                    <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">Hapus Fakultas?</h2>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Fakultas yang masih memiliki data Program Studi tidak dapat dihapus.</p>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" wire:click="$set('confirmDeleteId', null)" class="w-1/2 px-4 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
-                    <button type="button" wire:click="delete" class="w-1/2 px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Ya, Hapus</button>
+        <div class="fixed inset-0 bg-black/60 z-50 overflow-y-auto p-4 sm:p-6 backdrop-blur-xs">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 my-auto animate-in fade-in zoom-in-95 duration-150">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-100 dark:border-rose-900/40">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">Hapus Fakultas?</h2>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Fakultas yang masih memiliki data Program Studi tidak dapat dihapus.</p>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" wire:click="$set('confirmDeleteId', null)" class="w-1/2 px-4 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
+                        <button type="button" wire:click="delete" class="w-1/2 px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Ya, Hapus</button>
+                    </div>
                 </div>
             </div>
         </div>

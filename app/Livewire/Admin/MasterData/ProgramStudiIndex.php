@@ -25,6 +25,8 @@ class ProgramStudiIndex extends Component
 
     public string $search = '';
 
+    public ?int $filterFakultas = null;
+
     public string $viewMode = 'grid';
 
     public ?int $confirmDeleteId = null;
@@ -40,6 +42,11 @@ class ProgramStudiIndex extends Component
     }
 
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterFakultas(): void
     {
         $this->resetPage();
     }
@@ -137,11 +144,16 @@ class ProgramStudiIndex extends Component
             $query->where('fakultas_id', $user->fakultas_id);
         }
 
+        // Poin 6: Filter Fakultas untuk Super Admin
+        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+            $query->where('fakultas_id', (int) $this->filterFakultas);
+        }
+
         $prodi = $query
             ->when($this->search, fn ($q) => $q->where('nama_program_studi', 'like', "%{$this->search}%")
                 ->orWhere('kode_program_studi', 'like', "%{$this->search}%"))
             ->orderBy('nama_program_studi')
-            ->paginate(10);
+            ->paginate(12);
 
         $fakultas = ($user && $user->hasRole('operator') && $user->fakultas_id)
             ? Fakultas::where('id', $user->fakultas_id)->get()
@@ -150,6 +162,9 @@ class ProgramStudiIndex extends Component
         return view('livewire.admin.master-data.program-studi-index', [
             'prodi' => $prodi,
             'fakultas' => $fakultas,
+            'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
+            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'userFakultas' => $user?->fakultas,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Program Studi']);
     }
 }

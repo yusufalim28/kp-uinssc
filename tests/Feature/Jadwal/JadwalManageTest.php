@@ -10,6 +10,7 @@ use App\Models\PengajuanPerubahan;
 use App\Models\ProgramStudi;
 use App\Models\RuangPraktikum;
 use App\Models\TahunAkademik;
+use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Livewire\Livewire;
 
@@ -188,4 +189,68 @@ test('prodi yang diizinkan pada ruang multi-prodi bisa membuat jadwal sedangkan 
         ->set('jam_selesai', '10:00')
         ->call('save')
         ->assertHasErrors(['ruang_praktikum_id']);
+});
+
+test('ketua lab hanya berwenang menambah dan mengelola jadwal di laboratorium miliknya', function () {
+    $ruangKu = RuangPraktikum::factory()->create(['nama_ruang' => 'Lab Komputer 1']);
+    $ruangLain = RuangPraktikum::factory()->create(['nama_ruang' => 'Lab Komputer 2']);
+
+    $userKetua = User::factory()->create(['ruang_praktikum_id' => $ruangKu->id]);
+    $userKetua->assignRole('ketua-lab');
+
+    test()->actingAs($userKetua);
+
+    // openCreate otomatis mengeset ruang_praktikum_id ke ruangKu
+    $comp = Livewire::test(JadwalManage::class)
+        ->call('openCreate');
+    $comp->assertSet('ruang_praktikum_id', $ruangKu->id);
+
+    // Simpan di ruang sendiri berhasil
+    isiFormJadwal($comp, ['ruang_praktikum_id' => $ruangKu->id])
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(JadwalPraktikum::where('ruang_praktikum_id', $ruangKu->id)->exists())->toBeTrue();
+
+    // Mencoba menyimpan di ruang lain -> 403 Forbidden
+    $compLain = Livewire::test(JadwalManage::class)->call('openCreate');
+    isiFormJadwal($compLain, ['ruang_praktikum_id' => $ruangLain->id])
+        ->call('save')
+        ->assertForbidden();
+});
+
+test('bisa membuat jadwal dengan mata kuliah bersama fakultas dan ruang bersama fakultas', function () {
+    $fakultas = Fakultas::factory()->create(['nama_fakultas' => 'Fakultas Syariah']);
+    $prodiHKI = ProgramStudi::factory()->create(['fakultas_id' => $fakultas->id, 'nama_program_studi' => 'HKI']);
+    $kelasHKI = Kelas::factory()->create(['program_studi_id' => $prodiHKI->id, 'nama_kelas' => 'HK A']);
+
+    $mkBersama = MataKuliah::factory()->create([
+        'nama_mk' => 'Peradilan Agama',
+        'cakupan_mk' => 'bersama_fakultas',
+        'fakultas_id' => $fakultas->id,
+        'program_studi_id' => null,
+    ]);
+
+    $ruangBersama = RuangPraktikum::factory()->create([
+        'nama_ruang' => 'Laboratorium Peradilan',
+        'cakupan_akses' => 'bersama_fakultas',
+        'fakultas_id' => $fakultas->id,
+    ]);
+
+    $dosen = Dosen::factory()->create();
+
+    Livewire::test(JadwalManage::class)
+        ->call('openCreate')
+        ->set('mata_kuliah_id', $mkBersama->id)
+        ->set('kelas_id', $kelasHKI->id)
+        ->set('dosen_id', $dosen->id)
+        ->set('ruang_praktikum_id', $ruangBersama->id)
+        ->set('tahun_akademik_id', $this->tahun->id)
+        ->set('hari', 'Rabu')
+        ->set('jam_mulai', '09:10')
+        ->set('jam_selesai', '12:30')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(JadwalPraktikum::where('mata_kuliah_id', $mkBersama->id)->where('ruang_praktikum_id', $ruangBersama->id)->exists())->toBeTrue();
 });

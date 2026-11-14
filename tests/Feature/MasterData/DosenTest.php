@@ -8,6 +8,7 @@ use App\Models\MataKuliah;
 use App\Models\ProgramStudi;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -92,4 +93,25 @@ test('operator hanya melihat dosen yang mengajar di fakultasnya secara default',
         ->set('viewScope', 'semua')
         ->assertSee('Dosen FITK')
         ->assertSee('Dosen FEBI');
+});
+
+test('bisa mendaftarkan tutor lab dengan email pribadi dan password', function () {
+    Livewire::test(DosenIndex::class)
+        ->call('openCreate')
+        ->set('kategori', 'tutor')
+        ->set('nama', 'Rizky Tutor')
+        ->set('email', 'rizky.tutor@gmail.com')
+        ->set('password', 'rahasia123')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $tutor = Dosen::where('email', 'rizky.tutor@gmail.com')->first();
+    expect($tutor)->not->toBeNull();
+    expect($tutor->kategori)->toBe('tutor');
+    expect($tutor->user_id)->not->toBeNull();
+
+    $user = User::find($tutor->user_id);
+    expect($user)->not->toBeNull();
+    expect($user->hasRole('dosen'))->toBeTrue();
+    expect(Hash::check('rahasia123', $user->password))->toBeTrue();
 });

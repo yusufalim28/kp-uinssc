@@ -673,5 +673,62 @@ class DummyDataSeeder extends Seeder
                 );
             }
         }
+
+        // =========================================================================
+        // 8. SEED AKUN DEMO KETUA LAB & TUTOR NON-NIDN (GMAIL)
+        // =========================================================================
+        Role::firstOrCreate(['name' => 'ketua-lab', 'guard_name' => 'web']);
+
+        $ruangMoot = RuangPraktikum::where('kode_ruang', 'LAB-MOOT')->first();
+        $ruangKomA = RuangPraktikum::where('kode_ruang', 'LAB-KOM-A')->first();
+
+        // 1. Akun Ketua Lab FASYA (Peradilan Semu)
+        $ketuaFasya = User::updateOrCreate(
+            ['email' => 'ketualab.fasya@praktikum.ac.id'],
+            [
+                'name' => 'H. Ahmad Zaki, S.H.I., M.H. (Ketua Lab Peradilan)',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'fakultas_id' => $fasya?->id,
+                'ruang_praktikum_id' => $ruangMoot?->id,
+            ]
+        );
+        $ketuaFasya->syncRoles(['ketua-lab']);
+
+        // 2. Akun Ketua Lab FITK (Laboratorium Komputer A)
+        $ketuaFitk = User::updateOrCreate(
+            ['email' => 'ketualab.fitk@praktikum.ac.id'],
+            [
+                'name' => 'Rizky Ananda, S.Kom., M.Kom. (Ketua Lab Komputer)',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'fakultas_id' => $fitk?->id,
+                'ruang_praktikum_id' => $ruangKomA?->id,
+            ]
+        );
+        $ketuaFitk->syncRoles(['ketua-lab']);
+
+        // 3. Akun Tutor Lab Informatika (Gmail, Non-NIDN)
+        $tutorUser = User::updateOrCreate(
+            ['email' => 'tutor.informatika@gmail.com'],
+            [
+                'name' => 'Farhan Maulana, S.Kom. (Tutor Lab)',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $tutorUser->syncRoles(['dosen']);
+
+        Dosen::updateOrCreate(
+            ['email' => 'tutor.informatika@gmail.com'],
+            [
+                'user_id' => $tutorUser->id,
+                'nama' => 'Farhan Maulana, S.Kom.',
+                'kategori' => 'tutor',
+                'nidn' => null,
+                'email' => 'tutor.informatika@gmail.com',
+                'status' => 'aktif',
+            ]
+        );
     }
 }

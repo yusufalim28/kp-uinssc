@@ -25,59 +25,123 @@
     @endif
 
     {{-- Filter & Search Bar --}}
-    <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div class="relative flex-1 max-w-md">
-            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </span>
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama, kode ruang, atau lokasi..."
-                   class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 transition">
-        </div>
+    @if ($isSuperAdmin)
+        <div class="space-y-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div class="relative flex-1 min-w-0">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </span>
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama, kode ruang, atau lokasi..."
+                           class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 transition">
+                </div>
 
-        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-            <select wire:model.live="filterCakupan" class="rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
-                <option value="">Semua Hak Pakai</option>
-                <option value="bersama_fakultas">Bersama Fakultas</option>
-                <option value="eksklusif">Eksklusif 1 Prodi</option>
-                <option value="khusus_multi_prodi">Khusus Multi-Prodi</option>
-                <option value="umum_universitas">Umum / Universitas</option>
-            </select>
+                <div class="flex items-center gap-1 self-end sm:self-auto bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl shrink-0">
+                    <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
+                            @class([
+                                'p-1.5 rounded-lg transition',
+                                'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'grid',
+                                'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'grid',
+                            ])>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    </button>
+                    <button wire:click="$set('viewMode', 'table')" title="Tampilan Tabel"
+                            @class([
+                                'p-1.5 rounded-lg transition',
+                                'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'table',
+                                'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'table',
+                            ])>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                    </button>
+                </div>
+            </div>
 
-            <select wire:model.live="filterTipe" class="rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
-                <option value="">Semua Tipe Ruang</option>
-                <option value="laboratorium">Laboratorium</option>
-                <option value="auditorium">Auditorium / Gedung Besar</option>
-                <option value="studio">Studio</option>
-                <option value="kelas">Kelas Praktikum</option>
-            </select>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <select wire:model.live="filterFakultas" class="w-full truncate rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="">Semua Fakultas (Universitas)</option>
+                    @foreach ($fakultasList as $fak)
+                        <option value="{{ $fak->id }}">[{{ $fak->kode_fakultas }}] {{ $fak->nama_fakultas }}</option>
+                    @endforeach
+                </select>
 
-            <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl">
-                <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
-                        @class([
-                            'p-1.5 rounded-lg transition',
-                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'grid',
-                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'grid',
-                        ])>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                </button>
-                <button wire:click="$set('viewMode', 'table')" title="Tampilan Tabel"
-                        @class([
-                            'p-1.5 rounded-lg transition',
-                            'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'table',
-                            'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'table',
-                        ])>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                </button>
+                <select wire:model.live="filterCakupan" class="w-full truncate rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="">Semua Hak Pakai</option>
+                    <option value="bersama_fakultas">Bersama Fakultas</option>
+                    <option value="eksklusif">Eksklusif 1 Prodi</option>
+                    <option value="khusus_multi_prodi">Khusus Multi-Prodi</option>
+                    <option value="umum_universitas">Umum / Universitas</option>
+                </select>
+
+                <select wire:model.live="filterTipe" class="w-full truncate rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="">Semua Tipe Ruang</option>
+                    <option value="laboratorium">Laboratorium</option>
+                    <option value="auditorium">Auditorium / Gedung Besar</option>
+                    <option value="studio">Studio</option>
+                    <option value="kelas">Kelas Praktikum</option>
+                </select>
             </div>
         </div>
-    </div>
+    @else
+        <div class="flex flex-col lg:flex-row gap-2.5 items-stretch lg:items-center justify-between">
+            <div class="relative flex-1 min-w-[200px]">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </span>
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama, kode ruang, atau lokasi..."
+                       class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 transition">
+            </div>
+
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
+                <select wire:model.live="filterCakupan" class="w-full sm:w-auto sm:max-w-[180px] truncate rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="">Semua Hak Pakai</option>
+                    <option value="bersama_fakultas">Bersama Fakultas</option>
+                    <option value="eksklusif">Eksklusif 1 Prodi</option>
+                    <option value="khusus_multi_prodi">Khusus Multi-Prodi</option>
+                    <option value="umum_universitas">Umum / Universitas</option>
+                </select>
+
+                <select wire:model.live="filterTipe" class="w-full sm:w-auto sm:max-w-[180px] truncate rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="">Semua Tipe Ruang</option>
+                    <option value="laboratorium">Laboratorium</option>
+                    <option value="auditorium">Auditorium / Gedung Besar</option>
+                    <option value="studio">Studio</option>
+                    <option value="kelas">Kelas Praktikum</option>
+                </select>
+
+                <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl shrink-0 ml-auto">
+                    <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
+                            @class([
+                                'p-1.5 rounded-lg transition',
+                                'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'grid',
+                                'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'grid',
+                            ])>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    </button>
+                    <button wire:click="$set('viewMode', 'table')" title="Tampilan Tabel"
+                            @class([
+                                'p-1.5 rounded-lg transition',
+                                'bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' => $viewMode === 'table',
+                                'text-gray-500 dark:text-zinc-400 hover:text-gray-700' => $viewMode !== 'table',
+                            ])>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     @if ($viewMode === 'grid')
         {{-- Grid Card View --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse ($ruang as $r)
-                <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:border-emerald-500/40 hover:shadow-xs transition flex flex-col justify-between">
+                <div class="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-5 shadow-2xs hover:border-emerald-500/40 hover:shadow-xs transition flex flex-col justify-between overflow-hidden">
                     <div>
+                        @if ($r->foto_url)
+                            <div class="h-32 -mx-5 -mt-5 mb-3.5 overflow-hidden bg-gray-100 dark:bg-zinc-800 border-b border-gray-100 dark:border-zinc-800">
+                                <img src="{{ $r->foto_url }}" alt="{{ $r->nama_ruang }}" class="w-full h-full object-cover">
+                            </div>
+                        @endif
+
                         <div class="flex items-center justify-between gap-2 mb-3">
                             <span class="font-mono text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -121,7 +185,18 @@
                         </p>
 
                         <div class="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-between text-xs">
-                            <span class="text-gray-500 dark:text-zinc-400">Kapasitas: <strong class="text-gray-900 dark:text-zinc-100">{{ $r->kapasitas }} org</strong></span>
+                            @if ($r->isKapasitasFleksibel())
+                                <div>
+                                    <span class="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+                                        Fleksibel / Open Space
+                                    </span>
+                                    <span class="block text-[10px] text-gray-400 mt-0.5">
+                                        {{ $r->kapasitas_maksimal ? 'Daya tampung s/d ' . $r->kapasitas_maksimal . ' mhs' : 'Kapasitas menyesuaikan jurusan' }}
+                                    </span>
+                                </div>
+                            @else
+                                <span class="text-gray-500 dark:text-zinc-400">Kapasitas: <strong class="text-gray-900 dark:text-zinc-100">{{ $r->kapasitas }} org</strong></span>
+                            @endif
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60">
                                 {{ $r->jadwal_praktikum_count ?? 0 }} Jadwal
                             </span>
@@ -147,7 +222,7 @@
         </div>
     @else
         {{-- Desktop Table --}}
-    <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
+    <div class="hidden md:block bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-x-auto shadow-2xs">
         <table class="w-full text-xs text-left">
             <thead class="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-700/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 <tr>
@@ -390,6 +465,27 @@
                         @error('nama_ruang') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
+                    {{-- Upload Foto Laboratorium / Ruang Praktikum --}}
+                    <div>
+                        <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Foto Laboratorium / Ruangan (Opsional)</label>
+                        <div class="mt-1 flex items-center gap-3">
+                            @if ($foto)
+                                <img src="{{ $foto->temporaryUrl() }}" class="w-14 h-14 object-cover rounded-xl border border-emerald-400 shrink-0 shadow-2xs">
+                            @elseif ($existingFoto)
+                                <img src="{{ $existingFoto }}" class="w-14 h-14 object-cover rounded-xl border border-gray-200 dark:border-zinc-700 shrink-0 shadow-2xs">
+                            @else
+                                <div class="w-14 h-14 rounded-xl bg-gray-100 dark:bg-zinc-800 border border-dashed border-gray-300 dark:border-zinc-700 flex items-center justify-center text-gray-400 shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                            @endif
+                            <div class="flex-1">
+                                <input type="file" wire:model="foto" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 dark:file:bg-emerald-950/40 file:text-emerald-700 dark:file:text-emerald-300 hover:file:bg-emerald-100 transition">
+                                <p class="text-[10px] text-gray-400 mt-0.5">Format JPG/PNG/WebP, maksimal 3MB. Foto akan ditampilkan di kartu jadwal publik mahasiswa.</p>
+                                @error('foto') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Pengaturan Cakupan Hak Pakai --}}
                     <div class="p-3.5 bg-gray-50/80 dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 rounded-2xl space-y-3">
                         <div>
@@ -449,7 +545,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Fakultas Penanggung Jawab / Lokasi Fisik</label>
+                            <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Fakultas</label>
                             <select wire:model="fakultas_id" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
                                 <option value="">-- Fasilitas Bersama Universitas --</option>
                                 @foreach ($fakultasList as $fak)
@@ -471,17 +567,59 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Lokasi / Gedung *</label>
+                        <input type="text" wire:model="lokasi" placeholder="mis. Gedung Siber Lt. 3" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
+                        @error('lokasi') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Pengaturan Tipe Kapasitas (Workstation Tetap vs Fleksibel/Open Space) --}}
+                    <div class="p-3.5 bg-gray-50/80 dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 rounded-2xl space-y-3">
                         <div>
-                            <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Lokasi / Gedung *</label>
-                            <input type="text" wire:model="lokasi" placeholder="mis. Gedung Siber Lt. 3" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
-                            @error('lokasi') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                            <label class="text-xs font-bold text-gray-800 dark:text-zinc-200 mb-1.5 block">Model Kapasitas Ruangan *</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <label @class([
+                                    'cursor-pointer border rounded-xl p-2.5 flex items-start gap-2.5 transition',
+                                    'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/30' => $tipe_kapasitas === 'tetap',
+                                    'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50' => $tipe_kapasitas !== 'tetap',
+                                ])>
+                                    <input type="radio" wire:model.live="tipe_kapasitas" value="tetap" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                                    <div>
+                                        <span class="block text-xs font-bold text-gray-900 dark:text-zinc-100">🖥️ Workstation Tetap</span>
+                                        <span class="block text-[10px] text-gray-400 mt-0.5">1 Meja / 1 PC per mahasiswa (Lab Komputer reguler)</span>
+                                    </div>
+                                </label>
+                                <label @class([
+                                    'cursor-pointer border rounded-xl p-2.5 flex items-start gap-2.5 transition',
+                                    'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/30' => $tipe_kapasitas === 'fleksibel',
+                                    'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50' => $tipe_kapasitas !== 'fleksibel',
+                                ])>
+                                    <input type="radio" wire:model.live="tipe_kapasitas" value="fleksibel" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                                    <div>
+                                        <span class="block text-xs font-bold text-gray-900 dark:text-zinc-100">🏛️ Fleksibel / Open Space</span>
+                                        <span class="block text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">Lab Peradilan Semu, Microteaching, Studio Seni</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Kapasitas (Kursi/Orang) *</label>
-                            <input type="number" wire:model="kapasitas" min="1" max="1000" placeholder="mis. 40" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
-                            @error('kapasitas') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">
+                                    {{ $tipe_kapasitas === 'tetap' ? 'Kapasitas Workstation (PC/Meja) *' : 'Estimasi Kapasitas Standar *' }}
+                                </label>
+                                <input type="number" wire:model="kapasitas" min="1" max="1000" placeholder="mis. 40" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
+                                @error('kapasitas') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            @if($tipe_kapasitas === 'fleksibel')
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Daya Tampung Maksimum (Opsional)</label>
+                                    <input type="number" wire:model="kapasitas_maksimal" min="1" max="1000" placeholder="mis. 80" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs py-2 px-3 mt-1 text-gray-900 dark:text-zinc-100 transition">
+                                    <p class="text-[10px] text-gray-400 mt-0.5">Kapasitas bebas menyesuaikan rombongan belajar / gabungan prodi.</p>
+                                    @error('kapasitas_maksimal') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -496,18 +634,20 @@
 
     {{-- Delete Confirmation Modal --}}
     @if ($confirmDeleteId)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 animate-in fade-in zoom-in-95 duration-150">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-800">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
-                <div class="text-center">
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100">Hapus Ruang / Auditorium?</h2>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Data yang dihapus tidak bisa dikembalikan. Ruang yang masih memiliki jadwal tidak dapat dihapus.</p>
-                </div>
-                <div class="flex justify-center gap-2 pt-2">
-                    <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 font-semibold rounded-xl transition">Batal</button>
-                    <button wire:click="delete" class="px-4 py-2 text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-xs transition">Ya, Hapus</button>
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 overflow-y-auto p-4 sm:p-6">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 my-auto animate-in fade-in zoom-in-95 duration-150">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100">Hapus Ruang / Auditorium?</h2>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Data yang dihapus tidak bisa dikembalikan. Ruang yang masih memiliki jadwal tidak dapat dihapus.</p>
+                    </div>
+                    <div class="flex justify-center gap-2 pt-2">
+                        <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 font-semibold rounded-xl transition">Batal</button>
+                        <button wire:click="delete" class="px-4 py-2 text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-xs transition">Ya, Hapus</button>
+                    </div>
                 </div>
             </div>
         </div>

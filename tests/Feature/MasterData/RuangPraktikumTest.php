@@ -91,3 +91,24 @@ test('ruang multi-prodi wajib memilih minimal satu prodi pemakai', function () {
         ->call('save')
         ->assertHasErrors(['selected_prodi_ids']);
 });
+
+test('bisa menambah ruang dengan kapasitas fleksibel dan batas maksimal', function () {
+    Livewire::test(RuangPraktikumIndex::class)
+        ->call('openCreate')
+        ->set('kode_ruang', 'LAB-FASYA-01')
+        ->set('nama_ruang', 'Ruang Sidang Semu (Moot Court)')
+        ->set('lokasi', 'Gedung FASYA Lantai 3')
+        ->set('tipe_kapasitas', 'fleksibel')
+        ->set('kapasitas', 40)
+        ->set('kapasitas_maksimal', 80)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $ruang = RuangPraktikum::where('kode_ruang', 'LAB-FASYA-01')->first();
+    expect($ruang)->not->toBeNull()
+        ->and($ruang->tipe_kapasitas)->toBe('fleksibel')
+        ->and($ruang->kapasitas)->toBe(40)
+        ->and($ruang->kapasitas_maksimal)->toBe(80)
+        ->and($ruang->isKapasitasFleksibel())->toBeTrue()
+        ->and($ruang->label_kapasitas)->toBe('Fleksibel (Maks. 80 Mahasiswa)');
+});

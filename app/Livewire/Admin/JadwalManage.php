@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Imports\JadwalImport;
 use App\Models\Dosen;
+use App\Models\Fakultas;
 use App\Models\JadwalPraktikum;
 use App\Models\Kelas;
 use App\Models\MataKuliah;
@@ -46,6 +47,8 @@ class JadwalManage extends Component
     // Search & Filter Properties
     public string $search = '';
 
+    public ?int $filterFakultas = null;
+
     public string $filterHari = '';
 
     public ?int $filterRuang = null;
@@ -85,6 +88,11 @@ class JadwalManage extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterFakultas(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatingFilterHari(): void
     {
         $this->resetPage();
@@ -103,7 +111,7 @@ class JadwalManage extends Component
     public function resetFilters(): void
     {
         $taAktifId = TahunAkademik::where('is_aktif', true)->value('id');
-        $this->reset(['search', 'filterHari', 'filterRuang']);
+        $this->reset(['search', 'filterFakultas', 'filterHari', 'filterRuang']);
         $this->filterTahunAkademik = $taAktifId;
         $this->resetPage();
     }
@@ -167,6 +175,12 @@ class JadwalManage extends Component
             'jam_mulai', 'jam_selesai', 'status', 'keterangan',
             'conflictMessage',
         ]);
+
+        $user = auth()->user();
+        if ($user && $user->hasRole('ketua-lab') && $user->ruang_praktikum_id) {
+            $this->ruang_praktikum_id = $user->ruang_praktikum_id;
+        }
+
         $this->tahun_akademik_id = TahunAkademik::where('is_aktif', true)->value('id');
         $this->status = 'aktif';
         $this->showModal = true;
@@ -194,14 +208,23 @@ class JadwalManage extends Component
     public function save(): void
     {
         $validated = $this->validate();
+        $user = auth()->user();
 
-        // Validasi hak pakai ruang terhadap program studi mata kuliah
-        $mk = MataKuliah::with('programStudi')->find($this->mata_kuliah_id);
+        if ($user && $user->hasRole('ketua-lab') && $user->ruang_praktikum_id) {
+            abort_if($this->ruang_praktikum_id != $user->ruang_praktikum_id, 403, 'Ketua Lab hanya berwenang mengelola jadwal pada laboratorium miliknya.');
+        }
+
+        // Validasi hak pakai ruang terhadap program studi & kelas mata kuliah
+        $mk = MataKuliah::with(['programStudi', 'fakultas'])->find($this->mata_kuliah_id);
         $ruang = RuangPraktikum::with('prodiPengguna')->find($this->ruang_praktikum_id);
+        $kelas = $this->kelas_id ? Kelas::with('programStudi')->find($this->kelas_id) : null;
 
-        if ($mk && $ruang && ! $ruang->canBeUsedByProdi($mk->program_studi_id, $mk->programStudi?->fakultas_id)) {
+        $targetProdiId = $kelas?->program_studi_id ?? $mk?->program_studi_id;
+        $targetFakultasId = $kelas?->programStudi?->fakultas_id ?? ($mk?->fakultas_id ?? $mk?->programStudi?->fakultas_id);
+
+        if ($mk && $ruang && ! $ruang->canBeUsedByProdi($targetProdiId, $targetFakultasId)) {
             $namaRuang = $ruang->nama_ruang;
-            $namaProdi = $mk->programStudi?->nama_program_studi ?? 'prodi terkait';
+            $namaProdi = $kelas?->programStudi?->nama_program_studi ?? ($mk->programStudi?->nama_program_studi ?? 'program studi terkait');
             $this->addError('ruang_praktikum_id', "Ruangan '{$namaRuang}' tidak diizinkan untuk digunakan oleh program studi {$namaProdi}.");
 
             return;
@@ -240,9 +263,14 @@ class JadwalManage extends Component
 
     public function delete(): void
     {
+        $user = auth()->user();
         $jadwal = JadwalPraktikum::find($this->confirmDeleteId);
 
         if ($jadwal) {
+            if ($user && $user->hasRole('ketua-lab') && $user->ruang_praktikum_id) {
+                abort_if($jadwal->ruang_praktikum_id != $user->ruang_praktikum_id, 403, 'Ketua Lab hanya berwenang menghapus jadwal pada laboratorium miliknya.');
+            }
+
             if ($jadwal->pengajuanPerubahan()->exists()) {
                 session()->flash('error', 'Jadwal tidak bisa dihapus karena masih memiliki riwayat Pengajuan Perubahan.');
             } else {
@@ -266,11 +294,26 @@ class JadwalManage extends Component
         $kelasQuery = Kelas::where('status', 'aktif');
         $ruangQuery = RuangPraktikum::whereIn('status', ['aktif', 'tersedia']);
 
+        // Scoping akses Ketua Lab: hanya jadwal dan ruang pada laboratorium miliknya
+        if ($user && $user->hasRole('ketua-lab')) {
+            if ($user->ruang_praktikum_id) {
+                $jadwalQuery->where('ruang_praktikum_id', $user->ruang_praktikum_id);
+                $ruangQuery->where('id', $user->ruang_praktikum_id);
+            } elseif ($user->fakultas_id) {
+                $jadwalQuery->whereHas('ruangPraktikum', fn ($r) => $r->where('fakultas_id', $user->fakultas_id));
+                $ruangQuery->where('fakultas_id', $user->fakultas_id);
+            }
+        }
+
         if ($user && $user->hasRole('operator')) {
             if ($user->program_studi_id) {
                 // Operator Prodi: hanya jadwal prodinya sendiri
                 $jadwalQuery->whereHas('kelas', fn ($k) => $k->where('program_studi_id', $user->program_studi_id));
-                $mkQuery->where('program_studi_id', $user->program_studi_id);
+                $mkQuery->where(function ($q) use ($user) {
+                    $q->where('program_studi_id', $user->program_studi_id)
+                        ->orWhere(fn ($sub) => $sub->where('cakupan_mk', 'bersama_fakultas')->where('fakultas_id', $user->fakultas_id))
+                        ->orWhere('cakupan_mk', 'umum_universitas');
+                });
                 $kelasQuery->where('program_studi_id', $user->program_studi_id);
 
                 // Ruang: lab milik prodi, lab multi-prodi terdaftar, lab bersama fakultas, atau umum universitas
@@ -295,8 +338,16 @@ class JadwalManage extends Component
                 });
             } elseif ($user->fakultas_id) {
                 // Operator Fakultas: prodi yang bernaung di bawah fakultasnya
-                $jadwalQuery->whereHas('kelas.programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id));
-                $mkQuery->whereHas('programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id));
+                $jadwalQuery->where(function ($q) use ($user) {
+                    $q->whereHas('kelas.programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id))
+                        ->orWhereHas('mataKuliah', fn ($m) => $m->where('fakultas_id', $user->fakultas_id)->orWhereHas('programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id)))
+                        ->orWhereHas('ruangPraktikum', fn ($r) => $r->where('fakultas_id', $user->fakultas_id));
+                });
+                $mkQuery->where(function ($q) use ($user) {
+                    $q->where('fakultas_id', $user->fakultas_id)
+                        ->orWhereHas('programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id))
+                        ->orWhere('cakupan_mk', 'umum_universitas');
+                });
                 $kelasQuery->whereHas('programStudi', fn ($ps) => $ps->where('fakultas_id', $user->fakultas_id));
 
                 // Ruang: seluruh ruang milik fakultas, ruang multi-prodi yang mencakup prodi fakultas ini, atau umum universitas
@@ -310,6 +361,17 @@ class JadwalManage extends Component
                         });
                 });
             }
+        }
+
+        // Poin 6: Filter Fakultas untuk Super Admin
+        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+            $fakultasId = (int) $this->filterFakultas;
+            $jadwalQuery->where(function ($q) use ($fakultasId) {
+                $q->whereHas('ruangPraktikum', fn ($r) => $r->where('fakultas_id', $fakultasId))
+                    ->orWhereHas('mataKuliah', fn ($m) => $m->where('fakultas_id', $fakultasId)->orWhereHas('programStudi', fn ($p) => $p->where('fakultas_id', $fakultasId)))
+                    ->orWhereHas('kelas.programStudi', fn ($k) => $k->where('fakultas_id', $fakultasId));
+            });
+            $ruangQuery->where('fakultas_id', $fakultasId);
         }
 
         if ($this->search) {
@@ -345,6 +407,11 @@ class JadwalManage extends Component
             'dosenList' => Dosen::where('status', 'aktif')->orderBy('nama')->get(),
             'ruangList' => $ruangQuery->orderBy('nama_ruang')->get(),
             'tahunList' => TahunAkademik::orderByDesc('tahun_mulai')->get(),
+            'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
+            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isKetuaLab' => $user && $user->hasRole('ketua-lab'),
+            'userFakultas' => $user?->fakultas,
+            'userRuang' => $user?->ruangPraktikum,
         ])->layout('components.layouts.admin', ['title' => 'Kelola Jadwal Praktikum']);
     }
 }

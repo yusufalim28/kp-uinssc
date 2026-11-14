@@ -50,3 +50,16 @@ test('user tanpa role sama sekali ditolak di semua area terproteksi', function (
     $this->get('/pengajuan')->assertForbidden();
     $this->get('/pengajuan-saya')->assertForbidden();
 });
+
+test('ketua-lab bisa akses ruang, jadwal-manage, dan pengajuan tetapi ditolak di fakultas dan user-manage', function () {
+    loginAsRole('ketua-lab');
+
+    $this->get('/master/ruang')->assertOk();
+    $this->get('/jadwal-manage')->assertOk();
+    $this->get('/pengajuan')->assertOk();
+
+    // Ditolak di master fakultas dan pengguna
+    $this->get('/master/fakultas')->assertForbidden();
+    $this->get('/master/pengguna')->assertForbidden();
+    $this->get('/pengajuan-saya')->assertForbidden();
+});

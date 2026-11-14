@@ -169,8 +169,9 @@ class PengajuanSaya extends Component
         if (in_array($this->jenis_perubahan, ['ganti_ruang', 'ganti_jadwal_ruang'])) {
             $ruangBaru = RuangPraktikum::find($targetRuangId);
             if ($ruangBaru) {
-                $prodiId = $jadwal->mataKuliah?->program_studi_id;
-                if ($prodiId && ! $ruangBaru->canBeUsedByProdi($prodiId)) {
+                $prodiId = $jadwal->kelas?->program_studi_id ?? $jadwal->mataKuliah?->program_studi_id;
+                $fakultasId = $jadwal->kelas?->programStudi?->fakultas_id ?? ($jadwal->mataKuliah?->fakultas_id ?? $jadwal->mataKuliah?->programStudi?->fakultas_id);
+                if (! $ruangBaru->canBeUsedByProdi($prodiId, $fakultasId)) {
                     $this->conflictMessage = "Ruangan {$ruangBaru->nama_ruang} tidak diizinkan untuk program studi mata kuliah ini.";
 
                     return;

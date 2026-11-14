@@ -29,17 +29,28 @@
         </div>
     @endif
 
-    {{-- Toolbar: Pencarian & Toggle View Mode --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="relative w-full sm:w-80">
-            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </span>
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama atau kode prodi..."
-                   class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 transition">
+    {{-- Toolbar: Pencarian, Filter Fakultas (Super Admin), & Toggle View Mode --}}
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 flex-1 min-w-0">
+            <div class="relative flex-1 min-w-0 lg:max-w-sm">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </span>
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama atau kode prodi..."
+                       class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 transition">
+            </div>
+
+            @if ($isSuperAdmin)
+                <select wire:model.live="filterFakultas" class="w-full sm:w-64 lg:w-72 shrink-0 truncate rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs px-3 py-2 text-gray-900 dark:text-zinc-100 shadow-2xs focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="">Semua Fakultas (Universitas)</option>
+                    @foreach ($fakultasList as $fak)
+                        <option value="{{ $fak->id }}">[{{ $fak->kode_fakultas }}] {{ $fak->nama_fakultas }}</option>
+                    @endforeach
+                </select>
+            @endif
         </div>
 
-        <div class="flex items-center gap-1.5 self-end sm:self-auto bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl">
+        <div class="flex items-center gap-1 self-end lg:self-auto bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl shrink-0">
             <button wire:click="$set('viewMode', 'grid')" title="Tampilan Kartu (Grid)"
                     @class([
                         'p-1.5 rounded-lg transition',
@@ -184,8 +195,9 @@
 
     {{-- Modal Tambah / Edit --}}
     @if ($showModal)
-        <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div class="fixed inset-0 bg-black/60 z-50 overflow-y-auto p-4 sm:p-6 backdrop-blur-xs">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 my-auto animate-in fade-in zoom-in-95 duration-150">
                 <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-zinc-800">
                     <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">{{ $editId ? 'Edit Program Studi' : 'Tambah Program Studi Baru' }}</h2>
                     <button wire:click="$set('showModal', false)" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
@@ -195,13 +207,13 @@
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1">Kode Program Studi</label>
-                    <input type="text" wire:model="kode_program_studi" placeholder="mis. TIF, SI, PGMI" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition font-mono uppercase">
+                    <input type="text" wire:model="kode_program_studi" placeholder="mis. IT, KPI, PGMI" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition font-mono uppercase">
                     @error('kode_program_studi') <p class="text-rose-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1">Nama Program Studi</label>
-                    <input type="text" wire:model="nama_program_studi" placeholder="mis. Teknik Informatika" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition">
+                    <input type="text" wire:model="nama_program_studi" placeholder="mis. Informatika" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 focus:bg-white dark:focus:bg-zinc-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs px-3.5 py-2.5 text-gray-900 dark:text-zinc-100 transition">
                     @error('nama_program_studi') <p class="text-rose-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -229,23 +241,26 @@
                     <button type="button" wire:click="save" class="px-4 py-2 text-xs font-bold bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white rounded-xl shadow-xs transition">Simpan Prodi</button>
                 </div>
             </div>
+          </div>
         </div>
     @endif
 
     {{-- Modal Konfirmasi Hapus --}}
     @if ($confirmDeleteId)
-        <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-100 dark:border-rose-900/40">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </div>
-                <div class="text-center">
-                    <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">Hapus Program Studi?</h2>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Program Studi yang masih memiliki Kelas atau Mata Kuliah tidak dapat dihapus.</p>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" wire:click="$set('confirmDeleteId', null)" class="w-1/2 px-4 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
-                    <button type="button" wire:click="delete" class="w-1/2 px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Ya, Hapus</button>
+        <div class="fixed inset-0 bg-black/60 z-50 overflow-y-auto p-4 sm:p-6 backdrop-blur-xs">
+            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-sm p-6 border border-gray-200/80 dark:border-zinc-800 shadow-2xl space-y-4 my-auto animate-in fade-in zoom-in-95 duration-150">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto border border-rose-100 dark:border-rose-900/40">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100">Hapus Program Studi?</h2>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Program Studi yang masih memiliki Kelas atau Mata Kuliah tidak dapat dihapus.</p>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" wire:click="$set('confirmDeleteId', null)" class="w-1/2 px-4 py-2 text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
+                        <button type="button" wire:click="delete" class="w-1/2 px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Ya, Hapus</button>
+                    </div>
                 </div>
             </div>
         </div>

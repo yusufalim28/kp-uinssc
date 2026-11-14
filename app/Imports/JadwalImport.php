@@ -189,6 +189,8 @@ class JadwalImport implements ToCollection
                     'nama_mk' => $mkRaw,
                     'sks' => 2,
                     'semester' => 1,
+                    'cakupan_mk' => 'prodi',
+                    'fakultas_id' => ProgramStudi::find($defaultProdiId)?->fakultas_id,
                     'program_studi_id' => $defaultProdiId,
                 ]);
             }

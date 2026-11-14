@@ -21,6 +21,11 @@ class Fakultas extends Model
         return $this->hasMany(ProgramStudi::class);
     }
 
+    public function mataKuliah()
+    {
+        return $this->hasMany(MataKuliah::class);
+    }
+
     public function ruangPraktikum()
     {
         return $this->hasMany(RuangPraktikum::class);

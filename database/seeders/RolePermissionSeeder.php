@@ -27,17 +27,20 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Buat Roles dan Assign Permissions
-        $roleSuperAdmin = Role::create(['name' => 'super-admin']);
+        $roleSuperAdmin = Role::firstOrCreate(['name' => 'super-admin']);
         $roleSuperAdmin->givePermissionTo(Permission::all());
 
-        $roleOperator = Role::create(['name' => 'operator']);
+        $roleOperator = Role::firstOrCreate(['name' => 'operator']);
         $roleOperator->givePermissionTo(['manage-master-data', 'manage-jadwal', 'approve-pengajuan', 'view-jadwal']);
 
-        $roleDosen = Role::create(['name' => 'dosen']);
+        $roleKetuaLab = Role::firstOrCreate(['name' => 'ketua-lab']);
+        $roleKetuaLab->givePermissionTo(['manage-jadwal', 'approve-pengajuan', 'view-jadwal']);
+
+        $roleDosen = Role::firstOrCreate(['name' => 'dosen']);
         $roleDosen->givePermissionTo(['submit-pengajuan', 'view-jadwal']);
     }
 }

@@ -52,7 +52,6 @@
             <a href="{{ route('jadwal.manage') }}" class="flex items-center gap-2 bg-white/6 hover:bg-white/10 transition rounded-xl px-3 py-2 text-xs text-white/60 border border-white/5">
                 <svg class="w-3.5 h-3.5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <span class="flex-1 font-medium truncate">Cari jadwal atau sesi...</span>
-                <kbd class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white/50 font-mono">⌘ K</kbd>
             </a>
         </div>
 
@@ -169,10 +168,75 @@
                             <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('pengajuan.index') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                             <span class="truncate">Pengajuan Perubahan</span>
                         </div>
-                        @php $antreCount = \App\Models\PengajuanPerubahan::where('status', 'menunggu')->count(); @endphp
+                        @php
+                            $navUser = auth()->user();
+                            $antreCount = \App\Models\PengajuanPerubahan::where('status', 'menunggu')
+                                ->when($navUser && $navUser->hasRole('operator') && $navUser->fakultas_id, function ($q) use ($navUser) {
+                                    $fakId = $navUser->fakultas_id;
+                                    $q->whereHas('jadwalPraktikum', function ($jq) use ($fakId) {
+                                        $jq->where(function ($sub) use ($fakId) {
+                                            $sub->whereHas('ruangPraktikum', fn ($r) => $r->where('fakultas_id', $fakId))
+                                                ->orWhereHas('mataKuliah.programStudi', fn ($p) => $p->where('fakultas_id', $fakId))
+                                                ->orWhereHas('kelas.programStudi', fn ($k) => $k->where('fakultas_id', $fakId));
+                                        });
+                                    });
+                                })
+                                ->count();
+                        @endphp
                         @if ($antreCount > 0)
                             <span class="bg-emerald-400 text-emerald-950 font-black text-[10px] rounded-md px-1.5 py-0.2 shrink-0">
                                 {{ $antreCount }}
+                            </span>
+                        @endif
+                        @if(request()->routeIs('pengajuan.index'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+            @endrole
+
+            @role('ketua-lab')
+                <p class="px-3 pt-3.5 pb-1 text-white/40 font-bold uppercase text-[10px] tracking-wider">Laboratorium Saya</p>
+
+                @if (Route::has('ruang.index'))
+                    <a href="{{ route('ruang.index') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('ruang.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('ruang.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <span class="truncate">Profil Laboratorium</span>
+                        @if(request()->routeIs('ruang.*'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
+                @if (Route::has('jadwal.manage'))
+                    <a href="{{ route('jadwal.manage') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('jadwal.manage') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('jadwal.manage') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="truncate">Kelola Jadwal Lab</span>
+                        @if(request()->routeIs('jadwal.manage'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
+                @if (Route::has('pengajuan.index'))
+                    <a href="{{ route('pengajuan.index') }}"
+                        class="group relative flex items-center justify-between px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('pengajuan.index') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('pengajuan.index') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            <span class="truncate">Pengajuan Perubahan</span>
+                        </div>
+                        @php
+                            $klUser = auth()->user();
+                            $klAntreCount = \App\Models\PengajuanPerubahan::where('status', 'menunggu')
+                                ->when($klUser && $klUser->ruang_praktikum_id, fn ($q) => $q->whereHas('jadwalPraktikum', fn ($j) => $j->where('ruang_praktikum_id', $klUser->ruang_praktikum_id)))
+                                ->when($klUser && ! $klUser->ruang_praktikum_id && $klUser->fakultas_id, fn ($q) => $q->whereHas('jadwalPraktikum.ruangPraktikum', fn ($r) => $r->where('fakultas_id', $klUser->fakultas_id)))
+                                ->count();
+                        @endphp
+                        @if ($klAntreCount > 0)
+                            <span class="bg-emerald-400 text-emerald-950 font-black text-[10px] rounded-md px-1.5 py-0.2 shrink-0">
+                                {{ $klAntreCount }}
                             </span>
                         @endif
                         @if(request()->routeIs('pengajuan.index'))
@@ -301,12 +365,17 @@
                         <span class="block text-[10px] text-emerald-200/60 truncate uppercase tracking-wider font-medium">{{ auth()->user()->roles->first()?->name ?? 'Pengelola' }}</span>
                     </div>
                 </div>
-                <form method="POST" action="{{ route('logout') }}" class="shrink-0">
-                    @csrf
-                    <button type="submit" title="Keluar / Logout" class="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    </button>
-                </form>
+                <div class="flex items-center gap-1 shrink-0">
+                    <a href="{{ route('profile.edit') }}" title="Pengaturan Akun" class="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+                        @csrf
+                        <button type="submit" title="Keluar / Logout" class="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </aside>
