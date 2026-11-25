@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>{{ $title ?? 'Dashboard' }} — SI Jadwal Praktikum</title>
 
     <script>
@@ -24,10 +27,10 @@
 
     {{-- Sidebar (Tema Forest Emerald Premium - Sesuai Gambar 1) --}}
     <aside data-keep-light :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-        class="fixed md:sticky top-0 inset-y-0 left-0 z-40 w-64 shrink-0 h-screen max-h-screen flex flex-col bg-[#0F352A] text-white transition-transform duration-200 shadow-2xl md:shadow-none border-r border-[#164336]">
+        class="fixed md:sticky top-0 inset-y-0 left-0 z-40 w-64 shrink-0 h-screen max-h-screen flex flex-col bg-primary dark:bg-primary-dark text-white transition-transform duration-200 shadow-2xl md:shadow-none border-r border-emerald-900/60">
         
         {{-- Brand / Header Sidebar --}}
-        <div class="h-16 shrink-0 bg-[#0F352A] border-b border-white/8 flex items-center justify-between px-5">
+        <div class="h-16 shrink-0 bg-primary dark:bg-primary-dark border-b border-white/8 flex items-center justify-between px-5">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 font-bold text-white tracking-tight">
                 <div class="w-10 h-10 rounded-lg bg-white/2 border border-emerald-400/30 flex items-center justify-center     text-emerald-300 shadow-2xs">
                     <img class="h-7" src="{{ asset('img/uinsscv2.png') }}" alt="logo uinssc">
@@ -68,7 +71,7 @@
                 @endif
             </a>
 
-            @role('super-admin|operator')
+            @role('super-admin|operator|demo-viewer')
                 <p class="px-3 pt-3.5 pb-1 text-white/40 font-bold uppercase text-[10px] tracking-wider">Master Data</p>
                 
                 <a href="{{ route('fakultas.index') }}"
@@ -135,6 +138,17 @@
                     </a>
                 @endif
 
+                @if (Route::has('pjlab.index'))
+                    <a href="{{ route('pjlab.index') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('pjlab.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('pjlab.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="truncate">Penanggung Jawab Lab</span>
+                        @if(request()->routeIs('pjlab.*'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
                 @if (Route::has('tahunakademik.index'))
                     <a href="{{ route('tahunakademik.index') }}"
                         class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('tahunakademik.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
@@ -196,24 +210,70 @@
             @endrole
 
             @role('ketua-lab')
-                <p class="px-3 pt-3.5 pb-1 text-white/40 font-bold uppercase text-[10px] tracking-wider">Laboratorium Saya</p>
+                <p class="px-3 pt-3.5 pb-1 text-white/40 font-bold uppercase text-[10px] tracking-wider">Laboratorium & Master Data</p>
 
                 @if (Route::has('ruang.index'))
                     <a href="{{ route('ruang.index') }}"
                         class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('ruang.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
                         <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('ruang.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        <span class="truncate">Profil Laboratorium</span>
+                        <span class="truncate">Ruang Praktikum</span>
                         @if(request()->routeIs('ruang.*'))
                             <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
                         @endif
                     </a>
                 @endif
 
+                @if (Route::has('pjlab.index'))
+                    <a href="{{ route('pjlab.index') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('pjlab.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('pjlab.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="truncate">Penanggung Jawab Lab</span>
+                        @if(request()->routeIs('pjlab.*'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
+                @if (Route::has('kelas.index'))
+                    <a href="{{ route('kelas.index') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('kelas.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('kelas.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span class="truncate">Kelas</span>
+                        @if(request()->routeIs('kelas.*'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
+                @if (Route::has('matakuliah.index'))
+                    <a href="{{ route('matakuliah.index') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('matakuliah.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('matakuliah.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        <span class="truncate">Mata Kuliah</span>
+                        @if(request()->routeIs('matakuliah.*'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
+                @if (Route::has('dosen.index'))
+                    <a href="{{ route('dosen.index') }}"
+                        class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('dosen.*') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
+                        <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('dosen.*') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <span class="truncate">Dosen Pengampu</span>
+                        @if(request()->routeIs('dosen.*'))
+                            <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
+                        @endif
+                    </a>
+                @endif
+
+                <p class="px-3 pt-3.5 pb-1 text-white/40 font-bold uppercase text-[10px] tracking-wider">Jadwal & Operasional</p>
+
                 @if (Route::has('jadwal.manage'))
                     <a href="{{ route('jadwal.manage') }}"
                         class="group relative flex items-center gap-3 px-3 py-2 rounded-xl transition text-xs font-semibold {{ request()->routeIs('jadwal.manage') ? 'bg-white/12 text-white shadow-xs' : 'text-white/70 hover:text-white hover:bg-white/6' }}">
                         <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('jadwal.manage') ? 'text-emerald-300' : 'text-white/60 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span class="truncate">Kelola Jadwal Lab</span>
+                        <span class="truncate">Kelola Jadwal Praktikum</span>
                         @if(request()->routeIs('jadwal.manage'))
                             <span class="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-full bg-emerald-400"></span>
                         @endif
@@ -246,7 +306,7 @@
                 @endif
             @endrole
 
-            @role('super-admin')
+            @role('super-admin|demo-viewer')
                 <p class="px-3 pt-3.5 pb-1 text-white/40 font-bold uppercase text-[10px] tracking-wider">Super Admin</p>
                 
                 @if (Route::has('users.index'))
@@ -354,7 +414,7 @@
         </nav>
 
         {{-- Profile User Card di Bagian Bawah Sidebar (Persis Gambar 1) --}}
-        <div class="p-3 shrink-0 border-t border-white/8 bg-[#0B2A21] mt-auto">
+        <div class="p-3 shrink-0 border-t border-white/8 bg-[#071E17] dark:bg-[#051610] mt-auto">
             <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 hover:bg-white/8 transition border border-white/5">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center font-bold text-xs shrink-0">
@@ -439,11 +499,38 @@
         </header>
 
         <main class="p-4 md:p-6 lg:p-7 flex-1">
+            @if (auth()->check() && auth()->user()->isDemoViewer())
+                <div class="mb-5 rounded-2xl border border-amber-300/80 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/40 px-4 py-3 text-xs text-amber-950 dark:text-amber-200 flex items-start sm:items-center gap-3 shadow-2xs">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/30 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </span>
+                    <div class="leading-relaxed">
+                        <span class="font-extrabold uppercase tracking-wide text-amber-900 dark:text-amber-300">Mode Demo (Hanya Baca / Read-Only)</span>
+                        <span class="mx-1.5 text-amber-400">&bull;</span>
+                        <span>Anda masuk menggunakan akun demonstrasi dengan akses lihat penuh setara Super Admin. Anda dapat menjelajahi seluruh menu, pencarian, filter, dan rincian data, namun aksi <strong>tambah, ubah, dan hapus</strong> dinonaktifkan.</span>
+                    </div>
+                </div>
+            @endif
+
             {{ $slot }}
         </main>
+
+        <x-site-footer variant="admin" />
     </div>
 
+    @auth
+        <livewire:admin.onboarding-notice-modal />
+    @endauth
+
     @livewireScripts
+    <script>
+        // Anti-back cache setelah logout
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
+    </script>
 </body>
 
 </html>

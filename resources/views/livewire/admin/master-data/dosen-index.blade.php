@@ -13,7 +13,7 @@
                 Direktori dosen pengampu & tutor lab, autentikasi NIDN (Dosen) & Gmail pribadi (Tutor non-NIDN), serta pemetaan fakultas.
             </p>
         </div>
-        <button wire:click="openCreate" class="inline-flex items-center gap-2 bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs self-start sm:self-auto">
+        <button wire:click="openCreate" class="inline-flex items-center gap-2 bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs self-start sm:self-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Tambah Pengampu / Tutor</span>
         </button>
@@ -41,7 +41,7 @@
                 <button wire:click="$set('filterFakultas', '')"
                         @class([
                             'px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap shadow-2xs',
-                            'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterFakultas === '',
+                            'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterFakultas === '',
                             'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => $filterFakultas !== '',
                         ])>
                     Semua Fakultas
@@ -50,7 +50,7 @@
                     <button wire:click="$set('filterFakultas', '{{ $fak->id }}')"
                             @class([
                                 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap shadow-2xs',
-                                'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterFakultas === (string) $fak->id,
+                                'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterFakultas === (string) $fak->id,
                                 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => $filterFakultas !== (string) $fak->id,
                             ])>
                         {{ $fak->nama_fakultas }}
@@ -66,7 +66,7 @@
                     <button wire:click="$set('viewScope', 'fakultas')"
                             @class([
                                 'px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs',
-                                'bg-[#0F352A] dark:bg-emerald-600 text-white' => $viewScope === 'fakultas',
+                                'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $viewScope === 'fakultas',
                                 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-100' => $viewScope !== 'fakultas',
                             ])>
                         Dosen {{ $userFakultas ? ($userFakultas->kode_fakultas ?: (str_starts_with($userFakultas->nama_fakultas, 'Fakultas') ? $userFakultas->nama_fakultas : 'Fakultas ' . $userFakultas->nama_fakultas)) : 'Fakultas Saya' }}
@@ -74,7 +74,7 @@
                     <button wire:click="$set('viewScope', 'semua')"
                             @class([
                                 'px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs',
-                                'bg-[#0F352A] dark:bg-emerald-600 text-white' => $viewScope === 'semua',
+                                'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $viewScope === 'semua',
                                 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-100' => $viewScope !== 'semua',
                             ])>
                         Seluruh Direktori Kampus
@@ -222,7 +222,7 @@
                         <div class="flex items-start gap-3">
                             <div @class([
                                 'w-10 h-10 rounded-2xl text-white flex items-center justify-center font-black text-sm shrink-0 shadow-2xs',
-                                'bg-gradient-to-br from-[#0F352A] to-emerald-700' => $d->kategori === 'dosen',
+                                'bg-gradient-to-br from-[#0B2E23] to-emerald-700' => $d->kategori === 'dosen',
                                 'bg-gradient-to-br from-purple-800 to-indigo-600' => $d->kategori === 'tutor',
                                 'bg-gradient-to-br from-sky-700 to-cyan-600' => $d->kategori === 'asisten',
                             ])>
@@ -329,7 +329,7 @@
                                     <div class="flex items-center gap-2.5">
                                         <div @class([
                                             'w-7 h-7 rounded-lg text-white flex items-center justify-center font-bold text-[10px] shrink-0',
-                                            'bg-[#0F352A] dark:bg-emerald-700' => $d->kategori === 'dosen',
+                                            'bg-[#0B2E23] dark:bg-emerald-700' => $d->kategori === 'dosen',
                                             'bg-purple-700 dark:bg-purple-600' => $d->kategori === 'tutor',
                                             'bg-sky-700 dark:bg-sky-600' => $d->kategori === 'asisten',
                                         ])>
@@ -534,7 +534,7 @@
 
                 <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
                     <button type="button" wire:click="$set('showModal', false)" class="px-4 py-2 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
-                    <button type="button" wire:click="save" class="px-4 py-2 text-xs font-bold bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white rounded-xl shadow-xs transition">
+                    <button type="button" wire:click="save" class="px-4 py-2 text-xs font-bold bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white rounded-xl shadow-xs transition">
                         {{ $editId ? 'Perbarui Pengampu' : 'Simpan Pengampu' }}
                     </button>
                 </div>

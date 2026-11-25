@@ -12,8 +12,8 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     
-    --color-primary: #005e3d;
-    --color-primary-dark: #00482e;
+    --color-primary: #0B2E23;
+    --color-primary-dark: #071E17;
     --color-dark: #1F1F1F;
     --color-dark-light: #2A2A2A;
     --color-surface: #FAFAF7;
@@ -250,7 +250,7 @@ html.dark,
 }
 
 .dark [data-keep-light] .text-primary {
-    color: #005e3d !important;
+    color: #0B2E23 !important;
 }
 .dark [data-keep-light] .text-gray-900 {
     color: #111827 !important;

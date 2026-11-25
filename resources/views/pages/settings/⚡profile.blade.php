@@ -119,7 +119,7 @@ new #[Title('Pengaturan Akun'), Layout('components.layouts.admin')] class extend
 
             <div class="pt-2 flex items-center justify-between">
                 <button type="submit" data-test="update-profile-button"
-                        class="inline-flex items-center gap-2 bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs">
+                        class="inline-flex items-center gap-2 bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs">
                     <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     <span>Simpan Perubahan</span>
                 </button>

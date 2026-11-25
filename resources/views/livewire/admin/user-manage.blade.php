@@ -5,11 +5,19 @@
             <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-zinc-100 tracking-tight">Kelola Pengguna & Operator</h1>
             <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Manajemen akun pengelola, hak akses peran (Super Admin, Operator, Dosen), dan penugasan fakultas/prodi.</p>
         </div>
-        <button wire:click="openCreate"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold transition shadow-xs shrink-0 self-start sm:self-auto">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            <span>Tambah Pengguna</span>
-        </button>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <button wire:click="openNoticeModal"
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-950/70 text-amber-900 dark:text-amber-200 text-xs font-bold transition shadow-2xs">
+                <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>Peringatan Data (Overlay)</span>
+            </button>
+            <button wire:click="openCreate"
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold transition shadow-xs shrink-0 self-start sm:self-auto">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Tambah Pengguna</span>
+            </button>
+        </div>
     </div>
 
     {{-- Flash Notifications --}}
@@ -50,6 +58,7 @@
                 <option value="operator">Operator Fakultas/Prodi</option>
                 <option value="ketua-lab">Ketua Laboratorium</option>
                 <option value="dosen">Dosen</option>
+                <option value="demo-viewer">Demo Viewer (Read-Only)</option>
             </select>
         </div>
     </div>
@@ -89,6 +98,10 @@
                                 @elseif($r->name === 'dosen')
                                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
                                         🎓 Dosen
+                                    </span>
+                                @elseif($r->name === 'demo-viewer')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">
+                                        👁️ Demo Viewer (Read-Only)
                                     </span>
                                 @else
                                     <span class="px-2.5 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">{{ $r->name }}</span>
@@ -214,6 +227,7 @@
                                 <option value="ketua-lab">Ketua Laboratorium (Otonomi Lab Tertentu)</option>
                                 <option value="dosen">Dosen Pengampu</option>
                                 <option value="super-admin">Super Admin (Otoritas Penuh)</option>
+                                <option value="demo-viewer">Demo Viewer (Hanya Baca / Pameran)</option>
                             </select>
                             @error('role') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -284,7 +298,7 @@
 
                     <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
                         <button wire:click="$set('showModal', false)" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
-                        <button wire:click="save" class="px-5 py-2 text-xs font-bold bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl transition shadow-xs">
+                        <button wire:click="save" class="px-5 py-2 text-xs font-bold bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl transition shadow-xs">
                             Simpan Pengguna
                         </button>
                     </div>
@@ -309,6 +323,84 @@
                         <button wire:click="$set('confirmDeleteId', null)" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Batal</button>
                         <button wire:click="delete" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition">Hapus Pengguna</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Modal Pengaturan Onboarding Notice (Super Admin) --}}
+    @if ($showNoticeModal)
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-xl p-6 space-y-5 shadow-2xl border border-gray-100 dark:border-zinc-800 text-gray-900 dark:text-zinc-100 my-auto animate-in fade-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-zinc-800">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm sm:text-base">Pengaturan Overlay Peringatan Data</h3>
+                            <p class="text-xs text-gray-400">Peringatan 1x saat Operator / Ketua Lab pertama kali login</p>
+                        </div>
+                    </div>
+                    <button wire:click="$set('showNoticeModal', false)" class="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">✕</button>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    {{-- Status Banner --}}
+                    <div class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 flex items-center justify-between">
+                        <div>
+                            <span class="font-extrabold text-amber-900 dark:text-amber-300 block">Status Overlay Saat Ini: Versi {{ $noticeVersion }}</span>
+                            <span class="text-[11px] text-amber-800/80 dark:text-amber-300/70">
+                                Target: Operator Fakultas & Ketua Laboratorium
+                            </span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" wire:model="noticeActive" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
+                            <span class="ml-2 font-bold {{ $noticeActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-400' }} text-[11px]">
+                                {{ $noticeActive ? 'Aktif' : 'Nonaktif' }}
+                            </span>
+                        </label>
+                    </div>
+
+                    {{-- Form Judul --}}
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-zinc-300">Judul Pengumuman</label>
+                        <input type="text" wire:model="noticeTitle" class="w-full mt-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-gray-900 dark:text-zinc-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    </div>
+
+                    {{-- Form Isi Konten --}}
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-zinc-300">Isi Pesan Peringatan</label>
+                        <textarea wire:model="noticeContent" rows="4" class="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-gray-900 dark:text-zinc-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"></textarea>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Jelaskan bahwa NIDN Dosen & Kode MK perlu dicek/diverifikasi karena sebagian masih dummy saat pengumpulan jadwal.</p>
+                    </div>
+
+                    {{-- Re-broadcast Button Box --}}
+                    <div class="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/70 dark:border-blue-900/40 space-y-2">
+                        <div class="flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <div>
+                                <h4 class="font-bold text-blue-900 dark:text-blue-200">Tampilkan Ulang Peringatan (1x)?</h4>
+                                <p class="text-[11px] text-blue-800/80 dark:text-blue-300/80 leading-relaxed">
+                                    Jika Anda ingin agar <strong>seluruh Operator & Ketua Lab</strong> melihat kembali modal peringatan ini 1x pada login berikutnya, klik tombol di bawah.
+                                </p>
+                            </div>
+                        </div>
+                        <button wire:click="broadcastNoticeAgain"
+                                type="button"
+                                class="w-full py-2 px-3 rounded-xl font-bold text-xs bg-blue-600 hover:bg-blue-500 text-white transition flex items-center justify-center gap-1.5 shadow-2xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <span>Reset & Tampilkan Kembali ke Semua Operator/Ketua Lab</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
+                    <button wire:click="$set('showNoticeModal', false)" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">Tutup</button>
+                    <button wire:click="saveNoticeSettings" class="px-5 py-2 text-xs font-bold bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl transition shadow-xs">
+                        Simpan Pengaturan
+                    </button>
                 </div>
             </div>
         </div>

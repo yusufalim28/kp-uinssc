@@ -38,9 +38,12 @@ class RolePermissionSeeder extends Seeder
         $roleOperator->givePermissionTo(['manage-master-data', 'manage-jadwal', 'approve-pengajuan', 'view-jadwal']);
 
         $roleKetuaLab = Role::firstOrCreate(['name' => 'ketua-lab']);
-        $roleKetuaLab->givePermissionTo(['manage-jadwal', 'approve-pengajuan', 'view-jadwal']);
+        $roleKetuaLab->givePermissionTo(['manage-master-data', 'manage-jadwal', 'approve-pengajuan', 'view-jadwal']);
 
         $roleDosen = Role::firstOrCreate(['name' => 'dosen']);
         $roleDosen->givePermissionTo(['submit-pengajuan', 'view-jadwal']);
+
+        $roleDemoViewer = Role::firstOrCreate(['name' => 'demo-viewer']);
+        $roleDemoViewer->givePermissionTo(['view-jadwal']);
     }
 }

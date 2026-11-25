@@ -49,9 +49,6 @@
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-zinc-100 tracking-tight">
                     Jadwal Pemakaian Ruang & Lab
                 </h1>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                    Format Matriks Resmi
-                </span>
             </div>
             <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
                 Visualisasi jadwal penggunaan laboratorium dan ruang praktikum per sesi waktu perkuliahan (Senin – Jum'at).
@@ -157,18 +154,23 @@
 
             {{-- Detail Header Info Ruangan (Screen Only) --}}
             <div class="print:hidden bg-linear-to-r from-emerald-50/80 via-white to-gray-50 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900 rounded-2xl p-4 sm:p-5 border border-emerald-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2.5">
-                        <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-primary text-white">
-                            {{ $selectedRuang->kode_ruang }}
-                        </span>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100">
-                            {{ $selectedRuang->nama_ruang }}
-                        </h2>
+                <div class="flex items-center gap-4">
+                    @if ($selectedRuang->foto_url)
+                        <img src="{{ $selectedRuang->foto_url }}" alt="{{ $selectedRuang->nama_ruang }}" class="w-16 h-16 object-cover rounded-xl border border-gray-200 dark:border-zinc-700 shadow-2xs shrink-0">
+                    @endif
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-primary text-white">
+                                {{ $selectedRuang->kode_ruang }}
+                            </span>
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100">
+                                {{ $selectedRuang->nama_ruang }}
+                            </h2>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400">
+                            Lokasi: <span class="font-medium text-gray-700 dark:text-zinc-300">{{ $selectedRuang->lokasi }}</span> • Kapasitas: <span class="font-medium text-gray-700 dark:text-zinc-300">{{ $selectedRuang->kapasitas }} Orang</span> • Fakultas: <span class="font-medium text-gray-700 dark:text-zinc-300">{{ $selectedRuang->fakultas?->nama_fakultas ?? 'Fasilitas Bersama Universitas' }}</span>
+                        </p>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400">
-                        Lokasi: <span class="font-medium text-gray-700 dark:text-zinc-300">{{ $selectedRuang->lokasi }}</span> • Kapasitas: <span class="font-medium text-gray-700 dark:text-zinc-300">{{ $selectedRuang->kapasitas }} Orang</span> • Fakultas: <span class="font-medium text-gray-700 dark:text-zinc-300">{{ $selectedRuang->fakultas?->nama_fakultas ?? 'Fasilitas Bersama Universitas' }}</span>
-                    </p>
                 </div>
 
                 <div class="flex items-center gap-3">

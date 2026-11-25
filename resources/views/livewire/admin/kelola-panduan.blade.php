@@ -7,7 +7,7 @@
             <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Atur isi aturan, SOP operasional, dan petunjuk penggunaan sistem untuk publik maupun pengelola internal.</p>
         </div>
         <button wire:click="openCreate"
-            class="bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-2 text-xs shrink-0 self-start sm:self-auto">
+            class="bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-xs flex items-center justify-center gap-2 text-xs shrink-0 self-start sm:self-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Tambah Panduan Baru</span>
         </button>
@@ -30,28 +30,58 @@
             <button wire:click="$set('filterKategori', 'semua')"
                 @class([
                     'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs',
-                    'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterKategori === 'semua',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'semua',
                     'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'semua',
                 ])>
-                Semua Kategori ({{ $totalPublik + $totalInternal }})
+                Semua
+            </button>
+            <button wire:click="$set('filterKategori', 'operator')"
+                @class([
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'operator',
+                    'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'operator',
+                ])>
+                <span>Operator</span>
+            </button>
+            <button wire:click="$set('filterKategori', 'ketua-lab')"
+                @class([
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'ketua-lab',
+                    'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'ketua-lab',
+                ])>
+                <span>Ketua Lab</span>
+            </button>
+            <button wire:click="$set('filterKategori', 'dosen')"
+                @class([
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'dosen',
+                    'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'dosen',
+                ])>
+                <span>Dosen</span>
+            </button>
+            <button wire:click="$set('filterKategori', 'super-admin')"
+                @class([
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'super-admin',
+                    'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'super-admin',
+                ])>
+                <span>Super Admin</span>
+            </button>
+            <button wire:click="$set('filterKategori', 'fitur')"
+                @class([
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'fitur',
+                    'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'fitur',
+                ])>
+                <span>Fitur Halaman</span>
             </button>
             <button wire:click="$set('filterKategori', 'publik')"
                 @class([
                     'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
-                    'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterKategori === 'publik',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterKategori === 'publik',
                     'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'publik',
                 ])>
-                <span>Publik / Mahasiswa</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-black/15 font-mono">{{ $totalPublik }}</span>
-            </button>
-            <button wire:click="$set('filterKategori', 'internal')"
-                @class([
-                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs flex items-center gap-1.5',
-                    'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterKategori === 'internal',
-                    'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50' => $filterKategori !== 'internal',
-                ])>
-                <span>SOP Internal</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-black/15 font-mono">{{ $totalInternal }}</span>
+                <span>Publik</span>
             </button>
         </div>
 
@@ -160,8 +190,13 @@
                             <div>
                                 <label class="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider block mb-1">Kategori Sasaran *</label>
                                 <select wire:model="kategori" class="w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800 text-xs py-2 px-3 text-gray-900 dark:text-zinc-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
-                                    <option value="publik">Publik (Mahasiswa & Tamu)</option>
-                                    <option value="internal">SOP Internal (Operator & Dosen)</option>
+                                    <option value="operator">Alur Operator Fakultas</option>
+                                    <option value="ketua-lab">Alur Ketua Laboratorium</option>
+                                    <option value="dosen">Alur Dosen / Tutor</option>
+                                    <option value="super-admin">Alur Super Admin</option>
+                                    <option value="fitur">Petunjuk Fitur Halaman</option>
+                                    <option value="publik">Publik (Mahasiswa)</option>
+                                    <option value="internal">SOP Internal Umum</option>
                                 </select>
                                 @error('kategori') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
@@ -209,7 +244,7 @@
                         <button wire:click="$set('showModal', false)" type="button" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">
                             Batal
                         </button>
-                        <button wire:click="save" type="button" class="px-5 py-2 text-xs bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs">
+                        <button wire:click="save" type="button" class="px-5 py-2 text-xs bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs">
                             Simpan Perubahan
                         </button>
                     </div>

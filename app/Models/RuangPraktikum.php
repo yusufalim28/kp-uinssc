@@ -38,6 +38,11 @@ class RuangPraktikum extends Model
         return $this->hasMany(User::class, 'ruang_praktikum_id');
     }
 
+    public function penanggungJawab()
+    {
+        return $this->hasMany(PenanggungJawabLab::class, 'ruang_praktikum_id');
+    }
+
     public function getFotoUrlAttribute(): ?string
     {
         if ($this->foto && Storage::disk('public')->exists($this->foto)) {

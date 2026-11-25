@@ -17,15 +17,7 @@
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <a href="{{ route('jadwal.template.download') }}" class="inline-flex items-center gap-1.5 px-3 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-xl transition shadow-2xs whitespace-nowrap">
-                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span>Unduh Format Excel</span>
-            </a>
-            <button wire:click="openImportModal" class="inline-flex items-center gap-1.5 px-3 py-2 border border-emerald-200/80 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-xl transition shadow-2xs whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                <span>Import Excel</span>
-            </button>
-            <button wire:click="openCreate" class="inline-flex items-center gap-1.5 bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-xs whitespace-nowrap">
+            <button wire:click="openCreate" class="inline-flex items-center gap-1.5 bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-xs whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 <span>Tambah Jadwal</span>
             </button>
@@ -530,7 +522,7 @@
                         Batal
                     </button>
                     <button wire:click="save" wire:loading.attr="disabled"
-                            class="px-5 py-2 text-xs bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs disabled:opacity-50">
+                            class="px-5 py-2 text-xs bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs disabled:opacity-50">
                         <span wire:loading.remove wire:target="save">Simpan Jadwal</span>
                         <span wire:loading wire:target="save">Mengecek bentrok...</span>
                     </button>
@@ -558,64 +550,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
-
-    {{-- Modal Import Excel --}}
-    @if ($showImportModal)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 overflow-y-auto p-4 sm:p-6">
-            <div class="flex min-h-full items-start sm:items-center justify-center py-4 sm:py-6">
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-lg shadow-2xl p-6 space-y-4 border border-gray-100 dark:border-zinc-800 my-auto animate-in fade-in zoom-in-95 duration-150 text-gray-900 dark:text-zinc-100">
-                <div class="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
-                    <h2 class="text-base font-bold text-gray-900 dark:text-zinc-100 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <span>Import Jadwal Praktikum (Excel)</span>
-                    </h2>
-                    <button wire:click="$set('showImportModal', false)" class="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 rounded-lg p-1 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-
-                <div class="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl p-3.5 flex items-start gap-2.5">
-                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <div>
-                        <strong class="text-emerald-900 dark:text-emerald-200">Smart Importer Aktif:</strong> Anda dapat mengunggah file Excel jurusan secara langsung. Sistem otomatis membaca kolom, mendaftarkan mata kuliah/kelas, dan mendeteksi bentrok jadwal.
-                        <a href="{{ route('jadwal.template.download') }}" class="font-bold text-emerald-700 dark:text-emerald-400 underline block mt-1">Unduh Template Contoh (.xlsx)</a>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Pilih File Excel (.xlsx / .xls / .csv)</label>
-                    <input type="file" wire:model="excelFile" accept=".xlsx,.xls,.csv" class="w-full text-xs text-gray-500 dark:text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 dark:file:bg-emerald-950/50 file:text-emerald-700 dark:file:text-emerald-300 hover:file:bg-emerald-100 border border-gray-200 dark:border-zinc-700 rounded-xl p-1 bg-gray-50/50 dark:bg-zinc-800">
-                    @error('excelFile') <p class="text-rose-600 dark:text-rose-400 text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
-
-                @if($importErrors)
-                    <div class="max-h-40 overflow-y-auto bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-xl p-3 space-y-1">
-                        <span class="text-xs font-bold text-rose-800 dark:text-rose-300 block">Laporan Bentrok / Lewat ({{ count($importErrors) }} catatan):</span>
-                        @foreach($importErrors as $err)
-                            <p class="text-[11px] text-rose-600 dark:text-rose-400 leading-tight">• {{ $err }}</p>
-                        @endforeach
-                    </div>
-                @endif
-
-                @if($importSuccessCount > 0)
-                    <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3 text-xs text-emerald-800 dark:text-emerald-300 font-semibold">
-                        ✓ Berhasil mengimpor <strong>{{ $importSuccessCount }}</strong> jadwal praktikum!
-                    </div>
-                @endif
-
-                <div class="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
-                    <button wire:click="$set('showImportModal', false)" class="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition">
-                        Tutup
-                    </button>
-                    <button wire:click="importExcel" wire:loading.attr="disabled" class="px-4 py-2 text-xs font-bold bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-1.5">
-                        <span wire:loading.remove wire:target="importExcel">Proses Import</span>
-                        <span wire:loading wire:target="importExcel">Mengimpor data...</span>
-                    </button>
-                </div>
-            </div>
-          </div>
         </div>
     @endif
 

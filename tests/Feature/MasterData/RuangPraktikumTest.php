@@ -6,6 +6,8 @@ use App\Models\JadwalPraktikum;
 use App\Models\ProgramStudi;
 use App\Models\RuangPraktikum;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -111,4 +113,68 @@ test('bisa menambah ruang dengan kapasitas fleksibel dan batas maksimal', functi
         ->and($ruang->kapasitas_maksimal)->toBe(80)
         ->and($ruang->isKapasitasFleksibel())->toBeTrue()
         ->and($ruang->label_kapasitas)->toBe('Fleksibel (Maks. 80 Mahasiswa)');
+});
+
+test('foto ruang yang diunggah saat edit tersimpan ke storage dan record', function () {
+    Storage::fake('public');
+    $ruang = RuangPraktikum::factory()->create(['foto' => null]);
+
+    Livewire::test(RuangPraktikumIndex::class)
+        ->call('openEdit', $ruang->id)
+        ->set('foto', UploadedFile::fake()->image('lab.jpg', 1600, 1200)->size(15000))
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $ruang->refresh();
+    expect($ruang->foto)->not->toBeNull();
+    Storage::disk('public')->assertExists($ruang->foto);
+});
+
+test('foto ruang format heic diterima', function () {
+    Storage::fake('public');
+    $ruang = RuangPraktikum::factory()->create(['foto' => null]);
+
+    Livewire::test(RuangPraktikumIndex::class)
+        ->call('openEdit', $ruang->id)
+        ->set('foto', UploadedFile::fake()->create('IMG_0001.heic', 4000, 'image/heic'))
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($ruang->refresh()->foto)->toEndWith('.heic');
+});
+
+test('foto ruang lebih dari 20MB atau bukan gambar ditolak', function () {
+    Storage::fake('public');
+    $ruang = RuangPraktikum::factory()->create();
+
+    Livewire::test(RuangPraktikumIndex::class)
+        ->call('openEdit', $ruang->id)
+        ->set('foto', UploadedFile::fake()->image('besar.jpg')->size(21000))
+        ->call('save')
+        ->assertHasErrors(['foto']);
+
+    Livewire::test(RuangPraktikumIndex::class)
+        ->call('openEdit', $ruang->id)
+        ->set('foto', UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf'))
+        ->call('save')
+        ->assertHasErrors(['foto']);
+});
+
+test('foto ruang yang sudah tersimpan bisa dihapus lewat tombol hapus foto', function () {
+    Storage::fake('public');
+    $path = 'ruang-praktikum/foto-lama.jpg';
+    Storage::disk('public')->put($path, 'konten-foto');
+
+    $ruang = RuangPraktikum::factory()->create(['foto' => $path]);
+
+    Livewire::test(RuangPraktikumIndex::class)
+        ->call('openEdit', $ruang->id)
+        ->call('removeFoto')
+        ->assertSet('hapusFoto', true)
+        ->assertSet('existingFoto', null)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($ruang->fresh()->foto)->toBeNull();
+    Storage::disk('public')->assertMissing($path);
 });

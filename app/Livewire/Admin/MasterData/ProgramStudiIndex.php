@@ -145,7 +145,7 @@ class ProgramStudiIndex extends Component
         }
 
         // Poin 6: Filter Fakultas untuk Super Admin
-        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+        if ($user && $user->hasSuperAdminView() && ! empty($this->filterFakultas)) {
             $query->where('fakultas_id', (int) $this->filterFakultas);
         }
 
@@ -163,7 +163,7 @@ class ProgramStudiIndex extends Component
             'prodi' => $prodi,
             'fakultas' => $fakultas,
             'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
-            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isSuperAdmin' => $user && $user->hasSuperAdminView(),
             'userFakultas' => $user?->fakultas,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Program Studi']);
     }

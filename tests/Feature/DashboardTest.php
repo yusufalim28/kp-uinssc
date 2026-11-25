@@ -61,3 +61,16 @@ test('dosen sees lecturer dashboard', function () {
         ->assertSee('Dashboard Dosen Pengampu')
         ->assertSee('Jadwal Praktikum Saya');
 });
+
+test('ketua lab sees ketua laboratorium dashboard', function () {
+    Role::firstOrCreate(['name' => 'ketua-lab', 'guard_name' => 'web']);
+    $user = User::factory()->create();
+    $user->assignRole('ketua-lab');
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Ketua Laboratorium')
+        ->assertSee('Status Lab Saat Ini')
+        ->assertSee('Profil Laboratorium');
+});

@@ -308,8 +308,7 @@
                             <p class="text-xs text-gray-500">Pusat Teknologi Informasi dan Pangkalan Data (Pustikom) Universitas.</p>
                         </div>
                         <div class="flex items-center gap-2 flex-wrap text-xs">
-                            <span class="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 font-medium">Gedung Pustikom Lt. 2</span>
-                            <span class="px-3 py-1.5 rounded-lg bg-primary text-white font-semibold">helpdesk@praktikum.ac.id</span>
+                            <span class="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 font-medium">Gedung Pustikom Lt. 1</span>
                         </div>
                     </div>
                 </div>

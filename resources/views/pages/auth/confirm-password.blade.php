@@ -2,7 +2,7 @@
     <div class="flex items-center justify-center min-h-[calc(100vh-180px)] py-8 px-4">
         <div class="w-full max-w-md bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-3xl shadow-xl p-6 sm:p-8 relative overflow-hidden">
             <!-- Decorative Accent Top -->
-            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0F352A] to-emerald-600"></div>
+            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0B2E23] to-emerald-600"></div>
 
             <!-- Icon & Header -->
             <div class="text-center mb-6">
@@ -65,7 +65,7 @@
                         Batal
                     </a>
                     <button type="submit" data-test="confirm-password-button"
-                            class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs">
+                            class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>

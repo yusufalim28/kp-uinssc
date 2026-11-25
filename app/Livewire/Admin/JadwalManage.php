@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin;
 
-use App\Imports\JadwalImport;
 use App\Models\Dosen;
 use App\Models\Fakultas;
 use App\Models\JadwalPraktikum;
@@ -12,13 +11,11 @@ use App\Models\RuangPraktikum;
 use App\Models\TahunAkademik;
 use App\Services\JadwalConflictService;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Maatwebsite\Excel\Facades\Excel;
 
 class JadwalManage extends Component
 {
-    use WithFileUploads, WithPagination;
+    use WithPagination;
 
     public ?int $editId = null;
 
@@ -56,17 +53,6 @@ class JadwalManage extends Component
     public ?int $filterTahunAkademik = null;
 
     public string $viewMode = 'grid';
-
-    // Excel Import Properties
-    public bool $showImportModal = false;
-
-    public $excelFile = null;
-
-    public int $importSuccessCount = 0;
-
-    public int $importSkippedCount = 0;
-
-    public array $importErrors = [];
 
     public ?int $confirmDeleteId = null;
 
@@ -130,41 +116,6 @@ class JadwalManage extends Component
             'status' => 'required|in:aktif,nonaktif,dibatalkan,reschedule',
             'keterangan' => 'nullable|string|max:255',
         ];
-    }
-
-    public function openImportModal(): void
-    {
-        $this->reset(['excelFile', 'importSuccessCount', 'importSkippedCount', 'importErrors']);
-        $this->showImportModal = true;
-    }
-
-    public function importExcel(): void
-    {
-        $this->validate([
-            'excelFile' => 'required|file|mimes:xlsx,xls,csv|max:5120',
-        ], [
-            'excelFile.required' => 'Pilih file Excel yang akan diunggah.',
-            'excelFile.mimes' => 'Format file harus berupa Excel (.xlsx, .xls) atau .csv',
-            'excelFile.max' => 'Ukuran file maksimal 5MB.',
-        ]);
-
-        try {
-            $import = new JadwalImport;
-            Excel::import($import, $this->excelFile->getRealPath());
-
-            $this->importSuccessCount = $import->successCount;
-            $this->importSkippedCount = $import->skippedCount;
-            $this->importErrors = $import->errors;
-
-            if ($this->importSuccessCount > 0) {
-                session()->flash('success', "Berhasil mengimpor {$this->importSuccessCount} jadwal praktikum!");
-            }
-        } catch (\Throwable $e) {
-            $this->importErrors = ['Terjadi kesalahan saat membaca file: '.$e->getMessage()];
-            $this->importSkippedCount = 1;
-        }
-
-        $this->reset('excelFile');
     }
 
     public function openCreate(): void
@@ -364,7 +315,7 @@ class JadwalManage extends Component
         }
 
         // Poin 6: Filter Fakultas untuk Super Admin
-        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+        if ($user && $user->hasSuperAdminView() && ! empty($this->filterFakultas)) {
             $fakultasId = (int) $this->filterFakultas;
             $jadwalQuery->where(function ($q) use ($fakultasId) {
                 $q->whereHas('ruangPraktikum', fn ($r) => $r->where('fakultas_id', $fakultasId))
@@ -408,7 +359,7 @@ class JadwalManage extends Component
             'ruangList' => $ruangQuery->orderBy('nama_ruang')->get(),
             'tahunList' => TahunAkademik::orderByDesc('tahun_mulai')->get(),
             'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
-            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isSuperAdmin' => $user && $user->hasSuperAdminView(),
             'isKetuaLab' => $user && $user->hasRole('ketua-lab'),
             'userFakultas' => $user?->fakultas,
             'userRuang' => $user?->ruangPraktikum,

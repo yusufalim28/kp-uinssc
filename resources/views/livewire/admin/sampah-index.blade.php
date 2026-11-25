@@ -44,7 +44,7 @@
         <button wire:click="$set('filterJenis', '')"
                 @class([
                     'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs',
-                    'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterJenis === '',
+                    'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterJenis === '',
                     'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => $filterJenis !== '',
                 ])>
             Semua Data
@@ -53,7 +53,7 @@
             <button wire:click="$set('filterJenis', '{{ $key }}')"
                     @class([
                         'px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-2xs',
-                        'bg-[#0F352A] dark:bg-emerald-600 text-white' => $filterJenis === $key,
+                        'bg-[#0B2E23] dark:bg-emerald-600 text-white' => $filterJenis === $key,
                         'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => $filterJenis !== $key,
                     ])>
                 {{ $config['label'] }}

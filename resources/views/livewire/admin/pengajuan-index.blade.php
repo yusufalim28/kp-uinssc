@@ -406,7 +406,7 @@
                     </div>
                     <div class="flex justify-center gap-2 pt-2">
                         <button wire:click="$set('processId', null)" class="px-4 py-2 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 font-semibold rounded-xl transition">Batal</button>
-                        <button wire:click="confirmProcess" class="px-4 py-2 text-xs bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs transition">
+                        <button wire:click="confirmProcess" class="px-4 py-2 text-xs bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs transition">
                             Ya, Setujui
                         </button>
                     </div>

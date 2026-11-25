@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Fakultas;
+use App\Models\Pengaturan;
 use App\Models\ProgramStudi;
 use App\Models\RuangPraktikum;
 use App\Models\User;
@@ -40,6 +41,51 @@ class UserManage extends Component
     public string $search = '';
 
     public string $filterRole = '';
+
+    // Pengaturan Peringatan Onboarding Verifikasi Data
+    public bool $showNoticeModal = false;
+
+    public string $noticeTitle = '';
+
+    public string $noticeContent = '';
+
+    public bool $noticeActive = true;
+
+    public int $noticeVersion = 1;
+
+    public function openNoticeModal(): void
+    {
+        $this->noticeTitle = Pengaturan::get('onboarding_notice_title', 'Penting: Verifikasi Data Dosen (NIDN) & Kode Mata Kuliah');
+        $this->noticeContent = Pengaturan::get('onboarding_notice_content', 'Selamat datang di Sistem Jadwal Praktikum. Harap diperhatikan bahwa sebagian NIDN Dosen saat ini masih berupa data sementara (dummy) meskipun nama dosen sudah sesuai jadwal asli. Mohon periksa dan perbarui NIDN dosen serta kode mata kuliah di fakultas Anda.');
+        $this->noticeActive = (bool) ((int) Pengaturan::get('onboarding_notice_active', '1'));
+        $this->noticeVersion = (int) Pengaturan::get('onboarding_notice_version', 1);
+        $this->showNoticeModal = true;
+    }
+
+    public function saveNoticeSettings(): void
+    {
+        Pengaturan::set('onboarding_notice_title', $this->noticeTitle);
+        Pengaturan::set('onboarding_notice_content', $this->noticeContent);
+        Pengaturan::set('onboarding_notice_active', $this->noticeActive ? '1' : '0');
+
+        $this->showNoticeModal = false;
+        session()->flash('success', 'Pengaturan teks pemberitahuan verifikasi data berhasil disimpan.');
+    }
+
+    public function broadcastNoticeAgain(): void
+    {
+        $newVersion = ((int) Pengaturan::get('onboarding_notice_version', 1)) + 1;
+        Pengaturan::set('onboarding_notice_version', $newVersion);
+        Pengaturan::set('onboarding_notice_active', '1');
+
+        $affectedCount = User::role(['operator', 'ketua-lab'])->update([
+            'onboarding_notice_version' => 0,
+            'onboarding_notice_dismissed_at' => null,
+        ]);
+
+        $this->showNoticeModal = false;
+        session()->flash('success', "Pemberitahuan verifikasi berhasil diaktifkan ulang (Versi {$newVersion}). {$affectedCount} akun Operator & Ketua Lab akan melihat overlay 1x saat login berikutnya.");
+    }
 
     public function updatingSearch(): void
     {
@@ -84,7 +130,7 @@ class UserManage extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$this->editId,
-            'role' => 'required|in:super-admin,operator,ketua-lab,dosen',
+            'role' => 'required|in:super-admin,operator,ketua-lab,dosen,demo-viewer',
             'fakultas_id' => 'nullable|exists:fakultas,id',
             'program_studi_id' => 'nullable|exists:program_studi,id',
             'ruang_praktikum_id' => 'nullable|exists:ruang_praktikum,id',
@@ -156,7 +202,7 @@ class UserManage extends Component
 
     public function render()
     {
-        abort_if(! auth()->user()->hasRole('super-admin'), 403);
+        abort_if(! auth()->user()->hasSuperAdminView(), 403);
 
         $query = User::with(['fakultas', 'programStudi', 'ruangPraktikum', 'roles']);
 

@@ -217,8 +217,8 @@ class DosenIndex extends Component
                 },
             ]);
 
-        // Filter role Operator: hanya dosen yang mengajar / berjadwal di fakultas operator
-        if ($user && $user->hasRole('operator') && $user->fakultas_id && $this->viewScope === 'fakultas') {
+        // Filter role Operator / Ketua Lab: hanya dosen yang mengajar / berjadwal di fakultasnya
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id && $this->viewScope === 'fakultas') {
             $fakultasId = $user->fakultas_id;
             $query->where(function ($q) use ($fakultasId) {
                 $q->whereHas('jadwalPraktikum', function ($jq) use ($fakultasId) {
@@ -230,7 +230,7 @@ class DosenIndex extends Component
         }
 
         // Filter tab Fakultas untuk Super Admin
-        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+        if ($user && $user->hasSuperAdminView() && ! empty($this->filterFakultas)) {
             $fakultasId = (int) $this->filterFakultas;
             $query->where(function ($q) use ($fakultasId) {
                 $q->whereHas('jadwalPraktikum', function ($jq) use ($fakultasId) {
@@ -262,8 +262,8 @@ class DosenIndex extends Component
             'dosen' => $dosen,
             'fakultasList' => $fakultasList,
             'userFakultas' => $user?->fakultas,
-            'isOperator' => $user && $user->hasRole('operator'),
-            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isOperator' => $user && $user->hasRole(['operator', 'ketua-lab']),
+            'isSuperAdmin' => $user && $user->hasSuperAdminView(),
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Dosen']);
     }
 }

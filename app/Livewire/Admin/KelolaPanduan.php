@@ -36,7 +36,7 @@ class KelolaPanduan extends Component
     protected function rules(): array
     {
         return [
-            'kategori' => 'required|in:publik,internal',
+            'kategori' => 'required|in:publik,internal,operator,ketua-lab,dosen,super-admin,fitur',
             'urutan' => 'required|integer|min:1',
             'judul' => 'required|string|max:255',
             'subjudul' => 'nullable|string|max:255',

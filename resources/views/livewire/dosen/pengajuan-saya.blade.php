@@ -27,7 +27,7 @@
             </div>
 
             @if (! $tidakAdaProfilDosen)
-                <button wire:click="openCreate" class="inline-flex items-center gap-2 bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs">
+                <button wire:click="openCreate" class="inline-flex items-center gap-2 bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <span>Ajukan Perubahan</span>
                 </button>
@@ -431,13 +431,13 @@
                             <button wire:click="save" wire:loading.attr="disabled" type="button" class="px-3.5 py-2 text-xs text-gray-600 dark:text-zinc-300 hover:bg-gray-200/50 dark:hover:bg-zinc-700 rounded-xl transition font-semibold border border-gray-300 dark:border-zinc-700">
                                 Pengajuan Biasa
                             </button>
-                            <button wire:click="rescheduleInstant" wire:loading.attr="disabled" type="button" class="px-5 py-2 text-xs bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs inline-flex items-center justify-center gap-1.5">
+                            <button wire:click="rescheduleInstant" wire:loading.attr="disabled" type="button" class="px-5 py-2 text-xs bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs inline-flex items-center justify-center gap-1.5">
                                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                 <span wire:loading.remove wire:target="rescheduleInstant">⚡ Pindahkan Langsung</span>
                                 <span wire:loading wire:target="rescheduleInstant">Memproses...</span>
                             </button>
                         @else
-                            <button wire:click="save" wire:loading.attr="disabled" type="button" class="w-full sm:w-auto px-5 py-2 text-xs bg-[#0F352A] hover:bg-[#164336] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs disabled:opacity-50">
+                            <button wire:click="save" wire:loading.attr="disabled" type="button" class="w-full sm:w-auto px-5 py-2 text-xs bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-xs disabled:opacity-50">
                                 <span wire:loading.remove wire:target="save">Kirim Pengajuan</span>
                                 <span wire:loading wire:target="save">Mengirim...</span>
                             </button>

@@ -51,9 +51,14 @@
             <div>
                 <dt class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Ruang Praktikum</dt>
                 <dd class="font-medium text-gray-900 dark:text-zinc-100 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-primary dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    {{ $jadwal->ruangPraktikum->nama_ruang }}
+                    <svg class="w-5 h-5 text-primary dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <span>{{ $jadwal->ruangPraktikum->nama_ruang }}</span>
                 </dd>
+                @if ($jadwal->ruangPraktikum->foto_url)
+                    <div class="mt-2.5 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-700 shadow-2xs max-w-xs group">
+                        <img src="{{ $jadwal->ruangPraktikum->foto_url }}" alt="{{ $jadwal->ruangPraktikum->nama_ruang }}" class="w-full h-32 object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                @endif
             </div>
 
             <div class="md:col-span-2">
@@ -99,12 +104,11 @@
 
                         <div class="flex items-center gap-2.5 flex-wrap pt-1">
                             @if ($jadwal->mataKuliah->file_modul)
-                                <a href="{{ asset('storage/'.$jadwal->mataKuliah->file_modul) }}"
+                                <a href="{{ route('jadwal.modul.download', $jadwal->mataKuliah->id) }}"
                                    target="_blank"
-                                   download
-                                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#0F352A] hover:bg-[#134436] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-xs transition">
+                                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#0B2E23] hover:bg-[#124334] dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-xs transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    <span>Unduh Modul Praktikum (PDF)</span>
+                                    <span>Unduh Modul Praktikum</span>
                                 </a>
                             @endif
 

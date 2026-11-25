@@ -4,7 +4,7 @@
         <a href="{{ route('profile.edit') }}" wire:navigate
            @class([
                'flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition shadow-2xs',
-               'bg-[#0F352A] dark:bg-emerald-600 text-white shadow-xs' => request()->routeIs('profile.edit'),
+               'bg-[#0B2E23] dark:bg-emerald-600 text-white shadow-xs' => request()->routeIs('profile.edit'),
                'bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => !request()->routeIs('profile.edit'),
            ])>
             <div @class([
@@ -23,7 +23,7 @@
         <a href="{{ route('security.edit') }}" wire:navigate
            @class([
                'flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition shadow-2xs',
-               'bg-[#0F352A] dark:bg-emerald-600 text-white shadow-xs' => request()->routeIs('security.edit'),
+               'bg-[#0B2E23] dark:bg-emerald-600 text-white shadow-xs' => request()->routeIs('security.edit'),
                'bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => !request()->routeIs('security.edit'),
            ])>
             <div @class([
@@ -42,7 +42,7 @@
         <a href="{{ route('appearance.edit') }}" wire:navigate
            @class([
                'flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition shadow-2xs',
-               'bg-[#0F352A] dark:bg-emerald-600 text-white shadow-xs' => request()->routeIs('appearance.edit'),
+               'bg-[#0B2E23] dark:bg-emerald-600 text-white shadow-xs' => request()->routeIs('appearance.edit'),
                'bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800' => !request()->routeIs('appearance.edit'),
            ])>
             <div @class([

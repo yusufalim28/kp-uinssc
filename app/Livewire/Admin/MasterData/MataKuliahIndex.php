@@ -131,7 +131,7 @@ class MataKuliahIndex extends Component
         $mk = MataKuliah::with(['programStudi', 'fakultas'])->findOrFail($id);
         $effectiveFakultasId = $mk->fakultas_id ?? $mk->programStudi?->fakultas_id;
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             abort_if($effectiveFakultasId !== $user->fakultas_id, 403, 'Operator hanya dapat mengedit Mata Kuliah di bawah fakultas sendiri.');
         }
 
@@ -166,7 +166,7 @@ class MataKuliahIndex extends Component
         $user = auth()->user();
 
         // Operator fakultas otomatis mengunci fakultas_id ke miliknya
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             $this->fakultas_id = $user->fakultas_id;
         }
 
@@ -185,7 +185,7 @@ class MataKuliahIndex extends Component
 
         $validated = $this->validate();
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             abort_if($validated['fakultas_id'] !== $user->fakultas_id, 403, 'Operator hanya dapat mengelola Mata Kuliah di bawah fakultas sendiri.');
 
             if ($this->editId) {
@@ -222,7 +222,7 @@ class MataKuliahIndex extends Component
         $mk = MataKuliah::with('programStudi')->findOrFail($id);
         $fakId = $mk->fakultas_id ?? $mk->programStudi?->fakultas_id;
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             abort_if($fakId !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Mata Kuliah di bawah fakultas sendiri.');
         }
 
@@ -236,7 +236,7 @@ class MataKuliahIndex extends Component
 
         if ($mk) {
             $fakId = $mk->fakultas_id ?? $mk->programStudi?->fakultas_id;
-            if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
                 abort_if($fakId !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Mata Kuliah di bawah fakultas sendiri.');
             }
 
@@ -259,7 +259,7 @@ class MataKuliahIndex extends Component
             ->with(['programStudi.fakultas', 'fakultas'])
             ->withCount('jadwalPraktikum');
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             $query->where(function ($q) use ($user) {
                 $q->where('fakultas_id', $user->fakultas_id)
                     ->orWhereHas('programStudi', fn ($q2) => $q2->where('fakultas_id', $user->fakultas_id));
@@ -267,7 +267,7 @@ class MataKuliahIndex extends Component
         }
 
         // Poin 6: Filter Fakultas untuk Super Admin
-        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+        if ($user && $user->hasSuperAdminView() && ! empty($this->filterFakultas)) {
             $fakId = (int) $this->filterFakultas;
             $query->where(function ($q) use ($fakId) {
                 $q->where('fakultas_id', $fakId)
@@ -300,7 +300,7 @@ class MataKuliahIndex extends Component
             'mataKuliah' => $mataKuliah,
             'programStudi' => $programStudi,
             'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
-            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isSuperAdmin' => $user && $user->hasSuperAdminView(),
             'userFakultas' => $user?->fakultas,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Mata Kuliah']);
     }

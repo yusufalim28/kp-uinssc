@@ -64,7 +64,7 @@ class KelasIndex extends Component
         $user = auth()->user();
         $kelas = Kelas::with('programStudi')->findOrFail($id);
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             abort_if($kelas->programStudi && $kelas->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengedit Kelas di bawah fakultas sendiri.');
         }
 
@@ -81,7 +81,7 @@ class KelasIndex extends Component
         $user = auth()->user();
         $validated = $this->validate();
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             $prodi = ProgramStudi::findOrFail($this->program_studi_id);
             abort_if($prodi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat mengelola Kelas di bawah fakultas sendiri.');
 
@@ -101,7 +101,7 @@ class KelasIndex extends Component
     public function confirmDelete(int $id): void
     {
         $user = auth()->user();
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             $kelas = Kelas::with('programStudi')->findOrFail($id);
             abort_if($kelas->programStudi && $kelas->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Kelas di bawah fakultas sendiri.');
         }
@@ -115,7 +115,7 @@ class KelasIndex extends Component
         $kelas = Kelas::with('programStudi')->find($this->confirmDeleteId);
 
         if ($kelas) {
-            if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+            if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
                 abort_if($kelas->programStudi && $kelas->programStudi->fakultas_id !== $user->fakultas_id, 403, 'Operator hanya dapat menghapus Kelas di bawah fakultas sendiri.');
             }
 
@@ -138,12 +138,12 @@ class KelasIndex extends Component
             ->with(['programStudi.fakultas'])
             ->withCount('jadwalPraktikum');
 
-        if ($user && $user->hasRole('operator') && $user->fakultas_id) {
+        if ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id) {
             $query->whereHas('programStudi', fn ($q) => $q->where('fakultas_id', $user->fakultas_id));
         }
 
         // Poin 6: Filter Fakultas untuk Super Admin
-        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+        if ($user && $user->hasSuperAdminView() && ! empty($this->filterFakultas)) {
             $query->whereHas('programStudi', fn ($q) => $q->where('fakultas_id', (int) $this->filterFakultas));
         }
 
@@ -152,7 +152,7 @@ class KelasIndex extends Component
             ->orderBy('nama_kelas')
             ->paginate(12);
 
-        $programStudi = ($user && $user->hasRole('operator') && $user->fakultas_id)
+        $programStudi = ($user && $user->hasRole(['operator', 'ketua-lab']) && $user->fakultas_id)
             ? ProgramStudi::where('fakultas_id', $user->fakultas_id)->orderBy('nama_program_studi')->get()
             : ProgramStudi::orderBy('nama_program_studi')->get();
 
@@ -160,7 +160,7 @@ class KelasIndex extends Component
             'kelas' => $kelas,
             'programStudi' => $programStudi,
             'fakultasList' => Fakultas::orderBy('nama_fakultas')->get(),
-            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isSuperAdmin' => $user && $user->hasSuperAdminView(),
             'userFakultas' => $user?->fakultas,
         ])->layout('components.layouts.admin', ['title' => 'Master Data — Kelas']);
     }

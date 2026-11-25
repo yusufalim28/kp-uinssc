@@ -139,7 +139,7 @@ class PengajuanIndex extends Component
         }
 
         // Poin 6: Filter Fakultas untuk Super Admin
-        if ($user && $user->hasRole('super-admin') && ! empty($this->filterFakultas)) {
+        if ($user && $user->hasSuperAdminView() && ! empty($this->filterFakultas)) {
             $fakultasId = (int) $this->filterFakultas;
             $query->whereHas('jadwalPraktikum', function ($jq) use ($fakultasId) {
                 $jq->where(function ($sub) use ($fakultasId) {
@@ -169,7 +169,7 @@ class PengajuanIndex extends Component
         return view('livewire.admin.pengajuan-index', [
             'pengajuan' => $pengajuan,
             'fakultasList' => $fakultasList,
-            'isSuperAdmin' => $user && $user->hasRole('super-admin'),
+            'isSuperAdmin' => $user && $user->hasSuperAdminView(),
             'isKetuaLab' => $user && $user->hasRole('ketua-lab'),
             'userFakultas' => $user?->fakultas,
             'userRuang' => $user?->ruangPraktikum,
